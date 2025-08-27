@@ -1,0 +1,85 @@
+// !$*UTF8*$!
+{
+	AF852E3C2E5EC45400867BA3 /* Untitled */ = {
+		activeExec = 0;
+	};
+	AF852E452E5EC4DC00867BA3 /* Executable */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+			"PBXLSLaunchAction-0" = {
+				PBXLSLaunchAction = 0;
+				PBXLSLaunchStartAction = 1;
+				PBXLSLaunchStdioStyle = 2;
+				PBXLSLaunchStyle = 0;
+				class = PBXLSRunLaunchConfig;
+				commandLineArgs = (
+				);
+				displayName = "Executable Runner";
+				environment = {
+				};
+				identifier = com.apple.Xcode.launch.runConfig;
+				remoteHostInfo = "";
+				startActionInfo = "";
+			};
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		launchableReference = AF852E462E5EC4DC00867BA3 /* w */;
+		libgmallocEnabled = 0;
+		name = Executable;
+		sourceDirectories = (
+		);
+	};
+	AF852E462E5EC4DC00867BA3 /* w */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = text;
+		path = w;
+		sourceTree = "<group>";
+	};
+	AFD84C762E5EC04F00CDD013 /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = AF852E452E5EC4DC00867BA3 /* Executable */;
+		activeTarget = AF852E3C2E5EC45400867BA3 /* Untitled */;
+		addToTargets = (
+			AF852E3C2E5EC45400867BA3 /* Untitled */,
+		);
+		codeSenseManager = AFD84C7B2E5EC04F00CDD013 /* Code sense */;
+		executables = (
+			AF852E452E5EC4DC00867BA3 /* Executable */,
+		);
+		ignoreBreakpointsInProjectsDict = {
+		};
+		perUserDictionary = {
+			PBXPerProjectTemplateStateSaveDate = 777962563;
+			PBXWorkspaceStateSaveDate = 777962563;
+		};
+		sourceControlManager = AFD84C7A2E5EC04F00CDD013 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	AFD84C7A2E5EC04F00CDD013 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+		scmType = "";
+	};
+	AFD84C7B2E5EC04F00CDD013 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+}

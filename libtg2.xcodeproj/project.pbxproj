@@ -1,0 +1,198 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildRule section */
+		AF852E432E5EC49B00867BA3 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.gcc.4_2;
+			fileType = sourcecode.c;
+			isEditable = 1;
+			outputFiles = (
+			);
+		};
+		AF852E4B2E5EC52600867BA3 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.gcc.4_2;
+			fileType = "compiled.mach-o.objfile";
+			isEditable = 1;
+			outputFiles = (
+			);
+		};
+/* End PBXBuildRule section */
+
+/* Begin PBXFileReference section */
+		AF852E3D2E5EC45400867BA3 /* libUntitled.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libUntitled.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF852E482E5EC50900867BA3 /* crypto */ = {isa = PBXFileReference; lastKnownFileType = folder; path = crypto; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AF852E3B2E5EC45400867BA3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AFD84C742E5EC04F00CDD013 = {
+			isa = PBXGroup;
+			children = (
+				AFD84CAF2E5EC17600CDD013 /* Sources */,
+				AFD84C9B2E5EC0EF00CDD013 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AFD84C9B2E5EC0EF00CDD013 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AF852E3D2E5EC45400867BA3 /* libUntitled.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AFD84CAF2E5EC17600CDD013 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				AF852E482E5EC50900867BA3 /* crypto */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		AF852E392E5EC45400867BA3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		AF852E3C2E5EC45400867BA3 /* Untitled */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF852E402E5EC47400867BA3 /* Build configuration list for PBXNativeTarget "Untitled" */;
+			buildPhases = (
+				AF852E392E5EC45400867BA3 /* Headers */,
+				AF852E3A2E5EC45400867BA3 /* Sources */,
+				AF852E3B2E5EC45400867BA3 /* Frameworks */,
+			);
+			buildRules = (
+				AF852E4B2E5EC52600867BA3 /* PBXBuildRule */,
+				AF852E432E5EC49B00867BA3 /* PBXBuildRule */,
+			);
+			dependencies = (
+			);
+			name = Untitled;
+			productName = Untitled;
+			productReference = AF852E3D2E5EC45400867BA3 /* libUntitled.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AFD84C762E5EC04F00CDD013 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = AFD84C772E5EC04F00CDD013 /* Build configuration list for PBXProject "libtg2" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 0;
+			mainGroup = AFD84C742E5EC04F00CDD013;
+			productRefGroup = AFD84C9B2E5EC0EF00CDD013 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AF852E3C2E5EC45400867BA3 /* Untitled */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AF852E3A2E5EC45400867BA3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AF852E3E2E5EC45400867BA3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = Untitled;
+			};
+			name = Debug;
+		};
+		AF852E3F2E5EC45400867BA3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = Untitled;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		AFD84C782E5EC04F00CDD013 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				SYMROOT = "/tmp/${PROJECT_NAME}";
+			};
+			name = Debug;
+		};
+		AFD84C792E5EC04F00CDD013 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AF852E402E5EC47400867BA3 /* Build configuration list for PBXNativeTarget "Untitled" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF852E3E2E5EC45400867BA3 /* Debug */,
+				AF852E3F2E5EC45400867BA3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AFD84C772E5EC04F00CDD013 /* Build configuration list for PBXProject "libtg2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AFD84C782E5EC04F00CDD013 /* Debug */,
+				AFD84C792E5EC04F00CDD013 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AFD84C762E5EC04F00CDD013 /* Project object */;
+}
