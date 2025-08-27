@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.0)
+
+set(TARGET libtg)
+
+# Declares and names the project.
+project(${TARGET} VERSION 2.0 
+	DESCRIPTION "C99 Telegram API"
+		HOMEPAGE_URL "http://github.com/libtg2"
+		LANGUAGES C CXX
+)
+
+add_subdirectory(tl_generator)
+add_subdirectory(tl)

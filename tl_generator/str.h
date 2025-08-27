@@ -2,7 +2,7 @@
  * File              : str.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 06.12.2023
- * Last Modified Date: 04.06.2024
+ * Last Modified Date: 28.08.2025
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 

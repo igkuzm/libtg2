@@ -138,6 +138,7 @@ int open_tl_header(generator_t *g)
 	fputs("#include <stdbool.h>\n", g->tl_h);
 	fputs("#include <stdio.h>\n", g->tl_h);
 	fputs("#include <stdint.h>\n", g->tl_h);
+	fputs("#include <string.h>\n", g->tl_h);
 	fputs("\n", g->tl_h);
 	fputs("typedef struct tl_ {\n", g->tl_h);
 	fputs("\tuint32_t _id;\n", g->tl_h);
@@ -692,9 +693,9 @@ int open_deserialize_table(generator_t *g)
 		 	g->deserialize_table_c);
 	fputs("#include \"deserialize_table.h\"\n"
 	      "#include \"tl.h\"\n"
-	      "#include \"deserialize.h\"\n"
+	      "#include \"../essential/deserialize.h\"\n"
 	      "#include \"struct.h\"\n"
-	      "#include \"alloc.h\"\n"
+	      "#include \"../essential/alloc.h\"\n"
 	      "#include \"id.h\"\n",
 		 	g->deserialize_table_c);
 	
@@ -1329,8 +1330,8 @@ int open_methods(generator_t *g)
 		 	g->methods_c);
 	fputs(
 			"#include \"methods.h\"\n"
-			"#include \"serialize.h\"\n"
-			"#include \"alloc.h\"\n\n",
+			"#include \"../essential/serialize.h\"\n"
+			"#include \"../essential/alloc.h\"\n\n",
 		 	g->methods_c);
 	
 	return 0;
@@ -1861,6 +1862,31 @@ static int cb(
 
 int main(int argc, char *argv[])
 {
+	if (argc < 2){
+		fprintf(stderr,
+				"Usage: %s DIRECTORY\n"
+				"Generate libtl DIRECTORY with headers and source from"
+				"mtproto_api.tl and telegram_api.tl\n\n", argv[0]);
+		return 1;
+	}
+
+	// check tl files
+	const char *tl_sources[] = 
+		{"mtproto_api.tl", "telegram_api.tl"};
+	int i;
+	for (i = 0; i < sizeof(tl_sources)/sizeof(tl_sources[0]); ++i) {
+		FILE *fp = fopen(tl_sources[i], "r");
+		if (fp == NULL){
+			fprintf(stderr,
+					"Can't open source %s: ", tl_sources[i]);
+			perror("");
+			fprintf(stderr,
+					"Run %s from the directory with "
+					"mtproto_api.tl and telegram_api.tl\n", argv[0]);
+			return 1;
+		}
+	}
+	
 	fprintf(stderr,"%s: starting...\n", argv[0]);
 	generator_t g;
 

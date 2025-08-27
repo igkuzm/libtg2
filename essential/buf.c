@@ -80,7 +80,7 @@ int buf_realloc(buf_t *buf, uint32_t size)
 		}
 		buf->aptr = ptr;
 		buf->data = buf->aptr + offset;
-		memset(&buf->aptr[buf->asize], 0,
+		memset((buf->aptr + buf->asize), 0,
 				size - buf->asize + 1);
 		buf->asize = size;
 	}
