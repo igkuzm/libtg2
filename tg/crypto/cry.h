@@ -2,13 +2,13 @@
  * File              : cry.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 25.11.2024
+ * Last Modified Date: 28.08.2025
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef TL_CRY_H
 #define TL_CRY_H
 
-#include "../essential/buf.h"
+#include "../../essential/buf.h"
 
 extern int      tg_cry_rsa_cmp(const char *pubkey, buf_t);
 extern buf_t    tg_cry_rsa_enc(const char *pubkey, buf_t);

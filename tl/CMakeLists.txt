@@ -14,5 +14,5 @@ set(TARGET_SOURCES
 	../essential/deserialize.c
 )
 
-add_library(${TARGET} STATIC ${TARGET_SOURCES} ${RESOURCE_FILES})
+add_library(${TARGET} ${TARGET_SOURCES} ${RESOURCE_FILES})
 target_link_libraries(${TARGET} z)

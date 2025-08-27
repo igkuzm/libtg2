@@ -11,3 +11,4 @@ project(${TARGET} VERSION 2.0
 
 add_subdirectory(tl_generator)
 add_subdirectory(tl)
+add_subdirectory(tg)

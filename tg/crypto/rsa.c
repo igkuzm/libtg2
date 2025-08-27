@@ -1,4 +1,4 @@
-#include "../essential/serialize.h"
+#include "../../essential/serialize.h"
 #include "cry.h"
 #include "hsh.h"
 #include <openssl/rsa.h>
@@ -174,7 +174,7 @@ void tg_rsa(const char *pubkey, unsigned char * from, size_t from_size, unsigned
   pub = fopen(pubkey, "r");
 
   if (pub == NULL) {
-    frintf(stderr, "PEM_read_RSAPublicKey returns NULL\n");
+    fprintf(stderr, "PEM_read_RSAPublicKey returns NULL\n");
   }
 
   RSA * rsa = PEM_read_RSAPublicKey(pub, NULL, NULL, NULL);
