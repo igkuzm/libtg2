@@ -1,3 +1,4 @@
+AUTOMAKE_OPTIONS = subdir-objects
 lib_LTLIBRARIES = libtl.la
 
 libtl_la_SOURCES = libtl.c \
