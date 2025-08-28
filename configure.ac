@@ -1,6 +1,8 @@
 AC_INIT([libtg],[2.0],[https://github.com/igkuzm/libtg2])
 AM_INIT_AUTOMAKE
 
+AC_CONFIG_MACRO_DIRS([m4])
+
 AC_CONFIG_HEADERS([config.h])
 
 AC_PROG_CC

@@ -2,7 +2,7 @@
 # File              : autogen.sh
 # Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
 # Date              : 07.07.2023
-# Last Modified Date: 07.07.2023
+# Last Modified Date: 28.08.2025
 # Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
 #!/bin/sh
 
@@ -22,4 +22,4 @@ echo config.cache, autom4te.cache...
 rm -f config.cache
 rm -rf autom4te.cache
 
-echo done
+echo "Now run ./configure"
