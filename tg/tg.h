@@ -6,8 +6,9 @@
 #include "dc.h"
 #include "../essential/buf.h"
 #include "../essential/alloc.h"
+#include "../libtg.h"
 
-#define DEFAULT_DC 3
+#define DEFAULT_DC DC2t
 #define SERVER_PORT 443
 
 struct tg_t {
@@ -15,6 +16,7 @@ struct tg_t {
 	int apiId;
 	char apiHash[33];
 	const char *pubkey;
+	TG_TRANSPORT transport;
 	int seqn;
 	pthread_mutex_t seqnm;
 	buf_t key;

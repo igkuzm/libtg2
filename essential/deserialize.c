@@ -1,12 +1,12 @@
 #include "deserialize.h"
-#include "byteorder.h"
+#include "endian.h"
 #include <stdio.h>
 #include <string.h>
 
 uint32_t deserialize_ui32(buf_t *b){
 	uint32_t c;
 	c = buf_get_ui32(*b);
-	c = ctohl(c); // byteswap for big endian
+	c = le32toh(c); // byteswap for big endian
 	b->data += 4;
 	b->size -= 4;
 	//*b = buf_add(b->data + 4, b->size - 4);
@@ -16,7 +16,7 @@ uint32_t deserialize_ui32(buf_t *b){
 uint64_t deserialize_ui64(buf_t *b){
 	uint64_t c;
 	c = buf_get_ui64(*b);
-	c = ctohll(c); // byteswap for big endian
+	c = le64toh(c); // byteswap for big endian
 	b->data += 8;
 	b->size -= 8;
 	//*b = buf_add(b->data + 8, b->size - 8);
@@ -26,7 +26,7 @@ uint64_t deserialize_ui64(buf_t *b){
 double deserialize_double(buf_t *b){
 	double c;
 	c = buf_get_double(*b);
-	c = ctohll(c); // byteswap for big endian
+	c = le64toh(c); // byteswap for big endian
 	b->data += 8;
 	b->size -= 8;
 	//*b = buf_add(b->data + 8, b->size - 8);

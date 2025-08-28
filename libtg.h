@@ -17,6 +17,14 @@ tg_t * tg_new(
 		unsigned char *auth_key_or_null
 		);
 
+typedef enum {
+	TG_TRANSPORT_HTTP,
+	TG_TRANSPORT_SOCKET,
+} TG_TRANSPORT;
+
+/* set default transport */
+void tg_set_transport(tg_t *, TG_TRANSPORT);
+
 /* set on_error callback */
 void tg_set_on_error(tg_t *tg,
 		void *on_err_data,

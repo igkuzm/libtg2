@@ -46,12 +46,14 @@
  *  to the test DCs must be made, instead.
  */
 
-#define URI "http://%s%d.web.telegram.org:%d/api%s"
+#define URI    "%s%s.web.telegram.org:%d/api%s"
+#define URI_IP "%s:%d/api%s"
 
 static size_t tg_http_readfunc(
 		unsigned char *data, size_t s, size_t n, 
 		buf_t *buf)
 {
+	/*printf("%s: len %ld\n", __func__, s*n);*/
 	size_t size = s * n;
 	
 	if (size > buf->size)
@@ -69,8 +71,7 @@ static size_t tg_http_writefunc(
 		unsigned char  *data, size_t s, size_t n, 
 		buf_t *buf)
 {
-	if (!buf)
-		return 0;
+	printf("%s: len %ld\n", __func__, s*n);
 
 	size_t len = s * n;
 	*buf = buf_cat_data(*buf, data, len);
@@ -79,8 +80,8 @@ static size_t tg_http_writefunc(
 }
 
 buf_t tg_http_transport(
-		tg_t *tg, int dc, int port, bool maximum_limit, 
-		bool test, buf_t data,
+		tg_t *tg, enum dc dc, int port, bool maximum_limit, 
+		bool test, buf_t *query,
 		void *ptr, 
 		tg_progress_fun *progress)
 {
@@ -91,15 +92,33 @@ buf_t tg_http_transport(
 		ON_ERR(tg, "%s: can't init curl", __func__);
 		return buf;
 	}
+
+	//debug
+	/*curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);*/
 		
 	char url[BUFSIZ];
-	snprintf(url, BUFSIZ-1, URI, 
-			DCs[dc].ipv4, maximum_limit?-1:0, port, test?"_test":"");
-	curl_easy_setopt(curl, CURLOPT_URL, url);
+	/*snprintf(url, BUFSIZ-1, URI, */
+			/*DCs[dc].name, maximum_limit?"-1":"", port, test?"_test":"");*/
+	snprintf(url, BUFSIZ-1, URI_IP, 
+			DCs[dc].ipv4, port, test?"_test":"");
 	
-	curl_easy_setopt(curl, CURLOPT_READDATA, &data);
-	curl_easy_setopt(curl, CURLOPT_READFUNCTION, tg_http_readfunc);
-	curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, data.size);
+	ON_LOG(tg, "%s: open url: %s", __func__, url);
+	
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");		
+
+	curl_easy_setopt(curl, CURLOPT_HEADER, 0);
+	curl_easy_setopt(curl, CURLOPT_POST, 1L);		
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, query->data);
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, query->size);
+
+	/* enable TCP keep-alive for this transfer */
+  curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+
+	/*curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);*/
+	/*curl_easy_setopt(curl, CURLOPT_READDATA, query);*/
+	/*curl_easy_setopt(curl, CURLOPT_READFUNCTION, tg_http_readfunc);*/
+	/*curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, query->size);*/
 		
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buf);		
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tg_http_writefunc);
@@ -138,6 +157,7 @@ buf_t tg_http_transport(
 	
 	/* always cleanup */
 	curl_easy_cleanup(curl);
+	/*curl_slist_free_all(header);*/
 	
 	return buf;
 }	

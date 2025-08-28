@@ -24,6 +24,7 @@ set(TARGET_SOURCES
   send_query.c
   answer.c
   updates.c
+	auth_key.c
 )
 
 if(APPLE)

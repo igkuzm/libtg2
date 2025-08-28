@@ -91,7 +91,7 @@ void tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 		case id_updates:
 			// do updates
 			ON_LOG(tg, "%s: got updates", __func__);
-			tg_do_updates(tg, tl);
+			//tg_do_updates(tg, tl);
 			break;
 
 		case id_msg_container:
@@ -151,3 +151,5 @@ void tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 			break;
 	}
 }
+
+

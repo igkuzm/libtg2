@@ -3,11 +3,12 @@
 
 #include "../../libtg.h"
 #include "progress.h"
+#include "../dc.h"
 
 /* send buf_t data and rescive answer */
 extern buf_t tg_http_transport(
-		tg_t *tg, int dc, int port, bool maximum_limit, 
-		bool test, buf_t data,
+		tg_t *tg, enum dc, int port, bool maximum_limit, 
+		bool test, buf_t *query,
 		void *progressp, 
 		tg_progress_fun *progress);
 

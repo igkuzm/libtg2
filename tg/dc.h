@@ -10,14 +10,17 @@
  */
 
 #define DCS \
-	DC(1, "pluto", "149.154.175.53", "2001:b28:f23d:f001::a", "MIA, Miami FL, USA") \
-	DC(2, "venus", "149.154.167.51", "2001:67c:4e8:f002::a", "AMS, Amsterdam, NL") \
-	DC(3, "aurora", "149.154.175.100", "2001:b28:f23d:f003::a","MIA, Miami FL, USA") \
-	DC(4, "vesta", "149.154.167.91", "2001:67c:4e8:f004::a","AMS, Amsterdam, NL") \
-	DC(5, "flora", "91.108.56.130", "2001:b28:f23f:f005::a","SIN, Singapore") \
+	DC(1, 00001,  "pluto",  "149.154.175.53",   "2001:b28:f23d:f001::a","MIA, Miami FL, USA") \
+	DC(2, 00002, "venus",  "149.154.167.51",   "2001:67c:4e8:f002::a", "AMS, Amsterdam, NL") \
+	DC(3, 00003, "aurora", "149.154.175.100",  "2001:b28:f23d:f003::a","MIA, Miami FL, USA") \
+	DC(4, 00004, "vesta",  "149.154.167.91",   "2001:67c:4e8:f004::a", "AMS, Amsterdam, NL") \
+	DC(5, 00005, "flora",  "91.108.56.130",    "2001:b28:f23f:f005::a","SIN, Singapore") \
+	DC(1t, 10001, "pluto",  "149.154.175.10",   "2001:b28:f23f:f005::a","MIA, Miami FL, USA TEST") \
+	DC(2t, 10002, "venus",  "149.154.167.40",   "2001:67c:4e8:f002::e", "AMS, Amsterdam, NL TEST") \
+	DC(3t, 10003, "aurora", "149.154.175.117",  "2001:b28:f23d:f003::e","MIA, Miami FL, USA TEST") \
 
 enum dc {
-#define DC(n, ...) DC_##n = n,
+#define DC(n, ...) DC##n,
 	DCS
 #undef DC
 	DC_COUNT
@@ -25,6 +28,7 @@ enum dc {
 
 typedef struct dc_t {
 	enum dc dc;
+	int number;
 	int id;
 	char name[16];
 	char ipv4[16];
@@ -34,7 +38,7 @@ typedef struct dc_t {
 
 static const dc_t DCs[] = 
 {
-#define DC(n, dcname, ip4, ip6, desc) DC_##n, n, dcname, ip4, ip6, desc,
+#define DC(n, num, dcname, ip4, ip6, desc) DC##n, num, DC##n, dcname, ip4, ip6, desc,
 	DCS
 #undef DC
 };

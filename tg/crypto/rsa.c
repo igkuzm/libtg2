@@ -5,6 +5,7 @@
 #include <openssl/pem.h>
 #include <openssl/bn.h>
 #include <assert.h>
+#include <stdio.h>
 
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -130,7 +131,8 @@ buf_t tg_cry_rsa_enc(const char *pubkey, buf_t buf)
 	BIGNUM *r = BN_new();
   assert(BN_mod_exp(r, a, e, n, BN_ctx)); // r = a^e % n
 	int len = BN_bn2bin(r, (unsigned char *) ret.data);
-	ret.size = len;
+	printf("BN_bn2bin LEN: %d\n", len);
+	ret.size = BN_num_bytes(r);
 
 	BN_free(a);
 	BN_free(r);
@@ -169,7 +171,7 @@ unsigned tg_rsax(unsigned char * from, int from_len, unsigned char * to, int to_
 
 void tg_rsa(const char *pubkey, unsigned char * from, size_t from_size, unsigned char * to, size_t to_size)
 {
-  assert(from_size == 255 || to_size == 256);
+  //assert(from_size == 255 || to_size == 256);
   FILE * pub = NULL;
   pub = fopen(pubkey, "r");
 
@@ -195,11 +197,110 @@ void tg_rsa(const char *pubkey, unsigned char * from, size_t from_size, unsigned
 
 buf_t tg_cry_rsa_e(const char *pubkey, buf_t b)
 {
-  buf_t r = {};
-	buf_init(&r);
-  r.size = 256;
+  buf_t r = buf_new();
+	buf_realloc(&r, b.size);
 
-  tg_rsa(pubkey, b.data, b.size, r.data, r.size);
+  tg_rsa(pubkey, b.data, b.size,
+		 	r.data, r.size);
 
   return r;
+}
+
+buf_t tg_cry_rsa_public_enc(const char *pubkey, buf_t buf)
+{
+	buf_t ret = buf_new();
+	buf_realloc(&ret, buf.size);
+	
+	// RSA_public_encrypt - depricated in openssl 3.0
+
+	RSA *rsa = read_pubkey(pubkey);
+	if (rsa){
+		int size = RSA_public_encrypt(
+				buf.size, buf.data,
+				ret.data, rsa, RSA_NO_PADDING);
+		if (size < 0){
+			perror("RSA_public_encrypt");
+			return ret;
+		}
+
+		ret.size = size;
+	}
+
+	return ret;;
+	
+
+	/*FILE *fp = fopen(pubkey, "r");*/
+	/*if (!fp){*/
+		/*perror("can't open file");*/
+		/*return ret;*/
+	/*}*/
+
+	/*const char str[BUFSIZ];*/
+	/*fread((void *)str, BUFSIZ, 1, fp);*/
+	/*fclose(fp);*/
+
+	/*EVP_PKEY *key = EVP_PKEY_new_raw_public_key(*/
+			/*EVP_PKEY_RSA, NULL, */
+			/*(const unsigned char *)str,*/
+      /*strlen(str));*/
+	
+	/*EVP_PKEY_CTX *ctx;*/
+	/*ENGINE *eng;*/
+	
+	/*const char *engine_id = "ACME";*/
+	/*ENGINE_load_builtin_engines();*/
+	/*e = ENGINE_by_id(engine_id);*/
+	/*if(!e)*/
+			/*[> the engine isn't available <]*/
+			/*return;*/
+	/*if(!ENGINE_init(e)) {*/
+			/*[> the engine couldn't initialise, release 'e' <]*/
+			/*ENGINE_free(e);*/
+			/*return;*/
+	/*}*/
+	/*if(!ENGINE_set_default_RSA(e))*/
+			/* This should only happen when 'e' can't initialise, but the previous
+			 * statement suggests it did. */
+			/*abort();*/
+	/*ENGINE_set_default_DSA(e);*/
+	/*ENGINE_set_default_ciphers(e);*/
+	/*[> Release the functional reference from ENGINE_init() <]*/
+	/*ENGINE_finish(e);*/
+	/*[> Release the structural reference from ENGINE_by_id() <]*/
+	/*ENGINE_free(e);*/
+
+	
+	/*ctx = EVP_PKEY_CTX_new(key, eng);*/
+	/*if (!ctx){*/
+		/*perror("EVP_PKEY_CTX_new");*/
+		/*return ret;*/
+	/*}*/
+
+	/*if (EVP_PKEY_encrypt_init(ctx) <= 0){*/
+		/*perror("EVP_PKEY_encrypt_init");*/
+		/*return ret;*/
+	/*}*/
+
+	/*if (EVP_PKEY_CTX_set_rsa_padding(ctx, */
+				/*RSA_PKCS1_OAEP_PADDING) <= 0)*/
+	/*{*/
+		/*perror("EVP_PKEY_CTX_set_rsa_padding");*/
+		/*return ret;*/
+	/*}*/
+
+	/*[> Determine buffer length <]*/
+	/*//if (EVP_PKEY_encrypt(ctx, NULL, &ret.size, buf.data, buf.size) <= 0)*/
+		/*//return ret;*/
+	/*//out = OPENSSL_malloc(outlen);*/
+
+	/*size_t outlen;*/
+	/*if (EVP_PKEY_encrypt(ctx, ret.data, &outlen, */
+				/*buf.data, buf.size) <= 0)*/
+	/*{*/
+		/*perror("EVP_PKEY_encrypt");*/
+		/*return ret;*/
+	/*}*/
+
+	/*ret.size = outlen;*/
+	/*return ret;*/
 }

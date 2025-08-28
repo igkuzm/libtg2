@@ -36,7 +36,7 @@ static long long tg_get_current_time(tg_t *tg)
 buf_t tg_mtp_message(tg_t *tg, buf_t *payload, 
 		uint64_t *msgid, bool content)
 {
-	/*ON_LOG(tg, "%s", __func__);*/
+	ON_LOG(tg, "%s", __func__);
 	//message msg_id:long seqno:int bytes:int body:Object = Message;
   buf_t msg = buf_new();
 	
@@ -80,6 +80,7 @@ buf_t tg_mtp_message(tg_t *tg, buf_t *payload,
 static buf_t tg_header_enc(tg_t *tg, buf_t b, 
 		bool content, uint64_t *msgid)
 {
+	ON_LOG(tg, "%s", __func__);
   buf_t s = buf_new();
 	
 	/* When receiving an MTProto message that is marked 
@@ -203,6 +204,7 @@ static buf_t tg_header_enc(tg_t *tg, buf_t b,
 static buf_t tg_header_noenc(tg_t *tg, buf_t b, 
 		uint64_t *msgid)
 {
+	ON_LOG(tg, "%s", __func__);
   buf_t s = buf_new();
 	//auth_key_id = 0 message_id message_data_length message_data
 	//int64           int64      int32               bytes
@@ -225,7 +227,7 @@ static buf_t tg_header_noenc(tg_t *tg, buf_t b,
 buf_t tg_header(tg_t *tg, buf_t b, bool enc, 
 		bool content, uint64_t *msgid)
 {
-	/*ON_LOG(tg, "%s", __func__);*/
+	ON_LOG(tg, "%s", __func__);
   if (enc) 
 		return tg_header_enc(tg, b, content, msgid);
 		
@@ -235,6 +237,7 @@ buf_t tg_header(tg_t *tg, buf_t b, bool enc,
 
 static buf_t tg_deheader_enc(tg_t *tg, buf_t b)
 {
+	ON_LOG(tg, "%s", __func__);
   buf_t d;
 	buf_init(&d);
 
@@ -273,6 +276,7 @@ static buf_t tg_deheader_enc(tg_t *tg, buf_t b)
 
 static buf_t tg_deheader_noenc(tg_t *tg, buf_t b)
 {
+	ON_LOG(tg, "%s", __func__);
   buf_t d;
 	buf_init(&d);
 
@@ -308,7 +312,7 @@ static buf_t tg_deheader_noenc(tg_t *tg, buf_t b)
 
 buf_t tg_deheader(tg_t *tg, buf_t b, bool enc)
 {
-	/*ON_LOG(tg, "%s", __func__);*/
+	ON_LOG(tg, "%s", __func__);
 	if (!b.size){
 		ON_ERR(tg, "%s: got nothing", __func__);
 		return b;

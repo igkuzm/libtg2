@@ -22,6 +22,7 @@ libtg_la_SOURCES = \
 				   send_query.c \
 				   answer.c \
 				   updates.c \
+				   auth_key.c \
 				   
 libtg_la_CFLAGS = -fPIC
 libtg_la_LIBADD = -lcrypto -lcurl

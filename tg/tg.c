@@ -14,6 +14,14 @@ tg_t *tg_new(
 		unsigned char *auth_key
 		)
 {
+	// check pem
+	FILE *fp = fopen(pem, "r");
+	if (!fp){
+		perror("can't open public key");
+		return NULL;
+	}
+	fclose(fp);
+
 	// allocate struct
 	tg_t *tg = NEW(tg_t, return NULL);	
 
@@ -95,4 +103,9 @@ void tg_set_on_update(tg_t *tg,
 		tg->on_update = on_update;
 		tg->on_update_data = on_update_data;
 	}
+}
+
+void tg_set_transport(tg_t *tg, TG_TRANSPORT transport)
+{
+	tg->transport = transport;
 }

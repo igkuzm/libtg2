@@ -12,3 +12,13 @@ project(${TARGET} VERSION 2.0
 add_subdirectory(tl_generator)
 add_subdirectory(tl)
 add_subdirectory(tg)
+
+if (MAKE_TEST)
+	add_executable(tgtest test.c)
+	add_dependencies(tgtest generator)
+	target_link_libraries(tgtest tg tl)
+endif()
+
+#copy public key to binary dir
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/pub.pkcs
+	DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

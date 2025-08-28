@@ -1,7 +1,7 @@
 #include "../../libtg.h"
 #include "../tg.h"
 #include "transport.h"
-#include "../../essential/byteorder.h"
+#include "../../essential/endian.h"
 
 buf_t tg_transport(tg_t *tg, buf_t buf)
 {
@@ -48,7 +48,7 @@ buf_t tg_detransport(tg_t *tg, buf_t a)
 
 	uint32_t len = deserialize_ui32(&a);
 	
-	if (len == -404 || buf_get_ui32(a) == htocll(0xfffffe6c)) {
+	if (len == -404 || buf_get_ui32(a) == htole32(0xfffffe6c)) {
     ON_ERR(tg, "%s: 404", __func__);
 		b = buf_cat_ui32(b, 0xfffffe6c);
 		return b;

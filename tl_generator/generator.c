@@ -134,7 +134,7 @@ int open_tl_header(generator_t *g)
 		  ,g->tl_h);
 	
 	fputs("#include \"../essential/buf.h\"\n", g->tl_h);
-	fputs("#include \"../essential/byteorder.h\"\n", g->tl_h);
+	fputs("#include \"../essential/endian.h\"\n", g->tl_h);
 	fputs("#include <stdbool.h>\n", g->tl_h);
 	fputs("#include <stdio.h>\n", g->tl_h);
 	fputs("#include <stdint.h>\n", g->tl_h);
@@ -1437,7 +1437,7 @@ int append_methods(
 	fputs("{\n", g->methods_c);
 	
 	// set id
-	fputs(STR(buf, BLEN, "\tbuf_t buf = buf_add_ui32(htocl(0x%.8x));\n", m->id),
+	fputs(STR(buf, BLEN, "\tbuf_t buf = buf_add_ui32(htole32(0x%.8x));\n", m->id),
 			g->methods_c);
 
 	int nflag = 0;
@@ -1457,7 +1457,7 @@ int append_methods(
 			// handle flags
 			fputs(STR(buf, BLEN,
 					"\tuint32_t *flag%d = (uint32_t *)(&buf.data[buf.size]);\n"
-					"\tbuf = buf_cat_ui32(buf, htocl(0));\n"
+					"\tbuf = buf_cat_ui32(buf, htole32(0));\n"
 					, ++nflag)
 				,g->methods_c);
 
@@ -1489,13 +1489,13 @@ int append_methods(
 			if (m->args[i].flagn != 0)
 				fputs(
 						STR(buf, BLEN, 
-							"\t\tbuf = buf_cat_ui32(buf, htocl(*%s_));\n", 
+							"\t\tbuf = buf_cat_ui32(buf, htole32(*%s_));\n", 
 							m->args[i].name), 
 						g->methods_c);
 			else
 				fputs(
 						STR(buf, BLEN, 
-							"\t\tbuf = buf_cat_ui32(buf, htocl(%s_));\n", 
+							"\t\tbuf = buf_cat_ui32(buf, htole32(%s_));\n", 
 							m->args[i].name), 
 						g->methods_c);
 
@@ -1570,13 +1570,13 @@ int append_methods(
 			if (m->args[i].flagn != 0)
 				fputs(
 						STR(buf, BLEN, 
-							"\t\tbuf = buf_cat_ui64(buf, htocll(*%s_));\n", 
+							"\t\tbuf = buf_cat_ui64(buf, htole64(*%s_));\n", 
 							m->args[i].name), 
 						g->methods_c);
 			else
 				fputs(
 						STR(buf, BLEN, 
-							"\t\tbuf = buf_cat_ui64(buf, htocll(%s_));\n", 
+							"\t\tbuf = buf_cat_ui64(buf, htole64(%s_));\n", 
 							m->args[i].name), 
 						g->methods_c);
 
@@ -1605,13 +1605,13 @@ int append_methods(
 			if (m->args[i].flagn != 0)
 				fputs(
 						STR(buf, BLEN, 
-							"\t\tbuf = buf_cat_double(buf, htocll(*%s_));\n", 
+							"\t\tbuf = buf_cat_double(buf, htole64(*%s_));\n", 
 							m->args[i].name), 
 						g->methods_c);
 			else
 				fputs(
 						STR(buf, BLEN, 
-							"\t\tbuf = buf_cat_double(buf, htocll(%s_));\n", 
+							"\t\tbuf = buf_cat_double(buf, htole64(%s_));\n", 
 							m->args[i].name), 
 						g->methods_c);
 
@@ -1719,7 +1719,7 @@ int append_methods(
 			fputs(
 					STR(buf, BLEN, 
 						"\t\tbuf = buf_cat(buf, tl_vector());\n"
-						"\t\tbuf = buf_cat_ui32(buf, htocl(%s_len));\n"
+						"\t\tbuf = buf_cat_ui32(buf, htole32(%s_len));\n"
 						"\t\tint i;\n"
 						"\t\tfor (i=0; i<%s_len; ++i){\n"
 						, m->args[i].name, m->args[i].name), 
@@ -1743,21 +1743,21 @@ int append_methods(
 			         strcmp(type, "bool") == 0) 
 				fputs(
 						STR(buf, BLEN, 
-							"\t\t\tbuf = buf_cat_ui32(buf, htocl(%s_[i]));\n", 
+							"\t\t\tbuf = buf_cat_ui32(buf, htole32(%s_[i]));\n", 
 							m->args[i].name), 
 						g->methods_c);
 			
 			else if (strcmp(type, "long")   == 0 )
 				fputs(
 						STR(buf, BLEN, 
-							"\t\t\tbuf = buf_cat_ui64(buf, htocll(%s_[i]));\n", 
+							"\t\t\tbuf = buf_cat_ui64(buf, htole64(%s_[i]));\n", 
 							m->args[i].name), 
 						g->methods_c);
 
 			else if (strcmp(type, "double")   == 0 )
 				fputs(
 						STR(buf, BLEN, 
-							"\t\t\tbuf = buf_cat_double(buf, htocll(%s_[i]));\n", 
+							"\t\t\tbuf = buf_cat_double(buf, htole64(%s_[i]));\n", 
 							m->args[i].name), 
 						g->methods_c);
 
