@@ -12,14 +12,32 @@ set(TARGET_SOURCES
 	crypto/rsa.c
 	crypto/sha1.c
 	crypto/sha256.c
+	transport/http.c
+	mtproto/ack.c
+  mtproto/ds.c
+  mtproto/header.c
+  mtproto/encrypt.c
+  mtproto/transport.c
+  mtproto/mtproto.c
+  tg.c
+  strerr.c
+  send_query.c
+  answer.c
+  updates.c
 )
 
-#build both shared and static libs
-add_library(${TARGET} SHARED ${TARGET_SOURCES} ${RESOURCE_FILES})
-target_link_libraries(${TARGET} crypto)
+if(APPLE)
+	set(GETTIME mtproto/clock_gettime.c)
+endif()
 
-add_library(${TARGET}_static STATIC ${TARGET_SOURCES} ${RESOURCE_FILES})
-target_link_libraries(${TARGET}_static crypto)
+#build both shared and static libs
+add_library(${TARGET} SHARED 
+	${TARGET_SOURCES} ${GETTIME} ${RESOURCE_FILES})
+target_link_libraries(${TARGET} crypto curl)
+
+add_library(${TARGET}_static STATIC 
+	${TARGET_SOURCES} ${GETTIME} ${RESOURCE_FILES})
+target_link_libraries(${TARGET}_static crypto curl)
 set_target_properties(${TARGET}_static PROPERTIES 
 	OUTPUT_NAME tg
 	ARCHIVE_OUTPUT_DIRECTORY static) 

@@ -17,19 +17,14 @@ tg_t *tg_new(
 	// allocate struct
 	tg_t *tg = NEW(tg_t, return NULL);	
 
+	tg->dc = DCs[DEFAULT_DC];
+
 	// set apiId and apiHash
 	tg->apiId = apiId;
 	strncpy(tg->apiHash, apiHash, 33);
 
 	// set public_key
 	tg->pubkey = pem;
-
-	// set server address
-	strncpy(tg->ip, SERVER_IP,
-		sizeof(tg->ip) - 1);
-	
-	// set port
-	tg->port = SERVER_PORT;
 
 	// set auth_key
 	if (auth_key){
@@ -99,14 +94,5 @@ void tg_set_on_update(tg_t *tg,
 	if (tg){
 		tg->on_update = on_update;
 		tg->on_update_data = on_update_data;
-	}
-}
-
-void tg_set_server_address(tg_t *tg, const char *ip, int port)
-{
-	if (tg){
-		strncpy(tg->ip, ip,
-			 	sizeof(tg->ip) - 1);
-		tg->port = port;
 	}
 }

@@ -3,20 +3,18 @@
 
 #include <pthread.h>
 #include "tg_log.h"
+#include "dc.h"
 #include "../essential/buf.h"
 #include "../essential/alloc.h"
 
-#define SERVER_IP   "149.154.167.50"
-//#define SERVER_IP   "149.154.175.57"
+#define DEFAULT_DC 3
 #define SERVER_PORT 443
 
 struct tg_t {
-	int id;
+	dc_t dc;
 	int apiId;
 	char apiHash[33];
 	const char *pubkey;
-	char ip[16];
-	int port;
 	int seqn;
 	pthread_mutex_t seqnm;
 	buf_t key;

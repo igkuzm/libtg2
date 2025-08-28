@@ -27,9 +27,6 @@ void tg_set_on_log(tg_t *tg,
 		void *on_log_data,
 		void (*on_log)(void *on_log_data, const char *msg));
 
-/* set telegram server address */
-void tg_set_server_address(tg_t *, const char *ip, int port);
-
 /* free libtg structure and free memory */
 void tg_close(tg_t *);
 
@@ -52,5 +49,9 @@ int tg_connect(
 			const tl_t *tl,
 			const char *msg));
 
+/* set callback to handle telegram update information */
+void tg_set_on_update(tg_t *tg,
+		void *on_update_data,
+		void (*on_update)(void *on_update_data, int type, void *data));
 
 #endif /* ifndef LIBTG_H */

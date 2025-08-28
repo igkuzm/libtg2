@@ -1,24 +1,22 @@
 /**
- * File              : net.c
+ * File              : socket.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 15.07.2025
+ * Last Modified Date: 28.08.2025
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
-#include "../tg/tg.h"
+#include "../../libtg.h"
+#include "../tg.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
-#include "../list.h"
-#include "../alloc.h"
-#include "queue.h"
-#include "../transport/transport.h"
-#include "net.h"
+#include "../../essential/alloc.h"
+#include "socket.h"
 
-int tg_net_open(tg_t *tg, const char *ip, int port)
+int tg_socket_open(tg_t *tg, const char *ip, int port)
 {
   struct sockaddr_in serv_addr;
   struct hostent * server;
@@ -63,7 +61,7 @@ int tg_net_open(tg_t *tg, const char *ip, int port)
 	return sockfd;
 }
 
-void tg_net_close(tg_t *tg, int sockfd)
+void tg_socket_close(tg_t *tg, int sockfd)
 {
   close(sockfd);
 }
