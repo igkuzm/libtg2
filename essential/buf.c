@@ -131,7 +131,7 @@ buf_t buf_cat(buf_t dest, buf_t src)
   uint32_t s = dest.size + src.size;
 
   if (s > dest.asize) {
-		buf_realloc(&dest, s);
+		buf_realloc(dest.aptr, s);
   }
 
   int offset = dest.size;

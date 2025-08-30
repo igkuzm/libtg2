@@ -27,6 +27,15 @@ tg_t *tg_new(
 
 	tg->dc = DCs[DEFAULT_DC];
 
+	tg->socket = -1;
+	tg->port = DEFAULT_PORT;
+
+	//tg->curl = curl_easy_init();
+	//if (tg->curl == NULL){
+		//ON_ERR(tg, "%s: can't init curl", __func__);
+		//return NULL;
+	//}
+
 	// set apiId and apiHash
 	tg->apiId = apiId;
 	strncpy(tg->apiHash, apiHash, 33);
@@ -44,6 +53,8 @@ tg_t *tg_new(
 		tg->key_id = buf_get_ui64(auth_key_id);
 		buf_free(key_hash);
 		buf_free(auth_key_id);
+	} else {
+		tg->key = buf_new();
 	}
 
 	// start new seqn

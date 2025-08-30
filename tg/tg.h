@@ -8,8 +8,8 @@
 #include "../essential/alloc.h"
 #include "../libtg.h"
 
-#define DEFAULT_DC DC2t
-#define SERVER_PORT 443
+#define DEFAULT_DC   DC2t
+#define DEFAULT_PORT 443
 
 struct tg_t {
 	dc_t dc;
@@ -18,6 +18,8 @@ struct tg_t {
 	const char *pubkey;
 	TG_TRANSPORT transport;
 	int seqn;
+	int socket;
+	int port;
 	pthread_mutex_t seqnm;
 	buf_t key;
 	uint64_t key_id;
@@ -33,6 +35,7 @@ struct tg_t {
 	pthread_mutex_t msgidsm;
 	time_t timediff;
 	uint64_t fingerprint;
+	tl_config_t *config;
 };
 
 #endif /* ifndef TG_H */

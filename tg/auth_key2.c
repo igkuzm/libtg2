@@ -12,13 +12,8 @@
 
 #define SWAP(a, b) (((a) ^= (b)), ((b) ^= (a)), ((a) ^= (b)))
 
-bool tg_has_auth_key(tg_t *tg){
-	if (tg->key.size)
-		return true;
-	return false;
-} 
 
-int tg_new_auth_key(tg_t *tg)
+int tg_new_auth_key2(tg_t *tg)
 {
 	memset(&tg->key, 0, sizeof(buf_t));
 

@@ -1,5 +1,7 @@
 #include "libtg.h"
-#include "tg/auth_key.h"
+#include "tg/auth_key_mtx.h"
+#include "tg/auth_key1.h"
+#include "tg/auth.h"
 #include "api_id.h"
 
 void on_log(void *d, const char *msg){
@@ -20,7 +22,10 @@ int main(int argc, char *argv[])
 	tg_set_on_log(tg, NULL, on_log);
 
 	printf("get new auth key\n");
-	tg_new_auth_key(tg);
+	/*tg_new_auth_key_mtx(tg);*/
+	tg_new_auth_key1(tg);
+	
+	tg_auth_sendCode(tg, "+79990407731");
 	
 	return 0;
 }

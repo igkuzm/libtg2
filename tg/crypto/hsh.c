@@ -2,7 +2,7 @@
  * File              : hsh.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 25.11.2024
+ * Last Modified Date: 30.08.2025
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "sha1.h"

@@ -3,51 +3,29 @@
 #include "../tg_log.h"
 #include "header.h"
 #include "encrypt.h"
-#include "transport.h"
 #include "ack.h"
 #include "../../essential/ld.h"
 #include "../strerr.h"
 
-buf_t tg_mtproto_transport(
-		tg_t *tg, buf_t *query, bool enc, 
-		TG_TRANSPORT transport,
-		uint64_t *msgid)
+buf_t tg_mtproto_pack(
+		tg_t *tg, buf_t *query, bool enc, uint64_t *msgid)
 {
 	ON_LOG(tg, "%s", __func__);
 	
-	buf_t h = tg_header(tg, *query, enc, true, msgid);
-				
-	buf_t e = tg_encrypt(tg, h, enc);
-	buf_free(h);
+	buf_t header = tg_header(tg, query, enc, true, msgid);
+	buf_t encrypt = tg_encrypt(tg, &header, enc);
+	buf_free(header);
 
-	if (transport == TG_TRANSPORT_HTTP)
-		return e;
-
-	buf_t t = tg_transport(tg, e);
-	buf_free(e);
-
-	return t;
+	return encrypt;
 }
 
-buf_t tg_mtproto_detransport(
-		tg_t *tg, buf_t *answer, bool enc,
-		TG_TRANSPORT transport)
+buf_t tg_mtproto_unpack(tg_t *tg, buf_t *answer, bool enc)
 {
 	ON_LOG(tg, "%s", __func__);
 	
-	buf_t e;
-	if (transport == TG_TRANSPORT_HTTP){
-		e = tg_decrypt(tg, *answer, enc);
-
-	} else {
-		buf_t t = tg_detransport(tg, *answer);
-
-		buf_t e = tg_decrypt(tg, t, enc);
-		buf_free(t);
-	}
-
-	buf_t payload = tg_deheader(tg, e, enc);
-	buf_free(e);
+	buf_t decrypt = tg_decrypt(tg, answer, enc);
+	buf_t payload = tg_deheader(tg, &decrypt, enc);
+	buf_free(decrypt);
 
 	return payload;
 }

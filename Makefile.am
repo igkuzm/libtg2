@@ -1,4 +1,4 @@
-SUBDIRS = tl_generator tl tg
+SUBDIRS = tl_generator mtx tl tg
 ACLOCAL_AMFLAGS = -I m4
 
 if MAKE_TEST

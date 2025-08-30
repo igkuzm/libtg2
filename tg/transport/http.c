@@ -4,7 +4,9 @@
 #include "../tg_log.h"
 #include "../dc.h"
 #include <curl/curl.h>
+#include <curl/easy.h>
 #include <stdio.h>
+#include <sys/select.h>
 
 #define VERIFY_SSL 0
 
@@ -79,7 +81,92 @@ static size_t tg_http_writefunc(
   return len;
 }
 
-buf_t tg_http_transport(
+//CURLcode tg_http_open_connection(
+		//tg_t *tg, enum dc dc, int port, 
+		//bool maximum_limit, bool test)
+//{
+	//char url[BUFSIZ];
+	//snprintf(url, BUFSIZ-1, URI_IP, 
+			//DCs[dc].ipv4, port, test?"_test":"");
+	
+	//ON_LOG(tg, "%s: open url: %s", __func__, url);
+	
+	//curl_easy_setopt(tg->curl, CURLOPT_URL, url);
+	//curl_easy_setopt(tg->curl, CURLOPT_CONNECT_ONLY, 1L);
+  
+	//curl_easy_setopt(tg->curl, CURLOPT_SSL_VERIFYPEER, VERIFY_SSL);		
+  //curl_easy_setopt(tg->curl, CURLOPT_TCP_KEEPALIVE, 1L);
+  
+	/*buf_t buf = buf_new();*/
+
+	/*curl_easy_setopt(tg->curl, CURLOPT_WRITEDATA, &buf);		*/
+	/*curl_easy_setopt(tg->curl, CURLOPT_WRITEFUNCTION, tg_http_writefunc);*/
+	
+
+	/*return curl_easy_perform(tg->curl);*/
+	/*return curl_easy_perform(tg->curl);*/
+/*}*/
+
+/*buf_t tg_http_send(tg_t *tg, buf_t *query)*/
+/*{*/
+	/*curl_socket_t sockfd;*/
+  /*size_t sent = 0;*/
+  
+	/*buf_t buf = buf_new();*/
+
+	/*curl_easy_setopt(tg->curl, CURLOPT_WRITEDATA, &buf);		*/
+	/*curl_easy_setopt(tg->curl, CURLOPT_WRITEFUNCTION, tg_http_writefunc);*/
+	
+	/* Extract the socket from the curl handle - we need it for waiting. */
+  /*if (curl_easy_getinfo(tg->curl, CURLINFO_ACTIVESOCKET, &sockfd) != CURLE_OK)*/
+	/*{*/
+		/*ON_ERR(tg, "%s: curl_easy_getinfo error", __func__);*/
+	/*};*/
+
+  /*[> send data <]*/
+	/*while (sent < query->size){*/
+		/*if (curl_easy_send(*/
+				/*tg->curl, query->data, query->size, &sent) != CURLE_OK)*/
+		/*{*/
+			/*ON_ERR(tg, "%s: curl_easy_send error", __func__);*/
+		/*}*/
+	/*}*/
+
+	/*ON_LOG(tg, "%s: query size: %d", __func__, query->size);*/
+	/*ON_LOG(tg, "%s: sent data: %ld", __func__, sent);*/
+
+	/*return buf;*/
+/*}*/
+
+/*buf_t tg_http_recieve(tg_t *tg)*/
+/*{*/
+	/*curl_socket_t sockfd;*/
+	/*size_t nread;*/
+	/*buf_t buf = buf_new();*/
+	/*CURLcode res;*/
+  
+	/*[> Extract the socket from the curl handle - we need it for waiting. <]*/
+  /*if (curl_easy_getinfo(tg->curl, CURLINFO_ACTIVESOCKET, &sockfd) != CURLE_OK)*/
+	/*{*/
+		/*ON_ERR(tg, "%s: curl_easy_getinfo error", __func__);*/
+	/*};*/
+
+  /*[> rescieve data <]*/
+	/*res = CURLE_AGAIN;*/
+	/*while (res == CURLE_AGAIN) {*/
+		/*res = curl_easy_recv(tg->curl, buf.data, */
+				/*buf.size, &nread); */
+		/*if (res != CURLE_OK && res != CURLE_AGAIN)*/
+		/*{*/
+			/*ON_ERR(tg, "%s: curl_easy_recv error: %d", __func__, res);*/
+		/*}*/
+	/*}*/
+
+	/*ON_LOG(tg, "%s: received: %ld", __func__, nread);*/
+	/*return buf;*/
+/*}*/
+
+buf_t tg_http_send_query(
 		tg_t *tg, enum dc dc, int port, bool maximum_limit, 
 		bool test, buf_t *query,
 		void *ptr, 
@@ -92,7 +179,7 @@ buf_t tg_http_transport(
 		ON_ERR(tg, "%s: can't init curl", __func__);
 		return buf;
 	}
-
+	
 	//debug
 	/*curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);*/
 		
@@ -139,11 +226,11 @@ buf_t tg_http_transport(
 	}
 		
 	CURLcode err = curl_easy_perform(curl);
-	curl_easy_cleanup(curl);
-	if (err){
-		ON_ERR(tg, "%s: %s", __func__, curl_easy_strerror(err));
-		return buf;
-	}
+	//curl_easy_cleanup(curl);
+	//if (err){
+		//ON_ERR(tg, "%s: %s", __func__, curl_easy_strerror(err));
+		//return buf;
+	//}
 
 	/* now extract transfer info */
 	curl_off_t usize, dsize;
@@ -157,7 +244,7 @@ buf_t tg_http_transport(
 	
 	/* always cleanup */
 	curl_easy_cleanup(curl);
-	/*curl_slist_free_all(header);*/
+	//curl_slist_free_all(header);
 	
 	return buf;
 }	

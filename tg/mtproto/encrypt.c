@@ -5,14 +5,14 @@
 #include <stdio.h>
 #include "encrypt.h"
 
-buf_t tg_encrypt(tg_t *tg, buf_t b, bool encypt)
+buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 {
 	//ON_LOG(tg, "%s", __func__);
   buf_t e = buf_new();
 	
 	if (!encypt){
 		// no encryption needed
-		e = buf_cat(e, b);	
+		e = buf_cat(e, *b);	
 		return e;
 	}
 
@@ -42,7 +42,7 @@ buf_t tg_encrypt(tg_t *tg, buf_t b, bool encypt)
 	//+ plaintext + random_padding);
 	buf_t msg_key_large_ = 
 		buf_add(tg->key.data + 88, 32);
-	msg_key_large_ = buf_cat(msg_key_large_, b);
+	msg_key_large_ = buf_cat(msg_key_large_, *b);
 	buf_t msg_key_large = tg_hsh_sha256(msg_key_large_);
 	buf_free(msg_key_large_);
 
@@ -84,7 +84,7 @@ buf_t tg_encrypt(tg_t *tg, buf_t b, bool encypt)
 		buf_cat_data(aes_iv, sha256_b.data + 24, 8);
 	
 	// Encrypted Message: encrypted_data
-	buf_t enc = tg_cry_aes_e(b, aes_key, aes_iv);
+	buf_t enc = tg_cry_aes_e(*b, aes_key, aes_iv);
 	buf_free(aes_key);
 	buf_free(aes_iv);
 	buf_free(sha256_a);
@@ -104,19 +104,19 @@ buf_t tg_encrypt(tg_t *tg, buf_t b, bool encypt)
   return e;
 }
 
-buf_t tg_decrypt(tg_t *tg, buf_t m, bool encypted)
+buf_t tg_decrypt(tg_t *tg, buf_t *m, bool encypted)
 {
 	//ON_LOG(tg, "%s", __func__);
   buf_t d = buf_new();
 
-	if (!m.size) {
+	if (!m->size) {
     ON_LOG(tg, "%s: received nothing", __func__);
 		return d;
   }
 
 	if (!encypted){
 		// no decryption needed
-		d = buf_cat(d, m);
+		d = buf_cat(d, *m);
 		return d;
 	}
 
@@ -125,7 +125,7 @@ buf_t tg_decrypt(tg_t *tg, buf_t m, bool encypted)
 	// int64       int128  bytes
 		
 	// auth_key
-	uint64_t auth_key_id = buf_get_ui64(m);
+	uint64_t auth_key_id = buf_get_ui64(*m);
 	// check matching
 	buf_t key_hash = tg_hsh_sha1(tg->key);
 	buf_t auth_key_id_ = buf_add(key_hash.data + 12, 8);
@@ -135,13 +135,13 @@ buf_t tg_decrypt(tg_t *tg, buf_t m, bool encypted)
 		return d;
 	}
 	buf_free(auth_key_id_);
-	auth_key_id = deserialize_ui64(&m);
+	auth_key_id = deserialize_ui64(m);
 
 	// msg_key
-	buf_t msg_key = deserialize_buf(&m, 16);
+	buf_t msg_key = deserialize_buf(m, 16);
 	
 	// check encrypted_data size
-	if (m.size % 16 != 0){
+	if (m->size % 16 != 0){
 		ON_ERR(tg, "(length %% AES_BLOCK_SIZE) != 0");	
 		return d;
 	}
@@ -174,7 +174,7 @@ buf_t tg_decrypt(tg_t *tg, buf_t m, bool encypted)
 	aes_iv = buf_cat_data(aes_iv, sha256_a.data + 8, 16);
 	aes_iv = buf_cat_data(aes_iv, sha256_b.data + 24, 8);
 	
-	d = tg_cry_aes_d(m, aes_key, aes_iv);
+	d = tg_cry_aes_d(*m, aes_key, aes_iv);
 
 	//ON_LOG_BUF(tg, d, "%s: ", __func__);
   return d;

@@ -133,6 +133,7 @@ buf_t tg_cry_rsa_enc(const char *pubkey, buf_t buf)
 	int len = BN_bn2bin(r, (unsigned char *) ret.data);
 	printf("BN_bn2bin LEN: %d\n", len);
 	ret.size = BN_num_bytes(r);
+	ret.size = buf.size;
 
 	BN_free(a);
 	BN_free(r);
@@ -159,7 +160,8 @@ unsigned tg_rsax(unsigned char * from, int from_len, unsigned char * to, int to_
   assert(BN_mod_exp(y, x, E, N, BN_ctx)); // y = x^E % N
   //BN_print(wbio, &y);
   BIO_free(wbio);
-  unsigned y_len = BN_num_bytes(y); //printf("y_len: %d\n", y_len);
+  unsigned y_len = BN_num_bytes(y); 
+	//printf("y_len: %d\n", y_len);
   memset(to, 0x00, to_len);
   BN_bn2bin(y, (unsigned char *) to);
   BN_CTX_free(BN_ctx);
@@ -171,7 +173,7 @@ unsigned tg_rsax(unsigned char * from, int from_len, unsigned char * to, int to_
 
 void tg_rsa(const char *pubkey, unsigned char * from, size_t from_size, unsigned char * to, size_t to_size)
 {
-  //assert(from_size == 255 || to_size == 256);
+  assert(from_size == 255 || to_size == 256);
   FILE * pub = NULL;
   pub = fopen(pubkey, "r");
 
@@ -198,10 +200,10 @@ void tg_rsa(const char *pubkey, unsigned char * from, size_t from_size, unsigned
 buf_t tg_cry_rsa_e(const char *pubkey, buf_t b)
 {
   buf_t r = buf_new();
-	buf_realloc(&r, b.size);
+	r.size = 256;
 
   tg_rsa(pubkey, b.data, b.size,
-		 	r.data, r.size);
+		 	r.data, 256);
 
   return r;
 }

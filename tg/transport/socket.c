@@ -2,7 +2,7 @@
  * File              : socket.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 28.08.2025
+ * Last Modified Date: 30.08.2025
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "../../libtg.h"
@@ -14,7 +14,9 @@
 #include <netdb.h>
 #include <unistd.h>
 #include "../../essential/alloc.h"
+#include "progress.h"
 #include "socket.h"
+#include "header.h"
 
 int tg_socket_open(tg_t *tg, const char *ip, int port)
 {
@@ -64,4 +66,96 @@ int tg_socket_open(tg_t *tg, const char *ip, int port)
 void tg_socket_close(tg_t *tg, int sockfd)
 {
   close(sockfd);
+}
+
+static size_t tg_socket_receive(
+		tg_t *tg, int sockfd, buf_t *answer, 
+		void *progressp, tg_progress_fun *progress)
+{
+	ON_LOG(tg, "%s", __func__);
+	
+	// get length of the package
+	uint32_t len;
+	int s = recv(sockfd, &len, 4, 0);
+	if (s<0){
+		ON_ERR(tg, "%s: %d: socket error: %d", 
+				__func__, __LINE__, s);
+		return 0;
+	}
+
+	ON_LOG(tg, "%s: prepare to receive len: %d", __func__, len);
+	if (len < 0) {
+		// this is error - report it
+		ON_ERR(tg, "%s: received wrong length: %d", __func__, len);
+		return 0;
+	}
+
+	// realloc buf to be enough size
+	if (buf_realloc(answer, len)){
+		// handle error
+		ON_ERR(tg, "%s: error buf realloc to size: %d", __func__, len);
+		return 0;
+	}
+
+	// get data
+	uint32_t received = 0; 
+	while (received < len){
+		int s = recv(
+				sockfd, 
+				&(answer->data[received]), 
+				len - received, 
+				0);	
+		if (s<0){
+			ON_ERR(tg, "%s: %d: socket error: %d", 
+					__func__, __LINE__, s);
+			return 0;
+		}
+		received += s;
+		
+		ON_LOG(tg, 
+				"%s: expected: %d, received: %d, total: %d (%d%%)", 
+				__func__, len, s, received, received*100/len);
+
+		if (progress){
+			if(progress(progressp, 0, 0, received, len)){
+				buf_free(*answer);
+				ON_LOG(tg, "%s: download canceled", __func__);
+				// drop
+				//tg_add_todrop(queue->tg, queue->msgid);
+				return 0;
+			}
+		}
+	}
+
+	return received;
+}
+
+buf_t tg_socket_send_query_with_progress(
+		tg_t *tg, int socket, buf_t *query,
+		void *progressp, tg_progress_fun *progress)
+{
+	buf_t answer = buf_new();
+
+	// send query
+	buf_t pack = tg_transport_pack(tg, query);
+	int s = 
+		send(socket, pack.data, pack.size, 0);
+	if (s < 0){
+		ON_ERR(tg, "%s: socket error: %d", __func__, s);
+		return answer;
+	}
+	ON_LOG(tg, "%s: sent: %d", __func__, s);
+
+	answer.size = tg_socket_receive(
+			tg, socket, &answer, progressp, progress);
+
+	buf_free(pack);
+	
+	return answer;
+}
+
+buf_t tg_socket_send_query(tg_t *tg, int socket, buf_t *query)
+{
+	return tg_socket_send_query_with_progress(
+			tg, socket, query, NULL, NULL);
 }

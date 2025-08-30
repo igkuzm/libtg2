@@ -77,7 +77,7 @@ buf_t tg_mtp_message(tg_t *tg, buf_t *payload,
 	return msg;
 }
 
-static buf_t tg_header_enc(tg_t *tg, buf_t b, 
+static buf_t tg_header_enc(tg_t *tg, buf_t *b, 
 		bool content, uint64_t *msgid)
 {
 	ON_LOG(tg, "%s", __func__);
@@ -189,19 +189,19 @@ static buf_t tg_header_enc(tg_t *tg, buf_t b,
 	pthread_mutex_unlock(&tg->seqnm);
 
 	//message_data_length
-	s = buf_cat_ui32(s, b.size);
+	s = buf_cat_ui32(s, b->size);
 	
 	//message_data
-	s = buf_cat(s, b);
+	s = buf_cat(s, *b);
 	
 	//padding
-	uint32_t pad =  16 + (16 - (b.size % 16)) % 16;
+	uint32_t pad =  16 + (16 - (b->size % 16)) % 16;
 	s = buf_cat_rand(s, pad);
 
 	return s;
 }
 
-static buf_t tg_header_noenc(tg_t *tg, buf_t b, 
+static buf_t tg_header_noenc(tg_t *tg, buf_t *b, 
 		uint64_t *msgid)
 {
 	ON_LOG(tg, "%s", __func__);
@@ -216,15 +216,15 @@ static buf_t tg_header_noenc(tg_t *tg, buf_t b,
 	s = buf_cat_ui64(s, tg_get_current_time(tg));
 	
 	//message_data_length
-	s = buf_cat_ui32(s, b.size);
+	s = buf_cat_ui32(s, b->size);
 	
 	// message_data
-	s = buf_cat(s, b);
+	s = buf_cat(s, *b);
 
 	return s;
 }
 
-buf_t tg_header(tg_t *tg, buf_t b, bool enc, 
+buf_t tg_header(tg_t *tg, buf_t *b, bool enc, 
 		bool content, uint64_t *msgid)
 {
 	ON_LOG(tg, "%s", __func__);
@@ -235,7 +235,7 @@ buf_t tg_header(tg_t *tg, buf_t b, bool enc,
 }
 
 
-static buf_t tg_deheader_enc(tg_t *tg, buf_t b)
+static buf_t tg_deheader_enc(tg_t *tg, buf_t *b)
 {
 	ON_LOG(tg, "%s", __func__);
   buf_t d;
@@ -245,77 +245,82 @@ static buf_t tg_deheader_enc(tg_t *tg, buf_t b)
 	// int64 int64      int64      int32  int32                bytes        bytes
 		
 	// salt
-	uint64_t salt = deserialize_ui64(&b);
+	uint64_t salt = deserialize_ui64(b);
 	// update server salt
 	tg->salt = buf_add_ui64(salt);
 	
 	// session_id
-	uint64_t ssid = deserialize_ui64(&b);
+	uint64_t ssid = deserialize_ui64(b);
 	// check ssid
 	if (ssid != buf_get_ui64(tg->ssid)){
 		ON_ERR(tg, "%s: session id mismatch!", __func__);
 	}
 		
 	// message_id
-	uint64_t msg_id = deserialize_ui64(&b);
+	uint64_t msg_id = deserialize_ui64(b);
 	// add message id to array
 	//tg_add_msgid(tg, msg_id);
 	
 	// seq_no
-	uint32_t seq_no = deserialize_ui32(&b);
+	uint32_t seq_no = deserialize_ui32(b);
 
 	// data len
-	uint32_t msg_data_len = deserialize_ui32(&b);
+	uint32_t msg_data_len = deserialize_ui32(b);
 	// set data len without padding
-	b.size = msg_data_len;
+	b->size = msg_data_len;
 	
-	d = buf_cat(d, b);
+	d = buf_cat(d, *b);
 
 	return d;
 }
 
-static buf_t tg_deheader_noenc(tg_t *tg, buf_t b)
+static buf_t tg_deheader_noenc(tg_t *tg, buf_t *b)
 {
-	ON_LOG(tg, "%s", __func__);
-  buf_t d;
-	buf_init(&d);
+	//ON_LOG(tg, "%s", __func__);
+	ON_LOG_BUF(tg, *b, "%s:", __func__);
+  buf_t d = buf_new();
+
+	if (buf_get_ui32(*b) == htole32(0xfffffe6c)) {
+			ON_ERR(tg, "%s: 404", __func__);
+			return d;
+	}
 
 	//auth_key_id = 0 message_id message_data_length message_data
 	//int64           int64      int32               bytes
 		
 	// auth_key_id
-	uint64_t auth_key_id = buf_get_ui64(b);
+	uint64_t auth_key_id = buf_get_ui64(*b);
 	if (auth_key_id != 0){
 		ON_ERR(tg, 
 				"%s: auth_key_id is not 0 for unencrypted message", __func__);
 		return d;
 	}
-	auth_key_id = deserialize_ui64(&b);
+	auth_key_id = deserialize_ui64(b);
 
 	// message_id
-	uint64_t msg_id = deserialize_ui64(&b);
+	uint64_t msg_id = deserialize_ui64(b);
 
 	// message_data_length
-	uint32_t msg_data_len = deserialize_ui32(&b);
+	uint32_t msg_data_len = deserialize_ui32(b);
 
-	d = buf_cat(d, b);
+	d = buf_cat(d, *b);
 
 	// check len matching
-	if (msg_data_len != b.size){
+	if (msg_data_len != b->size){
 		ON_LOG(tg, 
 				"%s: msg_data_len mismatch: expected: %d, got: %d", 
-				__func__, msg_data_len, b.size);
+				__func__, msg_data_len, b->size);
 	}
 	
 	return d;
 }
 
-buf_t tg_deheader(tg_t *tg, buf_t b, bool enc)
+buf_t tg_deheader(tg_t *tg, buf_t *b, bool enc)
 {
 	ON_LOG(tg, "%s", __func__);
-	if (!b.size){
+	if (!b->size){
 		ON_ERR(tg, "%s: got nothing", __func__);
-		return b;
+		return buf_add_buf(*b);
 	}
 
   if (enc)

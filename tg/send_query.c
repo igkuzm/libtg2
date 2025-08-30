@@ -5,6 +5,7 @@
 #include "mtproto/mtproto.h"
 #include "tg_log.h"
 #include "transport/http.h"
+#include "transport/socket.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -28,21 +29,17 @@ void tg_send_query_with_progress(
 		void *progressp, tg_progress_fun *progress)
 {
 	uint64_t msgid;
-	buf_t mtproto = tg_mtproto_transport(
-			tg, query, enc, 
-			TG_TRANSPORT_HTTP, &msgid);
+	buf_t pack = tg_mtproto_pack(tg, query, enc, &msgid);
 	
-	if (mtproto.size){
-		buf_t answer = tg_http_transport(
+	if (pack.size){
+		buf_t answer = tg_http_send_query(
 				tg, dc, 443, false,
-			 	TG_TEST, &mtproto, 
+			 	TG_TEST, &pack, 
 				progressp, progress);
 
 		ON_LOG(tg, "%s: answer: %s", __func__, answer.data);
 
-		buf_t payload = tg_mtproto_detransport(
-				tg, &answer, enc,
-			 	TG_TRANSPORT_HTTP);
+		buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
 		buf_free(answer);
 	
 		tl_t *tl	= tl_deserialize(&payload);
@@ -59,25 +56,18 @@ tl_t *tg_send_query_sync(
 {
 	tl_t *tl = NULL;
 	uint64_t msgid;
-	buf_t mtproto = tg_mtproto_transport(
-			tg, query, enc, 
-			TG_TRANSPORT_HTTP, &msgid);
+	buf_t pack = tg_mtproto_pack(tg, query, enc,  &msgid);
+
+	ON_LOG_BUF(tg, pack, "%s: Data to send: ", __func__);
 	
-	if (mtproto.size){
-		buf_t answer = tg_http_transport(
-				tg, tg->dc.dc, 443, false,
-			 	TG_TEST, &mtproto, 
-				NULL, NULL);
+	if (pack.size){
+		buf_t answer = 
+			tg_socket_send_query(tg, tg->socket, &pack);
 
-		ON_LOG(tg, "%s: answer: %s", __func__, answer.data);
-
-		buf_t payload = tg_mtproto_detransport(
-				tg, &answer, enc,
-			 	TG_TRANSPORT_HTTP);
+		buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
 		buf_free(answer);
 	
 		tl	= tl_deserialize(&payload);
-
 	};
 
 	return tl;
