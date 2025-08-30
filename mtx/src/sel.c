@@ -239,7 +239,7 @@ buf_t_ sel_serialize(abstract_t a)
   buf_t_ s = {};
 	//buf_init(&s);
 
-  for (ui32_t i = 0; i < a.size; ++i) {
+ ui32_t i; for (i = 0; i < a.size; ++i) {
     b = api.sel.serialize_param(a.params[i]);
     s = api.buf.cat(s, b);
     //api.buf.dump(b);
@@ -288,7 +288,8 @@ buf_t_ sel_deserialize_vector(param_t p)
   /* Bad logic, ugly code. I will modify it. Sorry... */
   param_t p_[max_param_size];
 
-  for (uint32_t i = 0; i < q; ++i) {
+	uint32_t i;
+  for ( i = 0; i < q; ++i) {
     switch (p.id)
     {
       case _id_resPQ:

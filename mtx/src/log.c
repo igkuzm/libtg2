@@ -42,7 +42,7 @@ void log_hex(array_t a, ui32_t s)
 
   fprintf(stderr, "size : %d\n", s);
 
-  for (ui32_t i = 0; i < s; i++) {
+ ui32_t i; for (i = 0; i < s; i++) {
     if (!i) {
       fprintf(stderr, "%.4x | ", i), f = 1;
     }

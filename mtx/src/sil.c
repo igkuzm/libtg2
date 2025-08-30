@@ -244,7 +244,8 @@ tg_api_type_system_t sil_concrete(abstract_t a)
       p = api.sel.deserialize_param(p);
       buf_t_ b;
 
-      for (int i = 0; i < 2; ++i) {
+		int i;
+      for (i = 0; i < 2; ++i) {
         //api.buf.dump(p.value);
         b = api.hdl.deheader(p.value, CTER);
         abstract_t a = api.sel.deserialize(b);

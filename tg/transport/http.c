@@ -191,6 +191,8 @@ buf_t tg_http_send_query(
 	
 	ON_LOG(tg, "%s: open url: %s", __func__, url);
 	
+	struct curl_slist *header = NULL;
+	
 	curl_easy_setopt(curl, CURLOPT_URL, url);
 	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");		
 
@@ -200,7 +202,13 @@ buf_t tg_http_send_query(
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, query->size);
 
 	/* enable TCP keep-alive for this transfer */
+#if LIBCURL_VERSION_NUM < 0x072050
+	header = curl_slist_append(header, "Keep-alive");
+#else
   curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+#endif
+	
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
 
 	/*curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);*/
 	/*curl_easy_setopt(curl, CURLOPT_READDATA, query);*/
@@ -234,17 +242,26 @@ buf_t tg_http_send_query(
 
 	/* now extract transfer info */
 	curl_off_t usize, dsize;
+	
+#if LIBCURL_VERSION_NUM < 0x072000
+	curl_easy_getinfo(curl, 
+					  CURLINFO_CONTENT_LENGTH_UPLOAD, &usize);
+	curl_easy_getinfo(curl, 
+					  CURLINFO_CONTENT_LENGTH_DOWNLOAD, &dsize);
+#else
 	curl_easy_getinfo(curl, 
 			CURLINFO_CONTENT_LENGTH_UPLOAD_T, &usize);
-	ON_LOG(tg, "%s: uploaded: %ld", __func__, usize);
 	
 	curl_easy_getinfo(curl, 
 			CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &dsize);
+#endif
+	
+	ON_LOG(tg, "%s: uploaded: %ld", __func__, usize);
 	ON_LOG(tg, "%s: downloaded: %ld", __func__, dsize);
 	
 	/* always cleanup */
 	curl_easy_cleanup(curl);
-	//curl_slist_free_all(header);
+	curl_slist_free_all(header);
 	
 	return buf;
 }	

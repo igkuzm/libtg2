@@ -19,7 +19,7 @@ buf_t_ buf_add_(ui8_t data[], ui32_t size)
 
   buf_t_ b = {};
 
-  for (ui32_t i = 0; i < size; ++i) {
+ ui32_t i; for (i = 0; i < size; ++i) {
     b.data[i] = data[i];
   }
 
@@ -38,7 +38,7 @@ buf_t_ buf_cat_(buf_t_ dest, buf_t_ src)
 
   int offset = dest.size;
 
-  for (ui32_t i = 0; i < src.size; ++i) {
+ ui32_t i; for (i = 0; i < src.size; ++i) {
     dest.data[i + offset] = src.data[i];
   }
 
@@ -64,7 +64,7 @@ ui8_t buf_cmp_(buf_t_ a, buf_t_ b)
     api.log.error("Error: buf_cmp: different sizes");
   }
 
-  for (ui32_t i = 0; i < a.size; ++i) {
+ ui32_t i; for (i = 0; i < a.size; ++i) {
     if (a.data[i] != b.data[i]) {
       return 0;
     }
@@ -114,7 +114,7 @@ buf_t_ buf_rand_(ui32_t s)
 
   srand((unsigned int)time(NULL));
 
-  for (ui32_t i = 0; i < s; i++) {
+ ui32_t i; for (i = 0; i < s; i++) {
     b.data[i] = rand() % 256;
   }
 
@@ -131,7 +131,7 @@ buf_t_ buf_xor_(buf_t_ a, buf_t_ b)
 
   buf_t_ r;
 
-  for (ui32_t i = 0; i < a.size; ++i) {
+ ui32_t i; for (i = 0; i < a.size; ++i) {
     r.data[i] = a.data[i] ^ b.data[i];
   }
 

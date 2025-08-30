@@ -31,7 +31,7 @@ extern void scl_run()
   api.log.info("how many pings?");
   scanf("%d",&q);
 
-  for (ui32_t i = 0; i < q; ++i) {
+ ui32_t i; for (i = 0; i < q; ++i) {
     printf(product);
     printf(": ping (try #%d)\n", i);
     api.srl.ping();
