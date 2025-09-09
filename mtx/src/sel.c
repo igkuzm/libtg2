@@ -9,6 +9,7 @@
 #include "../include/api.h"
 #include "../include/buf.h"
 #include "../../essential/endian.h"
+#include <stdint.h>
 
 sel_t sel_init(trl_t trl)
 {
@@ -19,7 +20,7 @@ sel_t sel_init(trl_t trl)
 
 buf_t_ sel_serialize_id(buf_t_ b)
 {
-	uint32_t var = htole32(*(&b.data));
+	uint32_t var = htole32(*(uint32_t *)(&b.data));
 	buf_t_ s;
 	
 	s = api.buf.add_ui32(var);
@@ -34,7 +35,7 @@ buf_t_ sel_serialize_param(param_t p)
   {
     case TYPE_INT:
     {
-		uint32_t var = htole32(*(&p.value.data));
+		uint32_t var = htole32(*(uint32_t *)(&p.value.data));
 		s = api.buf.add_ui32(var);
 		
 		break;
@@ -53,7 +54,7 @@ buf_t_ sel_serialize_param(param_t p)
     }
     case TYPE_LONG:
     {
-		uint64_t var = htole64(*(&p.value.data));
+		uint64_t var = htole64(*(uint64_t *)(&p.value.data));
 		s = api.buf.add_ui64(var);
 		
 		break;
@@ -103,7 +104,7 @@ param_t sel_deserialize_param(param_t p)
   {
     case TYPE_INT:
     {
-		uint32_t var = le32toh(*(&p.value.data));
+		uint32_t var = le32toh(*(uint32_t *)(&p.value.data));
 		s = api.buf.add_ui32(var);
 		
 		break;
@@ -122,7 +123,7 @@ param_t sel_deserialize_param(param_t p)
     }
     case TYPE_LONG:
     {
-		uint64_t var = le64toh(*(&p.value.data));
+		uint64_t var = le64toh(*(uint64_t *)(&p.value.data));
 		s = api.buf.add_ui64(var);
 
 		break;
@@ -142,7 +143,7 @@ param_t sel_deserialize_param(param_t p)
     }
     case TYPE_ID:
     {
-		uint32_t var = le32toh(*(&p.value.data));
+		uint32_t var = le32toh(*(uint32_t *)(&p.value.data));
 		s = api.buf.add_ui32(var);
       
 		break;

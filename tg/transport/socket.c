@@ -2,7 +2,7 @@
  * File              : socket.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 30.08.2025
+ * Last Modified Date: 09.09.2025
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "../../libtg.h"
@@ -130,31 +130,43 @@ static size_t tg_socket_receive(
 	return received;
 }
 
-buf_t tg_socket_send_query_with_progress(
-		tg_t *tg, int socket, buf_t *query,
-		void *progressp, tg_progress_fun *progress)
+buf_t tg_socket_receive_query(tg_t *tg, int socket)
+{
+	return tg_socket_receive_query_with_progress(
+			tg, socket, NULL, NULL);
+}
+
+buf_t tg_socket_receive_query_with_progress(
+		          tg_t *tg, int socket,
+		          void *progressp, tg_progress_fun *progress)
 {
 	buf_t answer = buf_new();
 
+	answer.size = tg_socket_receive(
+			tg, socket, &answer, progressp, progress);
+
+	return answer;
+}
+
+int tg_socket_send_query_with_progress(
+		tg_t *tg, int socket, buf_t *query,
+		void *progressp, tg_progress_fun *progress)
+{
 	// send query
 	buf_t pack = tg_transport_pack(tg, query);
 	int s = 
 		send(socket, pack.data, pack.size, 0);
 	if (s < 0){
 		ON_ERR(tg, "%s: socket error: %d", __func__, s);
-		return answer;
+		return s;
 	}
 	ON_LOG(tg, "%s: sent: %d", __func__, s);
 
-	answer.size = tg_socket_receive(
-			tg, socket, &answer, progressp, progress);
-
 	buf_free(pack);
-	
-	return answer;
+	return s;	
 }
 
-buf_t tg_socket_send_query(tg_t *tg, int socket, buf_t *query)
+int tg_socket_send_query(tg_t *tg, int socket, buf_t *query)
 {
 	return tg_socket_send_query_with_progress(
 			tg, socket, query, NULL, NULL);

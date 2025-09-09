@@ -6,6 +6,7 @@
 #include "../essential/strtok_foreach.h"
 #include "../essential/serialize.h"
 #include "send_query.h"
+#include "tg_log.h"
 #include "transport/socket.h"
 
 buf_t initConnection(tg_t *tg, buf_t query)
@@ -94,7 +95,8 @@ tg_is_authorized(tg_t *tg)
 */
 
 tl_auth_sentCode_t *
-tg_auth_sendCode(tg_t *tg, const char *phone_number) 
+tg_auth_sendCode(tg_t *tg, const char *phone_number,
+		int ntokens, char *logout_tokens[]) 
 {
 	tl_t *tl = NULL;
 	ON_LOG(tg, "%s", __func__);
@@ -104,12 +106,6 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number)
 	buf_t init = initConnection(tg, getConfig);
 	buf_free(getConfig);
 
-	// open socket
-	socket_t socket = 
-		tg_socket_open(tg, tg->dc.ipv4, tg->port);
-	if (socket < 0)
-		return NULL;
-	
 	tl = tg_send_query_sync(tg, &init, true); 
 	buf_free(init);
 
@@ -118,49 +114,57 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number)
 		return NULL;
 	}
 
+	ON_LOG(tg, "got config!");
 	tg->config = (tl_config_t *)tl;
+
+	// get tokens 
+	buf_t tokens[20]; int i;
+	if (logout_tokens){
+		for (i = 0; i < ntokens && i < 20; ++i) {
+			tokens[i] = 
+				buf_add((uint8_t*)logout_tokens[i],
+					 	strlen(logout_tokens[i])); 
+		} 
+	}
 	
-	// get tokens from database 
-	//buf_t t[20]; int tn = 0;
-	//char *auth_tokens = auth_tokens_from_database(tg);
-	//if (auth_tokens){
-		//strtok_foreach(auth_tokens, ";", token){
-			//t[tn++] = 
-				//buf_add((uint8_t*)token, strlen(token)); 
-		//}
-	//}
-	
-	/*CodeSettings codeSettings = tl_codeSettings(*/
-			/*false,*/
-			 /*false,*/
-			 /*false,*/
-			 /*false,*/
-			 /*false, */
-			/*false,*/
-			 /*auth_tokens ? t : NULL,*/
-			 /*tn,*/
-			 /*NULL,*/
-			 /*NULL);*/
+	CodeSettings codeSettings = tl_codeSettings(
+			false,
+			 false,
+			 false,
+			 false,
+			 false, 
+			false,
+			 tokens,
+			 i,
+			 NULL,
+			 NULL);
 
-    /*ON_LOG_BUF(tg, codeSettings, */
-			/*"%s: codeSettings: ", __func__);*/
+		ON_LOG_BUF(tg, codeSettings, 
+			"%s: codeSettings: ", __func__);
 
-	/*buf_t sendCode = */
-		/*tl_auth_sendCode(*/
-				/*phone_number, */
-				/*tg->apiId, */
-				/*tg->apiHash, */
-				/*&codeSettings);*/
-	/*ON_LOG_BUF(tg, sendCode, */
-			/*"%s: sendCode: ", __func__);*/
-	/*buf_free(codeSettings);*/
+	buf_t sendCode = 
+		tl_auth_sendCode(
+				phone_number, 
+				tg->apiId, 
+				tg->apiHash, 
+				&codeSettings);
+	ON_LOG_BUF(tg, sendCode, 
+			"%s: sendCode: ", __func__);
+	buf_free(codeSettings);
 
-	/*tl = tg_send_query_sync(tg, &sendCode); */
-	/*buf_free(sendCode);*/
+	// free tokens
+	if (logout_tokens){
+		for (i = 0; i < ntokens && i < 20; ++i) {
+			buf_free(tokens[i]);
+		}
+	}
 
-	/*if (tl == NULL){*/
-		/*return NULL;*/
-	/*}*/
+	tl = tg_send_query_sync(tg, &sendCode, true); 
+	buf_free(sendCode);
+
+	if (tl == NULL){
+		return NULL;
+	}
 
 	/*if (tl->_id == id_rpc_error){*/
 		/*tl_rpc_error_t *error = (tl_rpc_error_t *)tl;*/
@@ -181,11 +185,11 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number)
 		/*}*/
 	/*}*/
 		
-	/*if (tl && tl->_id == id_auth_sentCode){*/
-		/*return (tl_auth_sentCode_t *)tl;*/
-	/*}*/
-	/*if (tl)*/
-		/*tl_free(tl);*/
+	if (tl && tl->_id == id_auth_sentCode){
+		return (tl_auth_sentCode_t *)tl;
+	}
+	if (tl)
+		tl_free(tl);
 	return NULL;
 }
 

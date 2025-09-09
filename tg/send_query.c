@@ -50,6 +50,40 @@ void tg_send_query_with_progress(
 		tl_free(tl);
 	}
 }
+
+int tg_send_query_sync_cb(void *d, const tl_t *answer){
+	tl_t **tl = (tl_t **)d;	
+	buf_t buf = answer->_buf;
+	*tl = tl_deserialize(&buf);
+	return 0;
+}
+
+
+static tl_t * tg_send_query_sync_parse_answer(
+		tg_t *tg, buf_t answer, bool enc, uint64_t msgid)
+{
+	tl_t *tl = NULL;
+	buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
+
+	tl_t *deserialized = tl_deserialize(&payload);
+
+	tg_parse_answer(tg, deserialized, msgid, 
+			&tl, tg_send_query_sync_cb);
+
+	return tl;
+}
+
+static tl_t * tg_send_query_sync_receive(
+		tg_t *tg, bool enc, uint64_t msgid)
+{
+	tl_t *tl = NULL;
+		
+	buf_t answer = tg_socket_receive_query(tg, tg->socket);
+	tl = tg_send_query_sync_parse_answer(tg, answer, enc, msgid);
+
+	buf_free(answer);
+	return tl;
+}
 		
 tl_t *tg_send_query_sync(
 		tg_t *tg, buf_t *query, bool enc)
@@ -61,13 +95,20 @@ tl_t *tg_send_query_sync(
 	ON_LOG_BUF(tg, pack, "%s: Data to send: ", __func__);
 	
 	if (pack.size){
-		buf_t answer = 
-			tg_socket_send_query(tg, tg->socket, &pack);
+		if (tg_socket_send_query(tg, tg->socket, &pack) < 0){
+			return NULL;
+		}
 
-		buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
-		buf_free(answer);
-	
-		tl	= tl_deserialize(&payload);
+		tl = tg_send_query_sync_receive(tg, enc, msgid);
+		
+		// handle ACK - get data again
+		if (tl && tl->_id == id_msgs_ack)
+			tl = tg_send_query_sync_receive(tg, enc, msgid);
+
+		// handle gzip
+		if (tl && tl->_id == id_gzip_packed){
+			return tg_mtproto_guzip(tg, tl);
+		}
 	};
 
 	return tl;

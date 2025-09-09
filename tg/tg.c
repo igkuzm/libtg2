@@ -56,6 +56,8 @@ tg_t *tg_new(
 	} else {
 		tg->key = buf_new();
 	}
+	tg->ssid = buf_add_ui64(0);
+	tg->salt = buf_add_ui64(0);
 
 	// start new seqn
 	tg->seqn = 0;

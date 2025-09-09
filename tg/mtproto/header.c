@@ -228,6 +228,7 @@ buf_t tg_header(tg_t *tg, buf_t *b, bool enc,
 		bool content, uint64_t *msgid)
 {
 	ON_LOG(tg, "%s", __func__);
+	ON_LOG_BUF(tg, *b, "");
   if (enc) 
 		return tg_header_enc(tg, b, content, msgid);
 		

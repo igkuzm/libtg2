@@ -2,12 +2,14 @@
 #include "../../libtg.h"
 #include "../crypto/hsh.h"
 #include "../crypto/cry.h"
+#include <endian.h>
 #include <stdio.h>
 #include "encrypt.h"
 
 buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 {
-	//ON_LOG(tg, "%s", __func__);
+	ON_LOG(tg, "%s", __func__);
+	ON_LOG_BUF(tg, *b, "");
   buf_t e = buf_new();
 	
 	if (!encypt){
@@ -106,11 +108,17 @@ buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 
 buf_t tg_decrypt(tg_t *tg, buf_t *m, bool encypted)
 {
-	//ON_LOG(tg, "%s", __func__);
+	ON_LOG(tg, "%s", __func__);
+	ON_LOG_BUF(tg, *m, "");
   buf_t d = buf_new();
 
 	if (!m->size) {
     ON_LOG(tg, "%s: received nothing", __func__);
+		return d;
+  }
+
+	if (m->size == 4 && le32toh(*(uint32_t *)(m->data)) == -404) {
+    ON_LOG(tg, "%s: 404 error", __func__);
 		return d;
   }
 
