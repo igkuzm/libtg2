@@ -10,21 +10,21 @@
 #include "../include/hdl.h"
 #include "../include/buf.h"
 #include <assert.h>
+#include "../../essential/endian.h"
 
 extern hdl_t hdl;
 
 buf_t_ hdl_header(buf_t_ b, msg_t t)
 {
   buf_t_ s = {};
-	//buf_init(&s);
 
   switch (t) {
     case RFC:
     {
-      ui64_t msg_id_ = get_current_time();
+      ui64_t msg_id_ = htole64(get_current_time());
       buf_t_ msg_id = api.buf.add((ui8_t *)&msg_id_, 8);
       s = api.buf.cat(s, msg_id);
-      ui32_t msg_data_len_ = b.size;
+      ui32_t msg_data_len_ = htole32(b.size);
       buf_t_ msg_data_len = api.buf.add((ui8_t *)&msg_data_len_, 4);
       s = api.buf.cat(s, msg_data_len);
       s = api.buf.cat(s, b);
@@ -37,13 +37,13 @@ buf_t_ hdl_header(buf_t_ b, msg_t t)
       s = api.buf.cat(s, salt);
       buf_t_ session_id = shared_rc_get_ssid();
       s = api.buf.cat(s, session_id);
-      ui64_t msg_id_ = get_current_time();
+      ui64_t msg_id_ = htole64(get_current_time());
       buf_t_ msg_id = api.buf.add((ui8_t *)&msg_id_, 8);
       s = api.buf.cat(s, msg_id);
-      ui32_t seqnh = shared_rc_get_seqnh();
+      ui32_t seqnh = htole32(shared_rc_get_seqnh());
       buf_t_ seq_no = api.buf.add_ui32(seqnh);
       s = api.buf.cat(s, seq_no);
-      ui32_t msg_data_len_ = b.size;
+      ui32_t msg_data_len_ = htole32(b.size);
       buf_t_ msg_data_len = api.buf.add((ui8_t *)&msg_data_len_, 4);
       s = api.buf.cat(s, msg_data_len);
       s = api.buf.cat(s, b);
@@ -64,7 +64,6 @@ buf_t_ hdl_header(buf_t_ b, msg_t t)
 buf_t_ hdl_deheader(buf_t_ b, msg_t t)
 {
   buf_t_ d;
-	//buf_init(&d);
 
   switch (t) {
     case RFC:
@@ -72,7 +71,7 @@ buf_t_ hdl_deheader(buf_t_ b, msg_t t)
       // check msg_id diff (under construction...)
       // remove msg_id
       d = api.buf.add(b.data + 8, b.size - 8);
-      ui32_t msg_data_len = api.buf.get_ui32(d);
+      ui32_t msg_data_len = le32toh(api.buf.get_ui32(d));
       d.size -= 4;
 
       if (msg_data_len != d.size) {
@@ -96,7 +95,7 @@ buf_t_ hdl_deheader(buf_t_ b, msg_t t)
       d = api.buf.add(d.data + 8, d.size - 8);
       // remove seq_no
       d = api.buf.add(d.data + 4, d.size - 4);
-      ui32_t msg_data_len = api.buf.get_ui32(d);
+      ui32_t msg_data_len = le32toh(api.buf.get_ui32(d));
       d.size -= 4;
 
       if (msg_data_len != d.size) {
@@ -114,7 +113,7 @@ buf_t_ hdl_deheader(buf_t_ b, msg_t t)
       d = api.buf.add(b.data + 8, b.size - 8);
       // remove seq_no
       d = api.buf.add(d.data + 4, d.size - 4);
-      ui32_t msg_data_len = api.buf.get_ui32(d);
+      ui32_t msg_data_len = le32toh(api.buf.get_ui32(d));
       // remove len
       d = api.buf.add(d.data + 4, msg_data_len);
 

@@ -16,6 +16,9 @@
 		AF2851692E630F6100415C28 /* gunzip.c in Sources */ = {isa = PBXBuildFile; fileRef = AF2851652E630F6100415C28 /* gunzip.c */; };
 		AF2B32852E63C31800C2E464 /* libtl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF28515C2E630F1B00415C28 /* libtl.a */; };
 		AF2B32862E63C32100C2E464 /* libmtx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AFDB98A52E6328130011C842 /* libmtx.a */; };
+		AF8714372E6FB55300CD9927 /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AF8714362E6FB55300CD9927 /* libstdc++.dylib */; };
+		AF87143A2E6FB57F00CD9927 /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AF8714382E6FB56100CD9927 /* libcrypto.0.9.7.dylib */; };
+		AF8714412E6FBDCD00CD9927 /* aes_ige.c in Sources */ = {isa = PBXBuildFile; fileRef = AF8714402E6FBDCD00CD9927 /* aes_ige.c */; };
 		AFDB98862E6326DA0011C842 /* api_layer.h in Headers */ = {isa = PBXBuildFile; fileRef = AFDB98762E6326DA0011C842 /* api_layer.h */; };
 		AFDB98872E6326DA0011C842 /* deserialize_table.c in Sources */ = {isa = PBXBuildFile; fileRef = AFDB98782E6326DA0011C842 /* deserialize_table.c */; };
 		AFDB98882E6326DA0011C842 /* deserialize_table.h in Headers */ = {isa = PBXBuildFile; fileRef = AFDB98792E6326DA0011C842 /* deserialize_table.h */; };
@@ -152,7 +155,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = AFD84C762E5EC04F00CDD013 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = AF28515B2E630F1B00415C28 /* tl */;
+			remoteGlobalIDString = AF28515B2E630F1B00415C28;
 			remoteInfo = tl;
 		};
 		AFDB989D2E6327360011C842 /* PBXContainerItemProxy */ = {
@@ -188,6 +191,9 @@
 		AF2851632E630F6100415C28 /* serialize.c */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = sourcecode.c.c; name = serialize.c; path = essential/serialize.c; sourceTree = "<group>"; };
 		AF2851642E630F6100415C28 /* deserialize.c */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = sourcecode.c.c; name = deserialize.c; path = essential/deserialize.c; sourceTree = "<group>"; };
 		AF2851652E630F6100415C28 /* gunzip.c */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = sourcecode.c.c; name = gunzip.c; path = essential/gunzip.c; sourceTree = "<group>"; };
+		AF8714362E6FB55300CD9927 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "/usr/lib/gcc/powerpc-apple-darwin9/4.2.1/libstdc++.dylib"; sourceTree = "<absolute>"; };
+		AF8714382E6FB56100CD9927 /* libcrypto.0.9.7.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.7.dylib; path = /usr/lib/libcrypto.0.9.7.dylib; sourceTree = "<absolute>"; };
+		AF8714402E6FBDCD00CD9927 /* aes_ige.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aes_ige.c; path = macos/aes_ige.c; sourceTree = SOURCE_ROOT; };
 		AFDB98762E6326DA0011C842 /* api_layer.h */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = sourcecode.c.h; path = api_layer.h; sourceTree = "<group>"; };
 		AFDB98772E6326DA0011C842 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		AFDB98782E6326DA0011C842 /* deserialize_table.c */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = sourcecode.c.c; path = deserialize_table.c; sourceTree = "<group>"; };
@@ -277,7 +283,7 @@
 		AFDB99442E6329A70011C842 /* mtx_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mtx_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFDB99482E6329C60011C842 /* pub.pkcs */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = text; path = pub.pkcs; sourceTree = "<group>"; };
 		AFDB995D2E632A950011C842 /* libcrypto.0.9.7.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o"; name = libcrypto.0.9.7.dylib; path = /Users/kuzmich/.Trash/Developer/SDKs/MacOSX10.5.sdk/usr/lib/libcrypto.0.9.7.dylib; sourceTree = "<absolute>"; };
-		AFDB99612E632AF20011C842 /* libcrypto.0.9.7.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o"; name = libcrypto.0.9.7.dylib; path = SDKs/MacOSX10.5.sdk/usr/lib/libcrypto.0.9.7.dylib; sourceTree = SYSTEM_DEVELOPER_DIR; };
+		AFDB99612E632AF20011C842 /* libcrypto.0.9.7.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.7.dylib; path = usr/lib/libcrypto.0.9.7.dylib; sourceTree = SDKROOT; };
 		AFDB996E2E632B650011C842 /* libtg.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libtg.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFDB99772E632B850011C842 /* answer.c */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = sourcecode.c.c; path = answer.c; sourceTree = "<group>"; };
 		AFDB99782E632B850011C842 /* answer.h */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = sourcecode.c.h; path = answer.h; sourceTree = "<group>"; };
@@ -365,6 +371,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				AFDB99552E632A210011C842 /* libmtx.a in Frameworks */,
+				AF8714372E6FB55300CD9927 /* libstdc++.dylib in Frameworks */,
+				AF87143A2E6FB57F00CD9927 /* libcrypto.0.9.7.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -388,12 +396,22 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		AF87143D2E6FBAC000CD9927 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				AF8714382E6FB56100CD9927 /* libcrypto.0.9.7.dylib */,
+				AF8714362E6FB55300CD9927 /* libstdc++.dylib */,
+				AFDB99252E6328BB0011C842 /* libcurlkuzm.dylib */,
+				AFDB995D2E632A950011C842 /* libcrypto.0.9.7.dylib */,
+				AFDB99612E632AF20011C842 /* libcrypto.0.9.7.dylib */,
+			);
+			name = libs;
+			sourceTree = "<group>";
+		};
 		AFD84C742E5EC04F00CDD013 = {
 			isa = PBXGroup;
 			children = (
-				AFDB99612E632AF20011C842 /* libcrypto.0.9.7.dylib */,
-				AFDB995D2E632A950011C842 /* libcrypto.0.9.7.dylib */,
-				AFDB99252E6328BB0011C842 /* libcurlkuzm.dylib */,
+				AF87143D2E6FBAC000CD9927 /* libs */,
 				AF28514B2E630D9000415C28 /* Resources */,
 				AFD84CAF2E5EC17600CDD013 /* Sources */,
 				AFD84C9B2E5EC0EF00CDD013 /* Products */,
@@ -527,6 +545,7 @@
 		AFDB98CD2E6328250011C842 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				AF8714402E6FBDCD00CD9927 /* aes_ige.c */,
 				AFDB98CE2E6328250011C842 /* aes.c */,
 				AFDB98CF2E6328250011C842 /* api.c */,
 				AFDB98D02E6328250011C842 /* app.c */,
@@ -935,6 +954,7 @@
 				AFDB99222E6328250011C842 /* tml.c in Sources */,
 				AFDB99232E6328250011C842 /* trl.c in Sources */,
 				AFDB99242E6328250011C842 /* types.c in Sources */,
+				AF8714412E6FBDCD00CD9927 /* aes_ige.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1076,6 +1096,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				SYMROOT = "/tmp/${PROJECT_NAME}";
 			};
 			name = Debug;
@@ -1084,6 +1105,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 			};
 			name = Release;
 		};
@@ -1107,8 +1129,10 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/../../../.Trash/Developer/SDKs/MacOSX10.5.sdk/usr/lib\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(DEVELOPER_DIR)/SDKs/MacOSX10.5.sdk/usr/lib\"";
 				OTHER_CFLAGS = "-fPIC";
+				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = mtx;
+				USER_HEADER_SEARCH_PATHS = "${PROJECT_DIR}/essential";
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1131,8 +1155,10 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/../../../.Trash/Developer/SDKs/MacOSX10.5.sdk/usr/lib\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(DEVELOPER_DIR)/SDKs/MacOSX10.5.sdk/usr/lib\"";
 				OTHER_CFLAGS = "-fPIC";
+				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = mtx;
+				USER_HEADER_SEARCH_PATHS = "${PROJECT_DIR}/essential";
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1147,6 +1173,12 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"/usr/lib/gcc/powerpc-apple-darwin9/4.2.1\"";
+				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = mtx_test;
 				ZERO_LINK = YES;
@@ -1161,6 +1193,11 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = "$(HOME)/bin";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"/usr/lib/gcc/powerpc-apple-darwin9/4.2.1\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = mtx_test;
 				ZERO_LINK = NO;

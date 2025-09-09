@@ -7,6 +7,7 @@
 //
 
 #include "../include/api.h"
+#include "../../essential/endian.h"
 
 typedef struct abstract_type_
 {
@@ -28,12 +29,12 @@ abstract_t sil_abstract(tg_api_type_system_t t)
   // dispatcher must be optimized!
   if (t.method_req_pq.id__) {
     a.type = RFC;
-    a.params[0].value = api.buf.add_ui32(t.method_req_pq.id__);
+    a.params[0].value = api.buf.add_ui32(htole32(t.method_req_pq.id__));
     a.params[1] = t.method_req_pq.nonce;
     a.size = 2;
   } else if (t.ctor_P_Q_inner_data.id__) {
     a.type = RFC;
-    a.params[0].value = api.buf.add_ui32(t.ctor_P_Q_inner_data.id__);
+    a.params[0].value = api.buf.add_ui32(htole32(t.ctor_P_Q_inner_data.id__));
     a.params[1] = t.ctor_P_Q_inner_data.pq;
     a.params[2] = t.ctor_P_Q_inner_data.p;
     a.params[3] = t.ctor_P_Q_inner_data.q;
@@ -43,7 +44,7 @@ abstract_t sil_abstract(tg_api_type_system_t t)
     a.size = 7;
   } else if (t.method_req_DH_params.id__) {
     a.type = RFC;
-    a.params[0].value = api.buf.add_ui32(t.method_req_DH_params.id__);
+    a.params[0].value = api.buf.add_ui32(htole32(t.method_req_DH_params.id__));
     a.params[1] = t.method_req_DH_params.nonce;
     a.params[2] = t.method_req_DH_params.server_nonce;
     a.params[3] = t.method_req_DH_params.p;
@@ -53,7 +54,7 @@ abstract_t sil_abstract(tg_api_type_system_t t)
     a.size = 7;
   } else if (t.ctor_Client_DH_Inner_Data.id__) {
     a.type = RFC;
-    a.params[0].value = api.buf.add_ui32(t.ctor_Client_DH_Inner_Data.id__);
+    a.params[0].value = api.buf.add_ui32(htole32(t.ctor_Client_DH_Inner_Data.id__));
     a.params[1] = t.ctor_Client_DH_Inner_Data.nonce;
     a.params[2] = t.ctor_Client_DH_Inner_Data.server_nonce;
     a.params[3] = t.ctor_Client_DH_Inner_Data.retry_id;
@@ -61,19 +62,19 @@ abstract_t sil_abstract(tg_api_type_system_t t)
     a.size = 5;
   } else if (t.method_set_client_DH_params.id__) {
     a.type = RFC;
-    a.params[0].value = api.buf.add_ui32(t.method_set_client_DH_params.id__);
+    a.params[0].value = api.buf.add_ui32(htole32(t.method_set_client_DH_params.id__));
     a.params[1] = t.method_set_client_DH_params.nonce;
     a.params[2] = t.method_set_client_DH_params.server_nonce;
     a.params[3] = t.method_set_client_DH_params.encrypted_data;
     a.size = 4;
   } else if (t.method_ping.id__) {
     a.type = API;
-    a.params[0].value = api.buf.add_ui32(t.method_ping.id__);
+    a.params[0].value = api.buf.add_ui32(htole32(t.method_ping.id__));
     a.params[1] = t.method_ping.ping_id;
     a.size = 2;
   } else if (t.method_auth_sendCode.id__) {
     a.type = API;
-    a.params[0].value = api.buf.add_ui32(t.method_auth_sendCode.id__);
+    a.params[0].value = api.buf.add_ui32(htole32(t.method_auth_sendCode.id__));
     a.params[1] = t.method_auth_sendCode.phone_number;
     a.params[2] = t.method_auth_sendCode.sms_type;
     a.params[3] = t.method_auth_sendCode.api_id;
@@ -82,7 +83,7 @@ abstract_t sil_abstract(tg_api_type_system_t t)
     a.size = 6;
   } else if (t.method_msgs_ack.id__) {
     a.type = API;
-    a.params[0].value = api.buf.add_ui32(t.method_msgs_ack.id__);
+    a.params[0].value = api.buf.add_ui32(htole32(t.method_msgs_ack.id__));
     a.params[1] = t.method_msgs_ack.msg_ids;
     a.size = 2;
   } else {
@@ -112,7 +113,7 @@ tg_api_type_system_t sil_concrete(abstract_t a)
     reset_tg_api_type_system_flag++;
   }
 #endif
-  ui32_t id = api.buf.get_ui32(a.params[0].value);
+  ui32_t id = le32toh(api.buf.get_ui32(a.params[0].value));
   param_t p;
   p.id = id;
   buf_t_ s = a.params[1].value; // hack
@@ -190,7 +191,7 @@ tg_api_type_system_t sil_concrete(abstract_t a)
       p.value = s;
       p.type = TYPE_STRING;
       c.dh_prime = api.sel.deserialize_param(p);
-      ui32_t l = c.dh_prime.value.size + 4; // hack
+      ui32_t l = le32toh(c.dh_prime.value.size + 4); // hack
       //api.buf.dump(c.dh_prime.value);
       s = api.buf.add(s.data + l, s.size - l);
       p.value = s;

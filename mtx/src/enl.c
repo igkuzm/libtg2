@@ -9,6 +9,7 @@
 #include "../include/api.h"
 #include "../include/enl.h"
 #include "../include/buf.h"
+#include "../../essential/endian.h"
 
 buf_t_ enl_encrypt(buf_t_ b, msg_t t)
 {

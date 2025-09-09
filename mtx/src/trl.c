@@ -9,6 +9,7 @@
 #include "../include/trl.h"
 #include "../include/api.h"
 #include "../include/buf.h"
+#include "../../essential/endian.h"
 
 trl_t trl_init()
 {
@@ -20,10 +21,9 @@ trl_t trl_init()
 buf_t_ trl_transport(buf_t_ buf)
 {
   buf_t_ b = {};
-	/*buf_init(&b);	*/
 
 	// intermediate header
-	b = api.buf.add_ui32(buf.size);
+	b = api.buf.add_ui32(htole32(buf.size));
 	b = api.buf.cat(b, buf);
 
   // add size
@@ -51,12 +51,12 @@ buf_t_ trl_detransport(buf_t_ a)
   }
 
   // check len
-  buf_t_ a_len = api.buf.add(a.data, 4);
-  buf_t_ a_len_ = api.buf.add((ui8_t *)&a.size, 4);
-
-  if (!api.buf.cmp(a_len, a_len_)) {
-    api.log.error("trl_transport: len mismatch");
-  }
+//  buf_t_ a_len = api.buf.add(a.data, 4);
+//  buf_t_ a_len_ = api.buf.add((ui8_t *)&a.size, 4);
+//
+//  if (!api.buf.cmp(a_len, a_len_)) {
+//    api.log.error("trl_transport: len mismatch");
+//  }
 	
   // check seq
   //buf_t_ a_seq = api.buf.add(a.data+4, 4);

@@ -8,6 +8,7 @@
 
 #include "../include/api.h"
 #include "../include/buf.h"
+#include "../../essential/endian.h"
 
 sel_t sel_init(trl_t trl)
 {
@@ -18,25 +19,25 @@ sel_t sel_init(trl_t trl)
 
 buf_t_ sel_serialize_id(buf_t_ b)
 {
-  buf_t_ s;
-	//buf_init(&s);
-  s = api.buf.add(b.data, 4);
-
-  return s;
+	uint32_t var = htole32(*(&b.data));
+	buf_t_ s;
+	
+	s = api.buf.add_ui32(var);
+	return s;
 }
 
 buf_t_ sel_serialize_param(param_t p)
 {
   buf_t_ s;
-	//buf_init(&s);
 
   switch (p.type)
   {
     case TYPE_INT:
     {
-      s = api.buf.add(p.value.data, 4);
-
-      break;
+		uint32_t var = htole32(*(&p.value.data));
+		s = api.buf.add_ui32(var);
+		
+		break;
     }
     case TYPE_INT128:
     {
@@ -52,9 +53,10 @@ buf_t_ sel_serialize_param(param_t p)
     }
     case TYPE_LONG:
     {
-      s = api.buf.add(p.value.data, 8);
-
-      break;
+		uint64_t var = htole64(*(&p.value.data));
+		s = api.buf.add_ui64(var);
+		
+		break;
     }
     case TYPE_VECTOR_LONG:
     {
@@ -83,10 +85,10 @@ buf_t_ sel_serialize_param(param_t p)
 
     default:
     {
-			printf("TYPE: %d\n", p.type);
-      api.log.error("unknown type");
+		printf("TYPE: %d\n", p.type);
+		api.log.error("unknown type");
 
-      break;
+		break;
     }
   }
 
@@ -96,15 +98,15 @@ buf_t_ sel_serialize_param(param_t p)
 param_t sel_deserialize_param(param_t p)
 {
   buf_t_ s;
-	//buf_init(&s);
 
   switch (p.type)
   {
     case TYPE_INT:
     {
-      s = api.buf.add(p.value.data, 4);
-
-      break;
+		uint32_t var = le32toh(*(&p.value.data));
+		s = api.buf.add_ui32(var);
+		
+		break;
     }
     case TYPE_INT128:
     {
@@ -120,9 +122,10 @@ param_t sel_deserialize_param(param_t p)
     }
     case TYPE_LONG:
     {
-      s = api.buf.add(p.value.data, 8);
+		uint64_t var = le64toh(*(&p.value.data));
+		s = api.buf.add_ui64(var);
 
-      break;
+		break;
     }
     case TYPE_VECTOR_LONG:
     case TYPE_VECTOR_MESSAGE:
@@ -139,9 +142,10 @@ param_t sel_deserialize_param(param_t p)
     }
     case TYPE_ID:
     {
-      s = api.buf.add(p.value.data, 4);
-
-      break;
+		uint32_t var = le32toh(*(&p.value.data));
+		s = api.buf.add_ui32(var);
+      
+		break;
     }
     case TYPE_MESSAGE:
     {
@@ -166,9 +170,7 @@ param_t sel_deserialize_param(param_t p)
 
 buf_t_ sel_deserialize_string(buf_t_ b)
 {
-	/*buf_dump(b);*/
   buf_t_ s;
-	//buf_init(&s);
   buf_t_ byte = api.buf.add(b.data, 4);
   int offset = byte.data[0];
 
@@ -187,7 +189,7 @@ buf_t_ sel_deserialize_string(buf_t_ b)
 
     buf_t_ len_ = api.buf.add(b.data + 1, 3);
     len_.size = 4; // hack
-    ui32_t len = api.buf.get_ui32(len_);
+    ui32_t len = le32toh(api.buf.get_ui32(len_));
     b = api.buf.add(b.data + 4, b.size - 4);
     s = api.buf.add(b.data, len);
   } else {
@@ -267,14 +269,14 @@ buf_t_ sel_deserialize_vector(param_t p)
   buf_t_ d;
 	//buf_init(&d);
   buf_t_ b = p.value;
-  ui32_t id = api.buf.get_ui32(b);
+  ui32_t id = le32toh(api.buf.get_ui32(b));
 
   if (id != _id_Vector) {
     api.log.error("this is not vector id");
   }
 
   b = api.buf.add(b.data + 4, b.size - 4);
-  ui32_t q = api.buf.get_ui32(b);
+  ui32_t q = le32toh(api.buf.get_ui32(b));
 
   if (!q) {
     api.log.info("empty container deserialized");
