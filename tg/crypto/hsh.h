@@ -13,6 +13,9 @@
 extern buf_t tg_hsh_sha1(buf_t b);
 extern buf_t tg_hsh_sha256(buf_t b);
 
+extern buf_t tg_pbkdf2_sha512(
+		buf_t password, buf_t salt, int iteration_count);
+
 extern buf_t tg_hsh_sha1_free(buf_t b);
 extern buf_t tg_hsh_sha256_free(buf_t b);
 

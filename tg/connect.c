@@ -128,11 +128,11 @@ int tg_connect(
 	}
 	_TG_CB(TG_AUTH_INFO, sentCode, "phone code: %s", phone_code);
 
-	tl_auth_authorization_t *auth = 
+	user = 
 		tg_auth_signIn(tg, sentCode, phone_number, phone_code);
-	if (auth){
+	if (user){
 		// authorized!
-		_TG_CB(TG_AUTH_SUCCESS, auth->user_, "authorized!");
+		_TG_CB(TG_AUTH_SUCCESS, user, "authorized!");
 		return 0;
 	}
 

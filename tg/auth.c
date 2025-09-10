@@ -146,7 +146,7 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number)
 	buf_free(sendCode);
 
 	if (tl == NULL){
-		ON_ERR(tg, "TL is NULL");
+		ON_ERR(tg, "%s: TL is NULL", __func__);
 		return NULL;
 	}
 
@@ -165,14 +165,13 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number)
 			tg_new_auth_key_mtx(tg);
 			tg->key.size = 0;
 			return tg_auth_sendCode(tg, phone_number);
+		} else {
+			// throw error
+			ON_ERR(tg, "%s", error->error_message_.data);
+			return NULL;
 		}
 	}
 	
-	if (!tl){
-		ON_ERR(tg, "TL is NULL");
-		return NULL;
-	}
-		
 	if (tl->_id == id_auth_sentCode){
 		return (tl_auth_sentCode_t *)tl;
 	}
@@ -181,7 +180,7 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number)
 	return NULL;
 }
 
-tl_auth_authorization_t *
+tl_user_t *
 tg_auth_signIn(tg_t *tg, tl_auth_sentCode_t *sentCode, 
 		const char *phone_number, const char *phone_code) 
 {
@@ -219,7 +218,7 @@ tg_auth_signIn(tg_t *tg, tl_auth_sentCode_t *sentCode,
 			return NULL;
 		}
 		
-		return auth;
+		return (tl_user_t *)auth->user_;
 	}
 
 	if (tl)

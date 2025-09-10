@@ -113,8 +113,7 @@ buf_t buf_add_buf(buf_t buf)
 
 buf_t buf_add_bufs(int n, ...)
 {
-	buf_t buf;
-	buf_init(&buf);
+	buf_t buf = buf_new();
 	va_list argv;
 	va_start(argv, n);
 	int i;
