@@ -1,3 +1,4 @@
+#include "auth.h"
 #include "../config.h"
 #include "tg.h"
 #include "../libtg.h"
@@ -180,7 +181,7 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number)
 	return NULL;
 }
 
-tl_user_t *
+tl_auth_authorization_t *
 tg_auth_signIn(tg_t *tg, tl_auth_sentCode_t *sentCode, 
 		const char *phone_number, const char *phone_code) 
 {
@@ -218,7 +219,7 @@ tg_auth_signIn(tg_t *tg, tl_auth_sentCode_t *sentCode,
 			return NULL;
 		}
 		
-		return (tl_user_t *)auth->user_;
+		return auth;
 	}
 
 	if (tl)

@@ -23,29 +23,29 @@
  * 
  * This extension of the SRP protocol uses the password-based PBKDF2 
  * with 100000 iterations using sha512 (PBKDF2HMACSHA512iter100000).
- *  PBKDF2 is used to additionally rehash the x parameter, 
- *  obtained using a method similar to the one described in 
- *  RFC 2945 (H(s | H ( I | password | I) | s) 
- *  instead of H(s | H ( I | ":" | password)) (see below).
+ * PBKDF2 is used to additionally rehash the x parameter, 
+ * obtained using a method similar to the one described in 
+ * RFC 2945 (H(s | H ( I | password | I) | s) 
+ * instead of H(s | H ( I | ":" | password)) (see below).
  *
- *  Here, | denotes concatenation and + denotes the arithmetical
- *  operator +. In all cases where concatenation of numbers 
- *  passed to hashing functions is done, the numbers must be 
- *  used in big-endian form, padded to 2048 bits; all math 
- *  is modulo p. Instead of I, salt1 will be used (see SRP protocol).
- *  Instead of s, salt2 will be used (see SRP protocol).
+ * Here, | denotes concatenation and + denotes the arithmetical
+ * operator +. In all cases where concatenation of numbers 
+ * passed to hashing functions is done, the numbers must be 
+ * used in big-endian form, padded to 2048 bits; all math 
+ * is modulo p. Instead of I, salt1 will be used (see SRP protocol).
+ * Instead of s, salt2 will be used (see SRP protocol).
  *
- *  The main hashing function H is sha256:
- *  H(data) := sha256(data)
+ * The main hashing function H is sha256:
+ * H(data) := sha256(data)
  *
- *  The salting hashing function SH is defined as follows:
- *  SH(data, salt) := H(salt | data | salt)
+ * The salting hashing function SH is defined as follows:
+ * SH(data, salt) := H(salt | data | salt)
  *
- *  The primary password hashing function is defined as follows:
- *  PH1(password, salt1, salt2) := SH(SH(password, salt1), salt2)
+ * The primary password hashing function is defined as follows:
+ * PH1(password, salt1, salt2) := SH(SH(password, salt1), salt2)
  *
- *  The secondary password hashing function is defined as follows:
- *  PH2(password, salt1, salt2) := SH(pbkdf2(sha512, PH1(password, salt1, salt2), salt1, 100000), salt2) */
+ * The secondary password hashing function is defined as follows:
+ * PH2(password, salt1, salt2) := SH(pbkdf2(sha512, PH1(password, salt1, salt2), salt1, 100000), salt2) */
 
 #include "tg.h"
 #include "send_query.h"
@@ -62,8 +62,36 @@
 #include <stdint.h>
 #include <string.h>
 #include "crypto/hsh.h"
+#include "crypto/pbkdf2.h"
 #include "tg_log.h"
 
+// H(data) := sha256(data)
+#define H(data) tg_hsh_sha256(data)
+ 
+// SH(data, salt) := H(salt | data | salt)
+#define SH(data, salt) \
+	({buf_t _buf = buf_add_bufs(salt, data, salt); \
+		buf_t _ret = H(_buf); \
+		buf_free(_buf); \
+		_ret;})
+ 
+// PH1(password, salt1, salt2) := SH(SH(password, salt1), salt2)
+#define PH1(password, salt1, salt2) \
+	({buf_t _buf = SH(password, salt1); \
+		buf_t _ret = SH(_buf, salt2); \
+		buf_free(_buf); \
+		_ret;})
+ 
+// PH2(password, salt1, salt2) := 
+// SH(pbkdf2(sha512, PH1(password, salt1, salt2), salt1, 100000), salt2)
+#define PH2(password, salt1, salt2) \
+	({buf_t _ph1 = PH1(password, salt1, salt2); \
+	  buf_t _buf = tg_pbkdf2_sha512(_ph1, salt1, 100000); \
+		buf_t _ret = SH(_buf, salt2); \
+		buf_free(_ph1); \
+		buf_free(_buf); \
+		_ret;})
+ 
 static buf_t tg_calc_password_hash(
 		tg_t *tg, const char *password, buf_t salt1, buf_t salt2)
 {
@@ -72,26 +100,35 @@ static buf_t tg_calc_password_hash(
 	buf_t password_buf = buf_add((unsigned char *)password,
 		 	strlen(password));
 
-	buf_t SH = tg_hsh_sha256_free(
-			buf_add_bufs(3, salt1, password_buf, salt1));
+	buf_t SH = buf_add_bufs(3, salt1, password_buf, salt1);
 	buf_free(password_buf);
-
-	buf_t PH1 = tg_hsh_sha256_free(
-			buf_add_bufs(3, salt2, SH, salt2));
+	ON_LOG_BUF(tg, SH, "%s: SH: ", __func__);
+	buf_t SH_HSH = tg_hsh_sha256(SH);
 	buf_free(SH);
+	ON_LOG_BUF(tg, SH_HSH, "%s: SH_HSH: ", __func__);
 
-	buf_t PBKDF2 = tg_pbkdf2_sha512(PH1, salt1,
-		 	100000);
+	buf_t PH1 = buf_add_bufs(3, salt2, SH_HSH, salt2);
+	buf_free(SH);
+	ON_LOG_BUF(tg, PH1, "%s: PH1: ", __func__);
+	buf_t PH1_HSH = tg_hsh_sha256(PH1);
 	buf_free(PH1);
+	ON_LOG_BUF(tg, PH1_HSH, "%s: PH1_HSH: ", __func__);
+
+	buf_t PBKDF2 = tg_pbkdf2_sha512(
+			PH1_HSH, salt1, 100000);
+	buf_free(PH1_HSH);
+	ON_LOG_BUF(tg, PBKDF2, "%s: PBKDF2: ", __func__);
 	
-	buf_t PH2 = tg_hsh_sha256_free(
-			buf_add_bufs(3, salt2, PBKDF2, salt2));
+	buf_t PH2 = buf_add_bufs(3, salt2, PBKDF2, salt2);
 	buf_free(PBKDF2);
+	ON_LOG_BUF(tg, PH2, "%s: PH2: ", __func__);
+	buf_t PH2_HSH = tg_hsh_sha256(PH2);
+	buf_free(PH2);
+	ON_LOG_BUF(tg, PH2_HSH, "%s: PH2_HSH: ", __func__);
 
 	ON_LOG(tg, "End password hash calculation");
-	return PH2;
+	return PH2_HSH;
 }	
-
 
 static buf_t tg_calc_password_srp_hash(
 		tg_t *tg, const char *password, buf_t salt1, buf_t salt2, 
@@ -160,6 +197,7 @@ static InputCheckPasswordSRP tg_get_inputCheckPasswordSRP(
 	buf_t g_padded = buf_new();
 	BN_bn2bin(g_bn, g_padded.data);
 	g_padded.size = 256;
+	ON_LOG_BUF(tg, g_padded, "%s: g_padded: ", __func__);
 
 	// auto x = calc_password_hash(password, client_salt, server_salt);
 	// auto x_bn = BigNum::from_binary(x.as_slice());
@@ -173,6 +211,7 @@ static InputCheckPasswordSRP tg_get_inputCheckPasswordSRP(
 	buf_t a = buf_rand(2048/8);
 	BIGNUM *a_bn = BN_new();
 	BN_bin2bn(a.data, a.size, a_bn);
+	ON_LOG_BUF(tg, a, "%s: a: ", __func__);
 	
 	// BigNumContext ctx;
   // BigNum A_bn;
@@ -184,14 +223,18 @@ static InputCheckPasswordSRP tg_get_inputCheckPasswordSRP(
 	buf_t A = buf_new();
 	BN_bn2bin(A_bn, A.data);
 	A.size = 256;
-	ON_LOG_BUF(tg, A, "A:                  ");
+	ON_LOG_BUF(tg, A, "%s: A: ", __func__);
 	
 	// string B_pad(256 - B.size(), '\0');
 	buf_t B_pad = buf_new();
 	B_pad.size = 256 - B.size;
+	ON_LOG_BUF(tg, B_pad, "%s: B_pad: ", __func__);
   
 	// string u = sha256(PSLICE() << A << B_pad << B);
-	buf_t u = tg_hsh_sha256_free(buf_add_bufs(3, A, B_pad, B));
+	buf_t u_ = buf_add_bufs(3, A, B_pad, B);
+	buf_t u  = tg_hsh_sha256(u);
+	buf_free(u_);
+	ON_LOG_BUF(tg, u, "%s: u: ", __func__);
   
 	// auto u_bn = BigNum::from_binary(u);
 	BIGNUM *u_bn = BN_new();
@@ -199,9 +242,12 @@ static InputCheckPasswordSRP tg_get_inputCheckPasswordSRP(
   
 	// string k = sha256(PSLICE() << p << g_padded);
   // auto k_bn = BigNum::from_binary(k);
-	buf_t k = tg_hsh_sha256_free(buf_add_bufs(2, p, g_padded));
+	buf_t k_ = buf_add_bufs(2, p, g_padded);
+	buf_t k  = tg_hsh_sha256(k_);
+	buf_free(k_);
 	BIGNUM *k_bn = BN_new();
 	BN_bin2bn(k.data, k.size, k_bn);
+	ON_LOG_BUF(tg, k, "%s: k: ", __func__);
 	
   // BigNum v_bn;
   // BigNum::mod_exp(v_bn, g_bn, x_bn, p_bn, ctx);
@@ -215,7 +261,6 @@ static InputCheckPasswordSRP tg_get_inputCheckPasswordSRP(
 	
 	// BigNum t_bn;
   // BigNum::sub(t_bn, B_bn, kv_bn);
-	// BigNum::sub(t_bn, B_bn, kv_bn);
   // if (BigNum::compare(t_bn, zero) == -1) {
   //  BigNum::add(t_bn, t_bn, p_bn);
   // }
@@ -234,13 +279,16 @@ static InputCheckPasswordSRP tg_get_inputCheckPasswordSRP(
   // BigNum S_bn;
   // BigNum::mod_exp(S_bn, t_bn, exp_bn, p_bn, ctx);
   // string S = S_bn.to_binary(256);
-  // auto K = sha256(S);
 	BIGNUM *S_bn = BN_new();
   assert(BN_mod_exp(S_bn, t_bn, exp_bn, p_bn, ctx)); 
 	buf_t S = buf_new();
 	BN_bn2bin(S_bn, S.data);
 	S.size = 256;
+	ON_LOG_BUF(tg, S, "%s: S: ", __func__);
+  
+	// auto K = sha256(S);
 	buf_t K = tg_hsh_sha256(S);
+	ON_LOG_BUF(tg, K, "%s: K: ", __func__);
 
 	// auto h1 = sha256(p);
   // auto h2 = sha256(g_padded);
@@ -250,37 +298,59 @@ static InputCheckPasswordSRP tg_get_inputCheckPasswordSRP(
 	// for (size_t i = 0; i < h1.size(); i++) {
   // h1[i] = static_cast<char>(static_cast<unsigned char>(h1[i]) ^ static_cast<unsigned char>(h2[i]));
   // }
-  // auto M = sha256(PSLICE() << h1 << sha256(client_salt) << sha256(server_salt) << A << B_pad << B << K);
+	buf_t xor = buf_xor(h1, h2);
 
 	buf_t salt1_hash = tg_hsh_sha256(salt1);
 	buf_t salt2_hash = tg_hsh_sha256(salt2);
 
-	buf_t M1 = tg_hsh_sha256_free(
-			buf_add_bufs(7, buf_xor(h1, h2), salt1_hash, salt2_hash, 
-				A, B_pad, B, K));
+  // auto M = sha256(PSLICE() << h1 << sha256(client_salt) << sha256(server_salt) << A << B_pad << B << K);
+	buf_t M1_ = buf_add_bufs(7, 
+			xor, salt1_hash, salt2_hash, A, B_pad, B, K);
+	buf_t M1  = tg_hsh_sha256(M1_);
+	buf_free(M1_);
 
 	buf_free(h1);
 	buf_free(h2);
+	buf_free(xor);
 	buf_free(salt1_hash);
 	buf_free(salt2_hash);
-
+	buf_free(B_pad);
+	buf_free(K);
+	buf_free(S);
 	buf_free(g_padded);
+	buf_free(u);
+	buf_free(k);
+	buf_free(x);
+
+	BN_free(g_bn);
+	BN_free(x_bn);
+	BN_free(a_bn);
+	BN_free(A_bn);
+	BN_free(u_bn);
+	BN_free(k_bn);
+	BN_free(v_bn);
+	BN_free(kv_bn);
+	BN_free(t_bn);
+	BN_free(exp_bn);
+	BN_free(S_bn);
+
+	BN_CTX_free(ctx);
 	
 	ON_LOG(tg, "End input password SRP hash calculation");
 
 	buf_free(srp);
 	srp = tl_inputCheckPasswordSRP(id, &A, &M1);
 
+	buf_free(A);
+	buf_free(M1);
+	
 	return srp;
 }
 
-int tg_2fa(tg_t *tg, const char *password){
-	
+static tl_account_password_t *tg_account_getPassword(tg_t *tg)
+{
 	tl_t *tl = NULL; 
-/* Client-side, the following parameters are extracted from 
- * the passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow
- * object, contained in the account.password object. */
-
+	
 	// get account.password
 	buf_t account_getPassword = 
 		tl_account_getPassword();
@@ -289,17 +359,30 @@ int tg_2fa(tg_t *tg, const char *password){
 	
 	if (tl == NULL){
 		ON_ERR(tg, "%s: TL is NULL", __func__);
-		return 1;
+		return NULL;
 	}
 
 	if (tl->_id != id_account_password){
 		ON_ERR(tg, "%s: expected: account_password, but got: %s",
 			 	__func__, TL_NAME_FROM_ID(tl->_id));
-		return 1;
+		tl_free(tl);
+		return NULL;
 	}
+
+	return (tl_account_password_t *)tl;
+}
+
+tl_auth_authorization_t *
+tg_auth_check_password(tg_t *tg, const char *password){
 	
+/* Client-side, the following parameters are extracted from 
+ * the passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow
+ * object, contained in the account.password object. */
+
 	tl_account_password_t *account_password = 
-		(tl_account_password_t *)tl;
+		tg_account_getPassword(tg);
+	if (!account_password)
+		return NULL;
 
 	tl_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow_t 
 		*algo = 
@@ -310,88 +393,45 @@ int tg_2fa(tg_t *tg, const char *password){
 			tg, password, algo->salt1_, algo->salt2_, 
 			algo->g_, algo->p_, 
 			account_password->srp_B_, account_password->srp_id_);	
-	if (srp.size == 0)
-		return 1;
+
+	if (srp.size == 0){
+		return NULL;
+	}
 
 	buf_t auth_check_password = 
 		tl_auth_checkPassword(&srp);
 	buf_free(srp);
 
-	tl = tg_send_query_sync(tg, &auth_check_password, true);
+	tl_t *tl = tg_send_query_sync(tg, &auth_check_password, true);
 	buf_free(auth_check_password);
 
 	if (!tl){
 		ON_ERR(tg, "%s: TL is NULL", __func__);
-		return 1;
+		return NULL;
 	}
 
 	if (tl->_id == id_rpc_error){
 		tl_rpc_error_t *error  = 
 			(tl_rpc_error_t *)tl;
 		ON_ERR(tg, "%s: %s", __func__, error->error_message_.data);
-		return 1;
+		tl_free(tl);
+		return NULL;
 	}
 
 	if (tl->_id != id_auth_authorization){
 		ON_ERR(tg, "%s: expected auth_authorization but got: %s",
 				__func__, TL_NAME_FROM_ID(tl->_id));
-		return 1;
+		tl_free(tl);
+		return NULL;
 	}
 
 	printf("GOOD PASSWORD!!!!\n");
 
-	return 0;
+	return (tl_auth_authorization_t *)tl;
 }
 
 
 /*
- *
-static void pbkdf2_impl(Slice password, Slice salt, int iteration_count, MutableSlice dest, const EVP_MD *evp_md) {
-  CHECK(evp_md != nullptr);
-  int hash_size = EVP_MD_size(evp_md);
-  CHECK(dest.size() == static_cast<size_t>(hash_size));
-  CHECK(iteration_count > 0);
-#if OPENSSL_VERSION_NUMBER < 0x10000000L
-  HMAC_CTX ctx;
-  HMAC_CTX_init(&ctx);
-  unsigned char counter[4] = {0, 0, 0, 1};
-  auto password_len = narrow_cast<int>(password.size());
-  HMAC_Init_ex(&ctx, password.data(), password_len, evp_md, nullptr);
-  HMAC_Update(&ctx, salt.ubegin(), narrow_cast<int>(salt.size()));
-  HMAC_Update(&ctx, counter, 4);
-  HMAC_Final(&ctx, dest.ubegin(), nullptr);
-  HMAC_CTX_cleanup(&ctx);
-
-  if (iteration_count > 1) {
-    CHECK(hash_size <= 64);
-    unsigned char buf[64];
-    std::copy(dest.ubegin(), dest.uend(), buf);
-    for (int iter = 1; iter < iteration_count; iter++) {
-      if (HMAC(evp_md, password.data(), password_len, buf, hash_size, buf, nullptr) == nullptr) {
-        LOG(FATAL) << "Failed to HMAC";
-      }
-      for (int i = 0; i < hash_size; i++) {
-        dest[i] = static_cast<unsigned char>(dest[i] ^ buf[i]);
-      }
-    }
-  }
-#else
-  int err = PKCS5_PBKDF2_HMAC(password.data(), narrow_cast<int>(password.size()), salt.ubegin(),
-                              narrow_cast<int>(salt.size()), iteration_count, evp_md, narrow_cast<int>(dest.size()),
-                              dest.ubegin());
-  LOG_IF(FATAL, err != 1);
-#endif
-}
-
-
-
-
-void pbkdf2_sha512(Slice password, Slice salt, int iteration_count, MutableSlice dest) {
-  pbkdf2_impl(password, salt, iteration_count, dest, EVP_sha512());
-}
-
-
-
 Result<BufferSlice> PasswordManager::calc_password_srp_hash(Slice password, Slice client_salt, Slice server_salt,
                                                             int32 g, Slice p) {
   LOG(INFO) << "Begin password SRP hash calculation";

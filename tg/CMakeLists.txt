@@ -12,6 +12,7 @@ set(TARGET_SOURCES
 	crypto/rsa.c
 	crypto/sha1.c
 	crypto/sha256.c
+	crypto/pbkdf2.c
 	transport/http.c
 	transport/socket.c
   transport/header.c

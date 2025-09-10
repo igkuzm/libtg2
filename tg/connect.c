@@ -5,40 +5,23 @@
 #include <stdio.h>
 #include <string.h>
 #include "auth.h"
+#include "tg_log.h"
 #include "transport/socket.h"
-#include "2fa.h"
 
 struct tg_connect_t {
-	void *userdata;
-	char * (*callback)(void *userdata, TG_AUTH auth,
-			const tl_t *tl, const char *error);
+	void *on_err_data;
+	void (*on_err)(void *on_err_data, const char *err);
 	char error[BUFSIZ];
 };
 
-static void on_err(void *d, const char *err)
+void catch_errors(void *data, const char *err)
 {
-	struct tg_connect_t *t = d;
-	if (err)
-		strcpy(t->error, err);
-	else
-		t->error[0] = 0;
-
-	if (t->callback)
-		t->callback(t->userdata, TG_AUTH_ERROR, NULL, err);
+	struct tg_connect_t *t = (struct tg_connect_t *)data;
+	strncpy(t->error, err, BUFSIZ - 1);
+	t->error[BUFSIZ - 1] = 0;
+	if (t->on_err)
+		t->on_err(t->on_err_data, err);
 }
-
-static void on_log(void *d, const char *msg)
-{
-	struct tg_connect_t *t = d;
-	if (msg)
-		strcpy(t->error, msg);
-	else
-		t->error[0] = 0;
-
-	if (t->callback)
-		t->callback(t->userdata, TG_AUTH_INFO, NULL, msg);
-}
-
 
 #define _TG_CB(auth, tl, ...)\
 	({\
@@ -61,14 +44,7 @@ int tg_connect(
 			const char *error))
 {
 	struct tg_connect_t t = 
-	{userdata, callback, 0};
-
-	// save previous error handler
-	/*void  *_prev_on_err_data = tg->on_err_data;*/
-	/*void (*_prev_on_err_call)= tg->on_err;*/
-
-	tg_set_on_error(tg, &t, on_err);
-	tg_set_on_log(tg, &t, on_log);
+		{tg->on_err_data, tg->on_err, 0};
 
 	// check if authorized
 	tl_user_t *user = tg_is_authorized(tg);
@@ -79,7 +55,7 @@ int tg_connect(
 
 	// get new auth key
 	if (tg_new_auth_key_mtx(tg)){
-		_TG_CB(TG_AUTH_ERROR, NULL, "no connection");
+		ON_ERR(tg, "no connection");
 		return 1;
 	}
 
@@ -89,32 +65,14 @@ int tg_connect(
 					"enter phone number (+7XXXXXXXXXX)");
 	
 	if (!phone_number){
-		_TG_CB(TG_AUTH_ERROR, NULL, "phone number is NULL");
+		ON_ERR(tg, "phone number is NULL");
 		return 1;
 	}
-	_TG_CB(TG_AUTH_INFO, NULL, "phone number: %s", phone_number);
+	ON_LOG(tg, "phone number: %s", phone_number);
 
 	// send authorization code
 	tl_auth_sentCode_t *sentCode = 
 		tg_auth_sendCode(tg, phone_number);
-
-	// check if need password
-	if (strcmp(t.error, "SESSION_PASSWORD_NEEDED") == 0)
-	{
-		// ask user for password
-		char *password = 
-			_TG_CB(TG_AUTH_PASSWORD_NEEDED, sentCode, "enter password");
-		if (!password){
-			_TG_CB(TG_AUTH_ERROR, sentCode, "password is NULL");
-			return 1;
-		}
-		_TG_CB(TG_AUTH_INFO, sentCode, "password: %s", password);
-
-		/* TODO: connect with password */
-		_TG_CB(TG_AUTH_ERROR, sentCode, 
-				"password auth is not implyed yet!");
-		return 1;
-	}
 
 	if (!sentCode)
 		return 1;
@@ -123,16 +81,24 @@ int tg_connect(
 	char *phone_code = 
 		_TG_CB(TG_AUTH_PHONE_CODE_NEEDED, sentCode, "enter code");
 	if (!phone_code){
-		_TG_CB(TG_AUTH_ERROR, sentCode, "phone code is NULL");
+		ON_ERR(tg, "phone code is NULL");
 		return 1;
 	}
-	_TG_CB(TG_AUTH_INFO, sentCode, "phone code: %s", phone_code);
+	ON_LOG(tg, "phone code: %s", phone_code);
 
-	user = 
+	// catch errors
+	tg_set_on_error(tg, &t, catch_errors);
+
+	tl_auth_authorization_t *auth = 
 		tg_auth_signIn(tg, sentCode, phone_number, phone_code);
-	if (user){
+
+	// stop catch errors
+	tg_set_on_error(tg, t.on_err_data, t.on_err);
+
+	if (auth){
 		// authorized!
-		_TG_CB(TG_AUTH_SUCCESS, user, "authorized!");
+		_TG_CB(TG_AUTH_AUTHORIZATION, auth, "authorization done");
+		_TG_CB(TG_AUTH_SUCCESS, auth->user_, "authorized!");
 		return 0;
 	}
 
@@ -143,14 +109,14 @@ int tg_connect(
 		char *password = 
 			_TG_CB(TG_AUTH_PASSWORD_NEEDED, sentCode, "enter password");
 		if (!password){
-			_TG_CB(TG_AUTH_ERROR, sentCode, "password is NULL");
+			ON_ERR(tg, "password is NULL");
 			return 1;
 		}
-		_TG_CB(TG_AUTH_INFO, sentCode, "password: %s", password);
+		ON_LOG(tg, "password: %s", password);
 
-		tg_2fa(tg, password);
+		auth = tg_auth_check_password(tg, password);
 
-		_TG_CB(TG_AUTH_ERROR, sentCode, 
+		ON_ERR(tg, 
 				"password auth is not implyed yet!");
 		return 1;
 	}

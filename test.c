@@ -82,19 +82,6 @@ char * callback(
 						(char *)user->phone_.data);
 			}
 			break;
-		case TG_AUTH_ERROR:
-			{
-				if (msg)
-					printf("tg_connect error: %s\n", msg);
-			}
-			break;
-		
-		case TG_AUTH_INFO:
-			{
-				if (msg)
-					printf("tg_connect info: %s\n", msg);
-			}
-			break;
 
 		default:
 			break;

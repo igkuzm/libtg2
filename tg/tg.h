@@ -8,8 +8,8 @@
 #include "../essential/alloc.h"
 #include "../libtg.h"
 
-/*#define DEFAULT_DC   DC2t*/
-#define DEFAULT_DC   DC2
+#define DEFAULT_DC   DC2t
+/*#define DEFAULT_DC   DC2*/
 #define DEFAULT_PORT 443
 
 struct tg_t {
