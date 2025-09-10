@@ -8,6 +8,7 @@
 #include "send_query.h"
 #include "tg_log.h"
 #include "transport/socket.h"
+#include "auth_key_mtx.h"
 
 buf_t initConnection(tg_t *tg, buf_t query)
 {
@@ -37,7 +38,6 @@ buf_t initConnection(tg_t *tg, buf_t query)
 	return invokeWithLayer;
 }
 
-/*
 tl_user_t *
 tg_is_authorized(tg_t *tg)
 {
@@ -49,7 +49,8 @@ tg_is_authorized(tg_t *tg)
 		buf_t init = initConnection(tg, getConfig);
 		buf_free(getConfig);
 		
-		tl_t *tl = tg_send_query_sync(tg, &init); 
+		tl_t *tl = 
+			tg_send_query_sync(tg, &init, true); 
 		buf_free(init);
 
 		if (tl == NULL || tl->_id !=id_config){
@@ -69,10 +70,11 @@ tg_is_authorized(tg_t *tg)
 		//ON_LOG_BUF(tg, getUsers, "%s: getUsers: ", __func__);
 		buf_free(iuser);
 
-		tl = tg_send_query_sync(tg, &getUsers); 
+		tl = tg_send_query_sync(tg, &getUsers, true); 
 		buf_free(getUsers);
 
 		if (tl == NULL){
+			ON_ERR(tg, "TL is NULL");
 			return NULL;
 		}
 
@@ -92,11 +94,9 @@ tg_is_authorized(tg_t *tg)
 	ON_ERR(tg, "NEED_TO_AUTHORIZE");
 	return NULL;
 }
-*/
 
 tl_auth_sentCode_t *
-tg_auth_sendCode(tg_t *tg, const char *phone_number,
-		int ntokens, char *logout_tokens[]) 
+tg_auth_sendCode(tg_t *tg, const char *phone_number) 
 {
 	tl_t *tl = NULL;
 	ON_LOG(tg, "%s", __func__);
@@ -117,16 +117,6 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number,
 	ON_LOG(tg, "got config!");
 	tg->config = (tl_config_t *)tl;
 
-	// get tokens 
-	buf_t tokens[20]; int i;
-	if (logout_tokens){
-		for (i = 0; i < ntokens && i < 20; ++i) {
-			tokens[i] = 
-				buf_add((uint8_t*)logout_tokens[i],
-					 	strlen(logout_tokens[i])); 
-		} 
-	}
-	
 	CodeSettings codeSettings = tl_codeSettings(
 			false,
 			 false,
@@ -134,8 +124,8 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number,
 			 false,
 			 false, 
 			false,
-			 tokens,
-			 i,
+			 NULL,
+			 0,
 			 NULL,
 			 NULL);
 
@@ -152,94 +142,88 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number,
 			"%s: sendCode: ", __func__);
 	buf_free(codeSettings);
 
-	// free tokens
-	if (logout_tokens){
-		for (i = 0; i < ntokens && i < 20; ++i) {
-			buf_free(tokens[i]);
-		}
-	}
-
 	tl = tg_send_query_sync(tg, &sendCode, true); 
 	buf_free(sendCode);
 
 	if (tl == NULL){
+		ON_ERR(tg, "TL is NULL");
 		return NULL;
 	}
 
-	/*if (tl->_id == id_rpc_error){*/
-		/*tl_rpc_error_t *error = (tl_rpc_error_t *)tl;*/
-		/*char *str = */
-			/*strstr((char *)error->error_message_.data, "PHONE_MIGRATE_");*/
-		/*if (str){*/
-			/*str += strlen("PHONE_MIGRATE_");*/
-			/*int dc = atoi(str);*/
-			/*const char *ip = */
-				/*tg_ip_address_for_dc(tg, dc);*/
-			/*if (!ip)*/
-				/*return NULL;*/
-			/*tg_set_server_address(tg, ip, 443);*/
-			/*// generate auth key*/
-			/*api.net.close(shared_rc.net);*/
-			/*tg->key.size = 0;*/
-			/*return tg_auth_sendCode(tg, phone_number);*/
-		/*}*/
-	/*}*/
+	if (tl->_id == id_rpc_error){
+		tl_rpc_error_t *error = (tl_rpc_error_t *)tl;
+		char *str = 
+			strstr((char *)error->error_message_.data, "PHONE_MIGRATE_");
+		if (str){
+			// reconnect to another DC
+			str += strlen("PHONE_MIGRATE_");
+			int dc = atoi(str);
+			tg->dc = DCs[dc-1]; 
+			
+			// generate new auth key
+			tg_socket_close(tg, tg->socket);
+			tg_new_auth_key_mtx(tg);
+			tg->key.size = 0;
+			return tg_auth_sendCode(tg, phone_number);
+		}
+	}
+	
+	if (!tl){
+		ON_ERR(tg, "TL is NULL");
+		return NULL;
+	}
 		
-	if (tl && tl->_id == id_auth_sentCode){
+	if (tl->_id == id_auth_sentCode){
 		return (tl_auth_sentCode_t *)tl;
 	}
-	if (tl)
-		tl_free(tl);
+
+	tl_free(tl);
 	return NULL;
 }
 
-/*tl_user_t **/
-/*tg_auth_signIn(tg_t *tg, tl_auth_sentCode_t *sentCode, */
-		/*const char *phone_number, const char *phone_code) */
-/*{*/
-	/*ON_LOG(tg, "%s", __func__);*/
-	/*buf_t signIn = */
-		/*tl_auth_signIn(*/
-				/*phone_number, */
-				/*(char *)sentCode->phone_code_hash_.data, */
-				/*phone_code, */
-				/*NULL);*/
+tl_auth_authorization_t *
+tg_auth_signIn(tg_t *tg, tl_auth_sentCode_t *sentCode, 
+		const char *phone_number, const char *phone_code) 
+{
+	ON_LOG(tg, "%s", __func__);
+	buf_t signIn = 
+		tl_auth_signIn(
+				phone_number, 
+				(char *)sentCode->phone_code_hash_.data, 
+				phone_code, 
+				NULL);
 	
-	/*tl_t *tl = */
-		/*tg_send_query_sync(tg, &signIn);*/
-	/*buf_free(signIn);*/
+	tl_t *tl = 
+		tg_send_query_sync(tg, &signIn, true);
+	buf_free(signIn);
+
+	if (!tl){
+		ON_ERR(tg, "TL is NULL");
+		return NULL;
+	}
 	
-	/*if (tl && tl->_id == id_auth_authorization){*/
-		/*tl_auth_authorization_t *auth =*/
-			/*(tl_auth_authorization_t *)tl;*/
+	if (tl->_id == id_rpc_error){
+		tl_rpc_error_t *error = (tl_rpc_error_t *)tl;
+		// throw error
+		ON_ERR(tg, "%s", error->error_message_.data);
+		return NULL;
+	}
+	
+	if (tl->_id == id_auth_authorization){
+		tl_auth_authorization_t *auth =
+			(tl_auth_authorization_t *)tl;
 
-		/*if (auth->setup_password_required_){*/
-			/*// throw error*/
-			/*ON_ERR(tg, "SESSION_PASSWORD_NEEDED");*/
-			/*return NULL;*/
-		/*}*/
+		if (auth->setup_password_required_){
+			// throw error
+			ON_ERR(tg, "SESSION_PASSWORD_NEEDED");
+			return NULL;
+		}
 		
-		/*if (auth->future_auth_token_.size > 0){*/
-		/*// save auth token*/
-			/*char auth_token[BUFSIZ];*/
-			/*strncpy(*/
-				/*auth_token,*/
-				/*((char *)auth->future_auth_token_.data),*/
-				/*auth->future_auth_token_.size);*/
-			/*auth_token_to_database(tg, auth_token);*/
-		/*}*/
-		
-		/*// save auth_key_id */
-		/*auth_key_to_database(tg, tg->key);*/
+		return auth;
+	}
 
-		/*// save ip address*/
-		/*ip_address_to_database(tg, tg->ip);*/
-		
-		/*return (tl_user_t *)auth->user_;*/
-	/*}*/
+	if (tl)
+		tl_free(tl);
 
-	/*if (tl)*/
-		/*tl_free(tl);*/
-
-	/*return NULL;*/
-/*}*/
+	return NULL;
+}

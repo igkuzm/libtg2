@@ -28,6 +28,8 @@ set(TARGET_SOURCES
 	auth_key1.c
 	auth_key_mtx.c
 	auth.c
+	connect.c
+	2fa.c
 )
 
 if(APPLE)

@@ -26,6 +26,9 @@ libtg_la_SOURCES = \
 				   auth_key1.c \
 				   auth_key_mtx.c \
 				   auth.c \
+				   connect.c \
+				   2fa.c \
+					 
 				   
 libtg_la_CFLAGS = -fPIC
 libtg_la_LIBADD = -lcrypto -lcurl
