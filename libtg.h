@@ -39,6 +39,7 @@ void tg_set_on_log(tg_t *tg,
 void tg_close(tg_t *);
 
 typedef enum {
+	TG_AUTH_ERROR,
 	TG_AUTH_PHONE_NUMBER_NEEDED,
 	TG_AUTH_PHONE_CODE_NEEDED,
 	TG_AUTH_PASSWORD_NEEDED,

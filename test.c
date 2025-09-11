@@ -83,6 +83,13 @@ char * callback(
 			}
 			break;
 
+		case TG_AUTH_ERROR:
+			{
+				printf("%s: %s\n", __func__, msg);
+			}
+			break;
+
+
 		default:
 			break;
 	}

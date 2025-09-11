@@ -85,12 +85,11 @@ static tl_t * tg_send_query_sync_receive(
 	return tl;
 }
 		
-tl_t *tg_send_query_sync(
-		tg_t *tg, buf_t *query, bool enc)
+tl_t *tg_send_query_sync(tg_t *tg, buf_t *query)
 {
 	tl_t *tl = NULL;
 	uint64_t msgid;
-	buf_t pack = tg_mtproto_pack(tg, query, enc,  &msgid);
+	buf_t pack = tg_mtproto_pack(tg, query, true,  &msgid);
 
 	ON_LOG_BUF(tg, pack, "%s: Data to send: ", __func__);
 	
@@ -99,15 +98,25 @@ tl_t *tg_send_query_sync(
 			return NULL;
 		}
 
-		tl = tg_send_query_sync_receive(tg, enc, msgid);
+		tl = tg_send_query_sync_receive(tg, true, msgid);
 		
 		// handle ACK - get data again
-		if (tl && tl->_id == id_msgs_ack)
-			tl = tg_send_query_sync_receive(tg, enc, msgid);
+		if (tl && tl->_id == id_msgs_ack){
+			tl_free(tl);
+			tl = tg_send_query_sync_receive(tg, true, msgid);
+		}
 
 		// handle gzip
 		if (tl && tl->_id == id_gzip_packed){
-			return tg_mtproto_guzip(tg, tl);
+			tl_t *unziped = tg_mtproto_guzip(tg, tl);
+			tl_free(tl);
+			tl = unziped;
+		}
+
+		// log errors
+		if (tl && tl->_id == id_rpc_error){
+			ON_LOG(tg, "%s: %s", __func__, 
+					STRING_T_TO_STR(((tl_rpc_error_t *)tl)->error_message_));
 		}
 	};
 

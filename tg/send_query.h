@@ -9,7 +9,7 @@ extern void tg_send_query(
 		void *ptr, int (*callback)(void *ptr, const tl_t *tl));
 
 extern tl_t *tg_send_query_sync(
-		tg_t *tg, buf_t *query, bool encrypt); 
+		tg_t *tg, buf_t *query); 
 
 extern void tg_send_query_with_progress(
 		tg_t *tg, buf_t *query, enum dc, bool enc, 

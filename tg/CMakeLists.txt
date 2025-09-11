@@ -31,6 +31,7 @@ set(TARGET_SOURCES
 	auth.c
 	connect.c
 	2fa.c
+	errors.c
 )
 
 if(APPLE)

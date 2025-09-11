@@ -33,7 +33,7 @@ int tg_new_auth_key2(tg_t *tg)
 	tl_t *tl = NULL;
 	buf_t nonce = buf_rand(16);
 	buf_t req_pq = tl_req_pq_multi(nonce);
-	tl = tg_send_query_sync(tg, &req_pq, false);
+	tl = tg_send_query_sync(tg, &req_pq);
  /* Server sends response of the form
 	* resPQ#05162463 nonce:int128 server_nonce:int128
 	* pq:string server_public_key_fingerprints:Vector long =
@@ -278,7 +278,7 @@ generation_new_random_temp_key:;
 		 ON_LOG_BUF(tg, req_DH_params, 
 				 "%s: req_DH_params: ", __func__);
 
-		tl = tg_send_query_sync(tg, &req_DH_params, false);
+		tl = tg_send_query_sync(tg, &req_DH_params);
 	 /* Server responds with
 		* server_DH_params_ok#d0e8075c nonce:int128
 		* server_nonce:int128 encrypted_answer:string =

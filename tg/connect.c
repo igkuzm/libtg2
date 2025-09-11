@@ -1,4 +1,5 @@
 #include "auth_key_mtx.h"
+#include "errors.h"
 #include "send_query.h"
 #include "tg.h"
 #include "../essential/strtok_foreach.h"
@@ -7,21 +8,6 @@
 #include "auth.h"
 #include "tg_log.h"
 #include "transport/socket.h"
-
-struct tg_connect_t {
-	void *on_err_data;
-	void (*on_err)(void *on_err_data, const char *err);
-	char error[BUFSIZ];
-};
-
-void catch_errors(void *data, const char *err)
-{
-	struct tg_connect_t *t = (struct tg_connect_t *)data;
-	strncpy(t->error, err, BUFSIZ - 1);
-	t->error[BUFSIZ - 1] = 0;
-	if (t->on_err)
-		t->on_err(t->on_err_data, err);
-}
 
 #define _TG_CB(auth, tl, ...)\
 	({\
@@ -43,9 +29,6 @@ int tg_connect(
 			const tl_t *tl,
 			const char *error))
 {
-	struct tg_connect_t t = 
-		{tg->on_err_data, tg->on_err, 0};
-
 	// check if authorized
 	tl_user_t *user = tg_is_authorized(tg);
 	if (user){
@@ -87,13 +70,9 @@ int tg_connect(
 	ON_LOG(tg, "phone code: %s", phone_code);
 
 	// catch errors
-	tg_set_on_error(tg, &t, catch_errors);
-
-	tl_auth_authorization_t *auth = 
-		tg_auth_signIn(tg, sentCode, phone_number, phone_code);
-
-	// stop catch errors
-	tg_set_on_error(tg, t.on_err_data, t.on_err);
+	AUTH_ERR_CODE err_code = AUTH_ERR_CODE_OK;
+	tl_auth_authorization_t *auth = tg_auth_signIn(tg, 
+			sentCode, phone_number, phone_code, &err_code);
 
 	if (auth){
 		// authorized!
@@ -103,26 +82,49 @@ int tg_connect(
 	}
 
 	// check if need password
-	if (strcmp(t.error, "SESSION_PASSWORD_NEEDED") == 0)
-	{
-		// ask user for password
-		char *password = 
-			_TG_CB(TG_AUTH_PASSWORD_NEEDED, sentCode, "enter password");
-		if (!password){
-			ON_ERR(tg, "password is NULL");
-			return 1;
-		}
-		ON_LOG(tg, "password: %s", password);
+	switch (err_code) {
+		case SESSION_PASSWORD_NEEDED:
+			{
+				// ask user for password
+				char *password = 
+					_TG_CB(TG_AUTH_PASSWORD_NEEDED, sentCode, "enter password");
+				if (!password){
+					ON_ERR(tg, "password is NULL");
+					return 1;
+				}
+				ON_LOG(tg, "password: %s", password);
 
-		auth = tg_auth_check_password(tg, password);
+				auth = tg_auth_check_password(tg, password);
 
-		ON_ERR(tg, 
-				"password auth is not implyed yet!");
-		return 1;
+				_TG_CB(TG_AUTH_ERROR, sentCode, 
+						"password auth is not implyed yet!");
+			}
+			break;
+		
+		case AUTH_RESTART:
+			{
+				_TG_CB(TG_AUTH_ERROR, sentCode, "restart authorization!");
+				// restart connection
+				return tg_connect(tg, userdata, callback);
+			}
+			break;
+
+		case PHONE_CODE_EXPIRED:
+			{
+				_TG_CB(TG_AUTH_ERROR, sentCode, "phone code expired!");
+				// restart connection
+				return tg_connect(tg, userdata, callback);
+			}
+			break;
+
+		case PHONE_NUMBER_UNOCCUPIED:
+				_TG_CB(TG_AUTH_ERROR, sentCode, 
+						"phone number unoccupied! you need to create new account");
+
+		default:
+			break;
+			
 	}
-
-	/* TODO: AUTH_RESTART, PHONE_CODE_EXPIRED, 
-	 * PHONE_NUMBER_UNOCCUPIED */
 
 	return 1;
 }

@@ -266,10 +266,10 @@ int open_libtl(generator_t *g)
 	fputs("\n", g->libtl_c);	
 
 	fputs("static tl_free_function *get_free_fun(unsigned int id){\n", g->libtl_c);
-	fputs("\tint i, len = sizeof(tl_deserialize_table)/sizeof(*tl_deserialize_table);\n", g->libtl_c);
+	fputs("\tint i, len = sizeof(tl_free_table)/sizeof(*tl_free_table);\n", g->libtl_c);
 	fputs("\tfor (i = 0; i < len; ++i)\n", g->libtl_c);
-	fputs("\t\tif(tl_deserialize_table[i].id == id)\n", g->libtl_c);
-	fputs("\t\t\ttl_free_table[i].fun;\n", g->libtl_c);
+	fputs("\t\tif(tl_free_table[i].id == id)\n", g->libtl_c);
+	fputs("\t\t\treturn tl_free_table[i].fun;\n", g->libtl_c);
 	fputs("\treturn NULL;\n", g->libtl_c);
 	fputs("}\n", g->libtl_c);
 	fputs("\n", g->libtl_c);	
@@ -279,7 +279,7 @@ int open_libtl(generator_t *g)
 	fputs("\n", g->libtl_c);	
 	fputs("\ttl_free_function *fun = get_free_fun(tl->_id);\n", g->libtl_c);
 	fputs("\tif (!fun){\n", g->libtl_c);
-	fputs("\t\tprintf(\"can't find free function for id: %.8x\\n\", tl->_id);\n", g->libtl_c);
+	fputs("\t\tprintf(\"can't find free function for id: 0x%.8x\\n\", tl->_id);\n", g->libtl_c);
 	fputs("\t\treturn;\n", g->libtl_c);
 	fputs("\t}\n", g->libtl_c);	
 	fputs("\tfun(tl);\n", g->libtl_c);	

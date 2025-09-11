@@ -44,7 +44,7 @@ int tg_new_auth_key1(tg_t *tg)
 	buf_t req_pq_multi = tl_req_pq_multi(nonce);
 	ON_LOG_BUF(tg, req_pq_multi, "%s: req_pq_multi:", __func__);
 	
-	tl = tg_send_query_sync(tg, &req_pq_multi, false);
+	tl = tg_send_query_sync(tg, &req_pq_multi);
 
 /* 2. Server sends response of the form
  * resPQ#05162463 nonce:int128 server_nonce:int128 pq:string server_public_key_fingerprints:Vector long = ResPQ; */
@@ -237,7 +237,7 @@ int tg_new_auth_key1(tg_t *tg)
  * Perfect Forward Secrecy (PFS) in client-server 
  * communication is achieved. Read more about PFS » */
 
-	tl = tg_send_query_sync(tg, &req_DH_params, false);
+	tl = tg_send_query_sync(tg, &req_DH_params);
 
 	/*  5. Server responds in one of two ways:
 

@@ -47,6 +47,7 @@
  * The secondary password hashing function is defined as follows:
  * PH2(password, salt1, salt2) := SH(pbkdf2(sha512, PH1(password, salt1, salt2), salt1, 100000), salt2) */
 
+#include "errors.h"
 #include "tg.h"
 #include "send_query.h"
 #include <assert.h>
@@ -354,11 +355,18 @@ static tl_account_password_t *tg_account_getPassword(tg_t *tg)
 	// get account.password
 	buf_t account_getPassword = 
 		tl_account_getPassword();
-	tl = tg_send_query_sync(tg, &account_getPassword, true);
+	tl = tg_send_query_sync(tg, &account_getPassword);
 	buf_free(account_getPassword);
 	
 	if (tl == NULL){
 		ON_ERR(tg, "%s: TL is NULL", __func__);
+		return NULL;
+	}
+
+	if (tl->_id == id_rpc_error){
+		// throw error
+		ON_ERR(tg, "%s: %s", __func__, RPC_ERROR(tl));
+		tl_free(tl);
 		return NULL;
 	}
 
@@ -375,6 +383,8 @@ static tl_account_password_t *tg_account_getPassword(tg_t *tg)
 tl_auth_authorization_t *
 tg_auth_check_password(tg_t *tg, const char *password){
 	
+	tl_t *tl = NULL; 
+
 /* Client-side, the following parameters are extracted from 
  * the passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow
  * object, contained in the account.password object. */
@@ -402,7 +412,7 @@ tg_auth_check_password(tg_t *tg, const char *password){
 		tl_auth_checkPassword(&srp);
 	buf_free(srp);
 
-	tl_t *tl = tg_send_query_sync(tg, &auth_check_password, true);
+	tl = tg_send_query_sync(tg, &auth_check_password);
 	buf_free(auth_check_password);
 
 	if (!tl){
@@ -411,9 +421,7 @@ tg_auth_check_password(tg_t *tg, const char *password){
 	}
 
 	if (tl->_id == id_rpc_error){
-		tl_rpc_error_t *error  = 
-			(tl_rpc_error_t *)tl;
-		ON_ERR(tg, "%s: %s", __func__, error->error_message_.data);
+		ON_ERR(tg, "%s: %s", __func__, RPC_ERROR(tl));
 		tl_free(tl);
 		return NULL;
 	}
