@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Pavel Morozkin. All rights reserved.
 //
 
+#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -113,6 +114,7 @@ buf_t buf_add_buf(buf_t buf)
 
 buf_t buf_add_bufs(int n, ...)
 {
+	assert(0); // this function is bugged
 	buf_t buf = buf_new();
 	va_list argv;
 	va_start(argv, n);
@@ -241,8 +243,7 @@ buf_t buf_xor(buf_t a, buf_t b)
     printf("Error: buf_cmp: different sizes\n");
   }
 
-  buf_t r;
-	buf_init(&r);
+  buf_t r = buf_new();
   if (a.size > r.asize) {
 		buf_realloc(&r, a.size);
   }

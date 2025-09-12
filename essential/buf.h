@@ -2,7 +2,7 @@
  * File              : buf.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 21.01.2025
+ * Last Modified Date: 12.09.2025
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef BUF_H
@@ -47,5 +47,9 @@ extern char*    buf_to_base64(buf_t);
 extern buf_t    buf_from_base64(const char*);
 
 #define buf_strdup(__b) strndup((char *)__b.data, __b.size)
+#define buf_concat(__b1, __b2) \
+	({buf_t __b = buf_new(); \
+	  __b = buf_cat(__b, __b1); __b = buf_cat(__b, __b2); \
+		__b;})	
 
 #endif
