@@ -61,6 +61,7 @@
 #include <openssl/params.h>
 #include <openssl/core_names.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include "crypto/hsh.h"
 #include "crypto/pbkdf2.h"
@@ -98,24 +99,24 @@
 		buf_free(_buf); \
 		_ret;})
 
-#define BN_bn2bin_size(a_, size_) \
-	({buf_t b_ = buf_new(); \
-	  b_.size = BN_bn2bin(a_, b_.data); \
-	  assert(b_.size > 0); \
-	  buf_t r_ = buf_new(); \
-	  r_.size = size_ - b_.size; \
-	  if (r_.size < 0) r_.size = 0; \
-	  r_ = buf_cat(r_, b_); \
-	  buf_free(b_); \
-	  r_; \
-	 })
 
-#define BN_new_from_value(value_) \
-	({ \
-	  BIGNUM *a_ = BN_new(); \
-	  BN_set_word(d_, value_); \
-	  a_; \
-	 })
+static buf_t BN_bn2bin_size(BIGNUM *a, int exact_size){
+	assert(exact_size <= BUFSIZ);
+	// int num_size = get_num_bytes();
+  int num_size = BN_num_bytes(a);
+  if (exact_size == -1) {
+    exact_size = num_size;
+  } else {
+		//CHECK(exact_size >= num_size);
+		assert(exact_size >= num_size);
+  }
+  // string res(exact_size, '\0');
+	buf_t res = buf_new();
+  // BN_bn2bin(impl_->big_num, MutableSlice(res).ubegin() + (exact_size - num_size));
+  BN_bn2bin(a, res.data + (exact_size - num_size));
+	res.size = exact_size;
+  return res;
+}
 
 #define buf_concat_sha256(__b1, __b2) \
 	({buf_t __b = buf_concat(__b1, __b2); \
