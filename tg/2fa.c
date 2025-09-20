@@ -480,7 +480,7 @@ static InputCheckPasswordSRP tg_get_inputCheckPasswordSRP(
 	// BigNum kv_bn;
   // BigNum::mod_mul(kv_bn, k_bn, v_bn, p_bn, ctx);
 	BIGNUM *kv_bn = BN_new();
-  assert(BN_mod_exp(kv_bn, k_bn, v_bn, p_bn, ctx)); 
+	assert(BN_mod_mul(kv_bn, k_bn, v_bn, p_bn, ctx));
 	
 	// BigNum t_bn;
   // BigNum::sub(t_bn, B_bn, kv_bn);
