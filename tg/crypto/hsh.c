@@ -2,7 +2,7 @@
  * File              : hsh.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 11.09.2025
+ * Last Modified Date: 28.09.2025
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "sha1.h"
@@ -25,7 +25,7 @@ buf_t tg_hsh_sha256(buf_t b)
   buf_t h = buf_new();
 	SHA256(b.data, b.size, h.data);
   /*sha256_bytes(b.data, b.size, h.data);*/
-  h.size = 256;
+  h.size = 32;
 
   return h;
 }

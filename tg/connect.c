@@ -96,8 +96,18 @@ int tg_connect(
 
 				auth = tg_auth_check_password(tg, password);
 
-				_TG_CB(TG_AUTH_ERROR, sentCode, 
-						"password auth is not implyed yet!");
+				if (auth){
+					// authorized!
+					_TG_CB(TG_AUTH_AUTHORIZATION, auth, "authorization done");
+					_TG_CB(TG_AUTH_SUCCESS, auth->user_, "authorized!");
+					return 0;
+
+				} else {
+					_TG_CB(TG_AUTH_ERROR, sentCode, 
+							"password is incorrect!");
+					return 1;
+				}
+
 			}
 			break;
 		
