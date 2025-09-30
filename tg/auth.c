@@ -11,7 +11,6 @@
 #include "tg_log.h"
 #include "transport/socket.h"
 #include "auth_key_mtx.h"
-#include "error.h"
 
 buf_t initConnection(tg_t *tg, buf_t query)
 {

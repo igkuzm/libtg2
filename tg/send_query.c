@@ -88,9 +88,13 @@ static tl_t * tg_send_query_sync_parse_answer(
 	tl_t *deserialized = tl_deserialize(&payload);
 	buf_free(payload);
 
-	tg_parse_answer(tg, deserialized, msgid, 
-			&tl, tg_send_query_sync_cb);
+	if (tg_parse_answer(tg, deserialized, msgid, 
+			&tl, tg_send_query_sync_cb) == TG_ANSWER_RESEND_QUERY)
+	{
+		return deserialized;
+	}
 
+	tl_free(deserialized);
 	return tl;
 }
 
@@ -125,6 +129,13 @@ tl_t *tg_send_query_sync(tg_t *tg, buf_t *query)
 		if (tl && tl->_id == id_msgs_ack){
 			tl_free(tl);
 			tl = tg_send_query_sync_receive(tg, true, msgid);
+		}
+
+		// handle bad server salt 
+		if (tl && tl->_id == id_bad_server_salt){
+			// resend query
+			tl_free(tl);
+			return tg_send_query_sync(tg, query);
 		}
 
 		// log errors

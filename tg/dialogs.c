@@ -2,8 +2,15 @@
 #include "tg.h"
 #include "send_query.h"
 #include "mtproto/mtproto.h"
+#include "errors.h"
+#include "tg_log.h"
 #include <assert.h>
 #include <stdbool.h>
+#ifdef _WIN32
+#include <windows.h> 
+#else
+#include <unistd.h>
+#endif
 
 struct tg_get_dialogs_t {
 	tg_t *tg; 
@@ -20,6 +27,20 @@ static int tg_get_dialogs_callback(void *data, const tl_t *tl)
 {
 	assert(data && tl);
 	struct tg_get_dialogs_t *t = (struct tg_get_dialogs_t *)data;
+
+	// handle FLOOD WAIT
+	if (tl->_id == id_rpc_error){
+		// ckeck FLOOD_WAIT
+		int wait = tg_error_flood_wait(t->tg, RPC_ERROR(tl));
+		if (wait){
+			ON_LOG(t->tg, "%s: waiting for %d seconds", __func__, wait);
+#ifdef _WIN32
+			Sleep(wait * 1000);
+#else
+			sleep(wait);
+#endif
+		}
+	}
 	
 	tl_messages_dialogs_t *md;
 	bool should_free_md = false; 
@@ -41,7 +62,6 @@ static int tg_get_dialogs_callback(void *data, const tl_t *tl)
 
 		// set total count of dialogs
 		t->total = mds->count_;
-		ON_LOG(t->tg, "%s: dialogsSlice len: %d", __func__, mds->count_);
 		
 		md->dialogs_ = mds->dialogs_; 
 		md->dialogs_len = mds->dialogs_len; 
@@ -58,12 +78,15 @@ static int tg_get_dialogs_callback(void *data, const tl_t *tl)
 		md = (tl_messages_dialogs_t *)tl;
 	}
 
+	t->count += md->dialogs_len;
+	ON_LOG(t->tg, "%s: got %d dialogs of: %d", __func__, 
+			t->count, t->total);
+
 	// get offset_id
-	tl_message_t *last_message = 
-		(tl_message_t *)md->messages_[md->messages_len-1];
-	if (last_message && last_message->_id == id_message){
-		t->offset_id = last_message->_id;
-		t->offset_date = last_message->date_;
+	tl_dialog_t *last_dialog = 
+		(tl_dialog_t *)md->dialogs_[md->dialogs_len-1];
+	if (last_dialog && last_dialog->_id == id_dialog){
+		t->offset_id = last_dialog->top_message_;
 	}
 	else
 		ON_ERR(t->tg, "%s: can't get last message", __func__);
@@ -86,8 +109,6 @@ void tg_get_dialogs(
 		void *data, 
 		int (*callback)(void *, const tl_messages_dialogs_t *))
 {
-	int i;
-	
 	struct tg_get_dialogs_t t =
 	{tg, data, callback,
   	0, 1, hash, -1,
@@ -95,7 +116,7 @@ void tg_get_dialogs(
 
 	InputPeer inputPeer = tl_inputPeerSelf();
 
-	for (i = 0; i < t.total; i+=t.count) {
+	for (t.count = 0; t.count < t.total; ) {
 		buf_t getDialogs = 
 			tl_messages_getDialogs(
 					NULL,

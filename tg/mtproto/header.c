@@ -239,8 +239,7 @@ buf_t tg_header(tg_t *tg, buf_t *b, bool enc,
 static buf_t tg_deheader_enc(tg_t *tg, buf_t *b)
 {
 	ON_LOG(tg, "%s", __func__);
-  buf_t d;
-	buf_init(&d);
+  buf_t d = buf_new();
 
 	// salt  session_id message_id seq_no message_data_length  message_data padding12..1024
 	// int64 int64      int64      int32  int32                bytes        bytes

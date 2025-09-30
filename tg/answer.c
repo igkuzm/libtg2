@@ -95,6 +95,11 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 				//pthread_mutex_lock(&tg->seqnm);
 				//tg->timediff = ntp_time_diff();
 				//pthread_mutex_unlock(&tg->seqnm);
+
+				// do callback
+				if (callback)
+					if (callback(ptr, tl))
+						break;
 			}
 			break; // run on_done
 		

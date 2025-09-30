@@ -37,7 +37,7 @@ void tg_set_on_log(tg_t *tg,
 /* free libtg structure and free memory */
 void tg_close(tg_t *);
 
-/* get 64-bit auth_key */
+/* get 256-byte (2048-bit) auth_key */
 unsigned char * tg_auth_key(tg_t *);
 
 typedef enum {

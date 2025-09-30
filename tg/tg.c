@@ -1,6 +1,7 @@
 #include "tg.h"
 #include "../libtg.h"
 #include "crypto/hsh.h"
+#include "tg_log.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -45,7 +46,7 @@ tg_t *tg_new(
 
 	// set auth_key
 	if (auth_key){
-		tg->key = buf_add(auth_key, 64);
+		tg->key = buf_add(auth_key, 256);
 		// auth key id
 		buf_t key_hash = tg_hsh_sha1(tg->key);
 		buf_t auth_key_id = 
@@ -53,11 +54,12 @@ tg_t *tg_new(
 		tg->key_id = buf_get_ui64(auth_key_id);
 		buf_free(key_hash);
 		buf_free(auth_key_id);
+		fprintf(stderr, "key_id: %ld\n", tg->key_id);
 	} else {
 		tg->key = buf_new();
 	}
-	tg->ssid = buf_add_ui64(0);
-	tg->salt = buf_add_ui64(0);
+	tg->ssid = buf_rand(8);
+	tg->salt = buf_rand(8);
 
 	// start new seqn
 	tg->seqn = 0;
@@ -65,14 +67,16 @@ tg_t *tg_new(
 	if (pthread_mutex_init(
 				&tg->msgidsm, NULL))
 	{
-		ON_ERR(tg, "%s: can't init mutex", __func__);
+		/*ON_ERR(tg, "%s: can't init mutex", __func__);*/
+		perror("can't init mutex");
 		return NULL;
 	}
 
 	if (pthread_mutex_init(
 				&tg->seqnm, NULL))
 	{
-		ON_ERR(tg, "%s: can't init mutex", __func__);
+		/*ON_ERR(tg, "%s: can't init mutex", __func__);*/
+		perror("can't init mutex");
 		return NULL;
 	}
 

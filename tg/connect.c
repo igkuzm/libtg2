@@ -29,6 +29,15 @@ int tg_connect(
 			const tl_t *tl,
 			const char *error))
 {
+	// check connection
+	int socket = tg_socket_open(tg, tg->dc.ipv4, tg->port);
+	if (socket < 0){
+		// no connection
+		ON_ERR(tg, "%s: no connection", __func__);
+		return 1;
+	}
+	tg_socket_close(tg, socket);
+
 	// check if authorized
 	tl_user_t *user = tg_is_authorized(tg);
 	if (user){
@@ -38,9 +47,11 @@ int tg_connect(
 
 	// get new auth key
 	if (tg_new_auth_key_mtx(tg)){
-		ON_ERR(tg, "no connection");
+		ON_ERR(tg, "%s: no connection", __func__);
 		return 1;
 	}
+	ON_LOG(tg, "%s: got new auth key with len: %d and id: %ld", 
+			__func__, tg->key.size, tg->key_id);
 
 	// ask phone_number
 	char * phone_number = 

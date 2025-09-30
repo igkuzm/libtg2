@@ -52,7 +52,7 @@ char * tl_log_hex(unsigned char * a, uint32_t s)
 
 int buf_init(buf_t *buf)
 {
-	buf->aptr = malloc(BUFSIZ + 1); 
+	buf->aptr = malloc(BUFSIZ); 
 	if (!buf->aptr){
 		perror("malloc");
 		return 1;
@@ -60,7 +60,7 @@ int buf_init(buf_t *buf)
 	buf->asize = BUFSIZ;
 	buf->size = 0;
 	buf->data = buf->aptr;
-	memset(buf->aptr, 0, buf->asize + 1);
+	memset(buf->aptr, 0, buf->asize);
 	return 0;
 }
 
@@ -74,15 +74,15 @@ int buf_realloc(buf_t *buf, uint32_t size)
 {
 	long offset = (void *)buf->data - buf->aptr;
 	if (size > buf->asize){
-		void *ptr = realloc(buf->aptr, size + 1);
+		void *ptr = realloc(buf->aptr, size);
 		if (!ptr){
 			perror("realloc");
 			return 1;
 		}
 		buf->aptr = ptr;
 		buf->data = buf->aptr + offset;
-		memset((buf->aptr + buf->asize), 0,
-				size - buf->asize + 1);
+		//memset((buf->aptr + buf->asize), 0,
+				//size - buf->asize);
 		buf->asize = size;
 	}
 	return 0;
@@ -132,7 +132,7 @@ buf_t buf_cat(buf_t dest, buf_t src)
   uint32_t s = dest.size + src.size;
 
   if (s > dest.asize) {
-		buf_realloc(dest.aptr, s);
+		buf_realloc(&dest, s);
   }
 
   int offset = dest.size;

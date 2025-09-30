@@ -2,7 +2,7 @@
  * File              : aes.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 24.11.2024
+ * Last Modified Date: 30.09.2025
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "cry.h"
@@ -37,10 +37,8 @@ buf_t tg_cry_aes_e(buf_t b, buf_t k, buf_t iv)
 
 buf_t tg_cry_aes_d(buf_t b, buf_t k, buf_t iv)
 {
-	buf_t r;
-	buf_init(&r);
-	if (b.size > r.size)
-		buf_realloc(&r, b.size * 3);
+	buf_t r = buf_new();
+	buf_realloc(&r, b.size * 3);
   
 	AES_KEY key;
   AES_set_decrypt_key(

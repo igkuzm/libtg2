@@ -85,7 +85,7 @@ char * callback(
 				if (fp){
 					tg_t *tg = userdata;
 					unsigned char *key = tg_auth_key(tg);
-					fwrite(key, 64, 1, fp);
+					fwrite(key, 256, 1, fp);
 					fclose(fp);
 				}
 
@@ -111,12 +111,7 @@ int dialogs_callback(void *userdata, const tl_messages_dialogs_t *md)
 	int i;
 	for (i = 0; i < md->dialogs_len; ++i) {
 		tl_dialog_t *dialog = (tl_dialog_t *)md->dialogs_[i];
-		tl_message_t *message = (tl_message_t *)md->messages_[i];
-		if (dialog->top_message_ != message->id_){
-			printf("TOP MESSAGE ID MISSMATCH!\n");
-		}
-
-		printf("%d: %s\n\n", i, message->message_.data);
+		printf("%d: %d\n\n", i, dialog->top_message_);
 	}
 
 	return 0;
@@ -127,10 +122,10 @@ int main(int argc, char *argv[])
 	int SETUP_API_ID(apiId)
 	char * SETUP_API_HASH(apiHash)
 
-	unsigned char key[64] = {0};
+	unsigned char key[256] = {0};
 	FILE *fp = fopen("key", "r");
 	if (fp){
-		fread(key, 64, 1, fp);
+		fread(key, 256, 1, fp);
 		fclose(fp);
 	}
 
