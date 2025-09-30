@@ -66,6 +66,9 @@ tg_is_authorized(tg_t *tg)
 	if (tg->key.size){
 		ON_LOG(tg, "have auth_key with len: %d", tg->key.size);
 
+		// open socket
+		tg->socket = tg_socket_open(tg, tg->dc.ipv4, tg->port);
+
 		tg->config = tg_init_and_get_config(tg);
 		if (!tg->config)
 			goto end;
@@ -107,6 +110,7 @@ tg_is_authorized(tg_t *tg)
 	}
 
 end:
+	tg_socket_close(tg, tg->socket);
 	ON_ERR(tg, "NEED_TO_AUTHORIZE");
 	return NULL;
 }

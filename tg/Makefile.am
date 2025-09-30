@@ -30,6 +30,7 @@ libtg_la_SOURCES = \
 	connect.c \
 	2fa.c \
 	errors.c \
+	dialogs.c \
 					 
 libtg_la_CFLAGS = -fPIC
 libtg_la_LIBADD = -lcrypto -lcurl

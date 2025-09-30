@@ -3,8 +3,7 @@
 
 #include "essential/buf.h"
 #include  "tl/libtl.h"
-#include <time.h>
-#include <pthread.h>
+#include "tl/struct.h"
 
 // LibTG structure
 typedef struct tg_t tg_t;
@@ -38,13 +37,16 @@ void tg_set_on_log(tg_t *tg,
 /* free libtg structure and free memory */
 void tg_close(tg_t *);
 
+/* get 64-bit auth_key */
+unsigned char * tg_auth_key(tg_t *);
+
 typedef enum {
 	TG_AUTH_ERROR,
 	TG_AUTH_PHONE_NUMBER_NEEDED,
 	TG_AUTH_PHONE_CODE_NEEDED,
 	TG_AUTH_PASSWORD_NEEDED,
-	TG_AUTH_AUTHORIZATION,
-	TG_AUTH_SUCCESS,
+	TG_AUTH_NEW_AUTHORIZATION,
+	TG_AUTH_AUTHORIZED_AS_USER,
 } TG_AUTH;
 
 /* connect to Telegram */  
@@ -61,5 +63,17 @@ int tg_connect(
 void tg_set_on_update(tg_t *tg,
 		void *on_update_data,
 		void (*on_update)(void *on_update_data, int type, void *data));
+
+/* get dialogs - full list of chats with messages and
+ * auxilary data
+ * limit = -1 - to load all dialogs */
+void tg_get_dialogs(
+		tg_t *tg, 
+		int limit, 
+		uint32_t offset_date, 
+		uint64_t * hash, 
+		uint32_t * folder_id, 
+		void *data,
+		int (*callback)(void *data, const tl_messages_dialogs_t *dialogs));
 
 #endif /* ifndef LIBTG_H */

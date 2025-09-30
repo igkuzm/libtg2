@@ -32,22 +32,42 @@ void tg_send_query_with_progress(
 	buf_t pack = tg_mtproto_pack(tg, query, enc, &msgid);
 	
 	if (pack.size){
-		buf_t answer = tg_http_send_query(
-				tg, dc, 443, false,
-			 	TG_TEST, &pack, 
-				progressp, progress);
+		//buf_t answer = tg_http_send_query(
+				//tg, dc, 443, false,
+				 //TG_TEST, &pack, 
+				//progressp, progress);
 
-		ON_LOG(tg, "%s: answer: %s", __func__, answer.data);
+		//ON_LOG(tg, "%s: answer: %s", __func__, answer.data);
 
-		buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
-		buf_free(answer);
+		//buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
+		//buf_free(answer);
 	
-		tl_t *tl	= tl_deserialize(&payload);
+		//tl_t *tl	= tl_deserialize(&payload);
 
-		tg_parse_answer(tg, tl, msgid, 
-				ptr, callback);
+		int socket = tg_socket_open(tg, tg->dc.ipv4, tg->port);
+		if (socket < 0 ||
+				tg_socket_send_query(tg, tg->socket, &pack) < 0)
+		{
+			return;
+		}
+		buf_t answer = tg_socket_receive_query(tg, tg->socket);
+		buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
+		/*buf_free(answer);*/
+		tl_t *tl = tl_deserialize(&payload);
+		/*buf_free(payload);*/
+
+		TG_ANSWER ret = 
+			tg_parse_answer(tg, tl, msgid, ptr, callback);
+		if (ret == TG_ANSWER_RESEND_QUERY){
+			ON_LOG(tg, "%s: bad server salt - resend query", __func__);
+			tl_free(tl);
+			tg_socket_close(tg, socket);
+			tg_send_query_with_progress(tg, query, dc, enc, 
+					ptr, callback, progressp, progress);
+		}
 
 		tl_free(tl);
+		tg_socket_close(tg, socket);
 	}
 }
 
@@ -66,6 +86,7 @@ static tl_t * tg_send_query_sync_parse_answer(
 	buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
 
 	tl_t *deserialized = tl_deserialize(&payload);
+	buf_free(payload);
 
 	tg_parse_answer(tg, deserialized, msgid, 
 			&tl, tg_send_query_sync_cb);
@@ -99,18 +120,11 @@ tl_t *tg_send_query_sync(tg_t *tg, buf_t *query)
 		}
 
 		tl = tg_send_query_sync_receive(tg, true, msgid);
-		
+
 		// handle ACK - get data again
 		if (tl && tl->_id == id_msgs_ack){
 			tl_free(tl);
 			tl = tg_send_query_sync_receive(tg, true, msgid);
-		}
-
-		// handle gzip
-		if (tl && tl->_id == id_gzip_packed){
-			tl_t *unziped = tg_mtproto_guzip(tg, tl);
-			tl_free(tl);
-			tl = unziped;
 		}
 
 		// log errors

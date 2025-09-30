@@ -7,14 +7,14 @@
 #include "../libtg.h"
 #include "../essential/ld.h"
 
-void tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
+TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 		void *ptr, int (*callback)(void *ptr, const tl_t *tl))
 {
 	ON_LOG(tg, "%s: %s", __func__,
 			tl?TL_NAME_FROM_ID(tl->_id):"NULL");
 
 	if (tl == NULL){
-		return;
+		return TG_ANSWER_ERR;
 	}
 
 	switch (tl->_id) {
@@ -34,9 +34,16 @@ void tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 					// got result!
 					ON_LOG(tg, "OK! We have result: %s", 
 						result?TL_NAME_FROM_ID(result->_id):"NULL");
+				
+					// handle gzip
+					if (result->_id == id_gzip_packed){
+						tl_t *unziped = tg_mtproto_guzip(tg, result);
+						result = unziped;
+					}
 					if (callback)
 						if (callback(ptr, result))
 							break;
+
 				} else {
 					ON_ERR(tg, "rpc_result: (%s) for wrong msg_id: "_LD_"",
 						result?TL_NAME_FROM_ID(result->_id):"NULL",
@@ -68,6 +75,12 @@ void tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 				tg_add_msgid(tg, msg_id_);
 			}
 			break;
+
+		case id_bad_server_salt:
+			{
+				// resend query
+				return TG_ANSWER_RESEND_QUERY;
+			}
 		
 		case id_rpc_error:
 		case id_bad_msg_notification:
@@ -146,10 +159,14 @@ void tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 			break;
 
 		default:
-			ON_LOG(tg, "%s: don't know how to handle: %s", __func__,
-					TL_NAME_FROM_ID(tl->_id));
-			break;
+			{
+				ON_LOG(tg, "%s: don't know how to handle: %s", __func__,
+						TL_NAME_FROM_ID(tl->_id));
+				break;
+			}
 	}
+
+	return TG_ANSWER_OK;
 }
 
 

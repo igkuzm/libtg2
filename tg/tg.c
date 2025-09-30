@@ -88,6 +88,11 @@ void tg_close(tg_t *tg)
 	free(tg);
 }
 
+unsigned char * tg_auth_key(tg_t *tg)
+{
+	return tg->key.data;
+}
+
 void tg_set_on_error(tg_t *tg,
 		void *on_err_data,
 		void (*on_err)(void *on_err_data, const char *err))

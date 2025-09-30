@@ -73,13 +73,22 @@ char * callback(
 				return strdup(password);
 			}
 			break;
-		case TG_AUTH_SUCCESS:
+		case TG_AUTH_AUTHORIZED_AS_USER:
 			{
 				printf("Connected as ");
 				tl_user_t *user = (tl_user_t *)tl;
 				printf("%s (%s)!\n", 
 						(char *)user->username_.data, 
 						(char *)user->phone_.data);
+				
+				FILE *fp = fopen("key", "w");
+				if (fp){
+					tg_t *tg = userdata;
+					unsigned char *key = tg_auth_key(tg);
+					fwrite(key, 64, 1, fp);
+					fclose(fp);
+				}
+
 			}
 			break;
 
@@ -97,20 +106,48 @@ char * callback(
 	return NULL;
 }
 
+int dialogs_callback(void *userdata, const tl_messages_dialogs_t *md)
+{
+	int i;
+	for (i = 0; i < md->dialogs_len; ++i) {
+		tl_dialog_t *dialog = (tl_dialog_t *)md->dialogs_[i];
+		tl_message_t *message = (tl_message_t *)md->messages_[i];
+		if (dialog->top_message_ != message->id_){
+			printf("TOP MESSAGE ID MISSMATCH!\n");
+		}
+
+		printf("%d: %s\n\n", i, message->message_.data);
+	}
+
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	int SETUP_API_ID(apiId)
 	char * SETUP_API_HASH(apiHash)
 
+	unsigned char key[64] = {0};
+	FILE *fp = fopen("key", "r");
+	if (fp){
+		fread(key, 64, 1, fp);
+		fclose(fp);
+	}
+
 	tg_t *tg = tg_new(apiId, apiHash, 
-			"pub.pkcs", NULL);
+			"pub.pkcs", key);
 	if (!tg)
 		return 1;
 
 	tg_set_on_error(tg, NULL, on_log);
 	tg_set_on_log(tg, NULL, on_log);
 
-	tg_connect(tg, NULL, callback);
+	if (tg_connect(tg, tg, callback))
+		return 1;
+
+	tg_get_dialogs(tg, 0, 0, 
+			NULL, NULL, 
+			NULL, dialogs_callback);
 
 	return 0;
 }

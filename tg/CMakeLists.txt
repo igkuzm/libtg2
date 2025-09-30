@@ -32,6 +32,7 @@ set(TARGET_SOURCES
 	connect.c
 	2fa.c
 	errors.c
+	dialogs.c
 )
 
 if(APPLE)

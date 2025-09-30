@@ -32,7 +32,7 @@ int tg_connect(
 	// check if authorized
 	tl_user_t *user = tg_is_authorized(tg);
 	if (user){
-		_TG_CB(TG_AUTH_SUCCESS, user, "authorized!");
+		_TG_CB(TG_AUTH_AUTHORIZED_AS_USER, user, "authorized!");
 		return 0;
 	}
 
@@ -76,8 +76,8 @@ int tg_connect(
 
 	if (auth){
 		// authorized!
-		_TG_CB(TG_AUTH_AUTHORIZATION, auth, "authorization done");
-		_TG_CB(TG_AUTH_SUCCESS, auth->user_, "authorized!");
+		_TG_CB(TG_AUTH_NEW_AUTHORIZATION, auth, "authorization done");
+		_TG_CB(TG_AUTH_AUTHORIZED_AS_USER, auth->user_, "authorized!");
 		return 0;
 	}
 
@@ -98,8 +98,8 @@ int tg_connect(
 
 				if (auth){
 					// authorized!
-					_TG_CB(TG_AUTH_AUTHORIZATION, auth, "authorization done");
-					_TG_CB(TG_AUTH_SUCCESS, auth->user_, "authorized!");
+					_TG_CB(TG_AUTH_NEW_AUTHORIZATION, auth, "authorization done");
+					_TG_CB(TG_AUTH_AUTHORIZED_AS_USER, auth->user_, "authorized!");
 					return 0;
 
 				} else {
