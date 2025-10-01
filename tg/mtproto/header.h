@@ -7,4 +7,7 @@ extern buf_t tg_header(tg_t *tg, buf_t *query, bool enc,
 
 extern buf_t tg_deheader(tg_t *tg, buf_t *answer, bool enc);
 
+extern buf_t tg_mtp_message(tg_t *tg, buf_t *payload, 
+		uint64_t *msgid, bool content);
+
 #endif /* ifndef TG_HEADER_H */

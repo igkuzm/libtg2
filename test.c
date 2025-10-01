@@ -108,10 +108,15 @@ char * callback(
 
 int dialogs_callback(void *userdata, const tl_messages_dialogs_t *md)
 {
+	tg_t *tg = userdata;
 	int i;
 	for (i = 0; i < md->dialogs_len; ++i) {
-		tl_dialog_t *dialog = (tl_dialog_t *)md->dialogs_[i];
-		printf("%d: %d\n\n", i, dialog->top_message_);
+		tg_peer_t peer = tg_dialogs_get_peer(tg, md, i);
+		tg_message_t msg = tg_dialogs_get_dialog_top_message(tg, 
+				md, i);
+		printf("%d: %s: %s: %20s\n\n", i, peer.title,
+			 msg.from.title,	
+				msg.msg->message_.data);
 	}
 
 	return 0;
@@ -140,9 +145,9 @@ int main(int argc, char *argv[])
 	if (tg_connect(tg, tg, callback))
 		return 1;
 
-	tg_get_dialogs(tg, 0, 0, 
+	tg_get_dialogs(tg, 10, 0, 
 			NULL, NULL, 
-			NULL, dialogs_callback);
+			tg, dialogs_callback);
 
 	return 0;
 }

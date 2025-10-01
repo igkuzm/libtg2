@@ -7,6 +7,7 @@
 #include <time.h>
 #include <assert.h>
 #include "header.h"
+#include "ack.h"
 #ifdef __APPLE__
 #include "darwin-posix-rt.h"
 #endif
@@ -106,7 +107,6 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 	if (*msgid)
 		*msgid = 0;
 
-	/*
 	buf_t ack = tg_ack(tg);
 	if (ack.size > 0){ // need to add acknolege
 		//ON_LOG_BUF(tg, b, "SEND DATA:");
@@ -116,26 +116,26 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 		// container does not have vertor serialization in it
 		buf_t msgs[2];
 		uint64_t msg_id;
-		msgs[0] = tg_mtp_message(tg, &b, 
+		msgs[0] = tg_mtp_message(tg, b, 
 				&msg_id, true);	
 		msgs[1] = tg_mtp_message(tg, &ack, 
 				NULL, false);	
-		buf_free(b);
+		buf_free(*b);
 		
 		// add container id
-		b = buf_add_ui32(id_msg_container);
+		*b = buf_add_ui32(id_msg_container);
 
 		// add size
 		buf_t todrop = buf_new();
 		int len = tg_to_drop(tg, &todrop);
-		b =  buf_cat_ui32(b, 2+len);
+		*b =  buf_cat_ui32(*b, 2+len);
 
 		// add data
-		b =  buf_cat(b,msgs[0]);
-		b =  buf_cat(b,msgs[1]);
+		*b =  buf_cat(*b,msgs[0]);
+		*b =  buf_cat(*b,msgs[1]);
 
 		// add tg_to_drop
-		b = buf_cat(b, todrop);
+		*b = buf_cat(*b, todrop);
 
 		//ON_LOG_BUF(tg, b, "CONTAINER TO SEND: ");
 		// set msgid
@@ -147,7 +147,6 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 		buf_free(todrop);
 	}
 	buf_free(ack);
-	*/
 		
 	// salt  session_id message_id seq_no message_data_length  message_data padding12..1024
 	// int64 int64      int64      int32  int32                bytes        bytes

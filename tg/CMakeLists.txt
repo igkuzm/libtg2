@@ -33,6 +33,7 @@ set(TARGET_SOURCES
 	2fa.c
 	errors.c
 	dialogs.c
+	peer.c
 )
 
 if(APPLE)

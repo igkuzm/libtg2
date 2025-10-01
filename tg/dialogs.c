@@ -6,6 +6,9 @@
 #include "tg_log.h"
 #include <assert.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
+#include "peer.h"
 #ifdef _WIN32
 #include <windows.h> 
 #else
@@ -27,6 +30,8 @@ static int tg_get_dialogs_callback(void *data, const tl_t *tl)
 {
 	assert(data && tl);
 	struct tg_get_dialogs_t *t = (struct tg_get_dialogs_t *)data;
+	
+	ON_LOG(t->tg, "%s", __func__);
 
 	// handle FLOOD WAIT
 	if (tl->_id == id_rpc_error){
@@ -109,6 +114,7 @@ void tg_get_dialogs(
 		void *data, 
 		int (*callback)(void *, const tl_messages_dialogs_t *))
 {
+	ON_LOG(tg, "%s", __func__);
 	struct tg_get_dialogs_t t =
 	{tg, data, callback,
   	0, 1, hash, -1,
@@ -136,4 +142,83 @@ void tg_get_dialogs(
 	}
 
 	buf_free(inputPeer);
+}
+
+tg_message_t tg_dialogs_get_dialog_top_message(
+		tg_t *tg, const tl_messages_dialogs_t *dialogs, int idx)
+{
+	ON_LOG(tg, "%s", __func__);
+	assert(dialogs);
+	tg_message_t msg;
+	memset(&msg, 0, sizeof(tg_message_t));
+
+	if (idx < 0 || idx >= dialogs->dialogs_len){
+		ON_ERR(tg, "%s: idx is out of dialogs len", __func__);
+		return msg;
+	}
+	
+	tl_dialog_t *dialog = (tl_dialog_t *)dialogs->dialogs_[idx];
+	if (!dialog || dialog->_id != id_dialog){
+		ON_ERR(tg, "%s: no dialog at index: %d", __func__, idx);
+		return msg;
+	}
+
+	// iterate messages
+	int i;
+	for (i = 0; i < dialogs->messages_len; ++i) {
+		tl_message_t *message = 
+			(tl_message_t *)dialogs->messages_[i];	
+		if (message && message->_id == id_message){
+			if (message->id_ == dialog->top_message_)
+			{	
+				ON_LOG(tg, "%s: %d", __func__, __LINE__);
+				if (message->from_id_){
+					msg.from = tg_peer_get_with_id(tg, 
+							dialogs->users_, dialogs->users_len, 
+							dialogs->chats_, dialogs->chats_len, 
+							((tl_peerChat_t *)message->from_id_)->chat_id_);
+				}
+				msg.msg = message;
+				return msg;
+			}
+		}
+	}
+
+	return msg;
+}
+
+tg_peer_t tg_dialogs_get_peer_with_peer_id(
+		tg_t *tg, const tl_messages_dialogs_t *dialogs, uint64_t id)
+{
+	ON_LOG(tg, "%s", __func__);
+	assert(dialogs);
+
+	return tg_peer_get_with_id(tg, 
+			dialogs->users_, dialogs->users_len, 
+			dialogs->chats_, dialogs->chats_len, 
+			id);
+}
+
+tg_peer_t tg_dialogs_get_peer(
+		tg_t *tg, const tl_messages_dialogs_t *dialogs, int idx)
+{	
+	ON_LOG(tg, "%s", __func__);
+	assert(dialogs);
+	tg_peer_t peer;
+	memset(&peer, 0, sizeof(tg_peer_t));
+
+	if (idx < 0 || idx >= dialogs->dialogs_len){
+		ON_ERR(tg, "%s: idx is out of dialogs len", __func__);
+		return peer;
+	}
+	
+	tl_dialog_t *dialog = (tl_dialog_t *)dialogs->dialogs_[idx];
+	if (!dialog || dialog->_id != id_dialog){
+		ON_ERR(tg, "%s: no dialog at index: %d", __func__, idx);
+		return peer;
+	}
+ 
+	uint64_t id = ((tl_peerChat_t *)dialog->peer_)->chat_id_;
+	
+	return tg_dialogs_get_peer_with_peer_id(tg, dialogs, id);
 }

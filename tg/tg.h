@@ -34,6 +34,8 @@ struct tg_t {
 	void (*on_update)(void *on_update_data, int type, void *data);
 	uint64_t *msgids; 
 	pthread_mutex_t msgidsm;
+	uint64_t *todrop; 
+	pthread_mutex_t todropm;
 	time_t timediff;
 	uint64_t fingerprint;
 	tl_config_t *config;

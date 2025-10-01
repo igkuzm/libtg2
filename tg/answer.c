@@ -50,6 +50,7 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 						rpc_result->req_msg_id_); 
 					// drop!
 					/*tg_add_todrop(tg, rpc_result->req_msg_id_);*/
+					return TG_ANSWER_READ_AGAIN;
 				}
 			}
 			break;

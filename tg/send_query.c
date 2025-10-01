@@ -23,6 +23,16 @@ void tg_send_query(
 			NULL, NULL);
 }
 
+static tl_t *tg_send_query_read(tg_t *tg, bool enc)
+{
+	buf_t answer = tg_socket_receive_query(tg, tg->socket);
+	buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
+	/*buf_free(answer);*/
+	tl_t *tl = tl_deserialize(&payload);
+	/*buf_free(payload);*/
+	return tl;
+}
+
 void tg_send_query_with_progress(
 		tg_t *tg, buf_t *query, enum dc dc, bool enc, 
 		void *ptr, int (*callback)(void *ptr, const tl_t *tl),
@@ -50,11 +60,9 @@ void tg_send_query_with_progress(
 		{
 			return;
 		}
-		buf_t answer = tg_socket_receive_query(tg, tg->socket);
-		buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
-		/*buf_free(answer);*/
-		tl_t *tl = tl_deserialize(&payload);
-		/*buf_free(payload);*/
+
+		// read
+		tl_t *tl = tg_send_query_read(tg, enc);
 
 		TG_ANSWER ret = 
 			tg_parse_answer(tg, tl, msgid, ptr, callback);
@@ -64,6 +72,13 @@ void tg_send_query_with_progress(
 			tg_socket_close(tg, socket);
 			tg_send_query_with_progress(tg, query, dc, enc, 
 					ptr, callback, progressp, progress);
+		}
+
+		while (ret == TG_ANSWER_READ_AGAIN) {
+			ON_LOG(tg, "%s: read again", __func__);
+			tl_free(tl);
+			tl = tg_send_query_read(tg, enc);
+			ret = tg_parse_answer(tg, tl, msgid, ptr, callback);
 		}
 
 		tl_free(tl);

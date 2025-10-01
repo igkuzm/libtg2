@@ -64,6 +64,8 @@ void tg_set_on_update(tg_t *tg,
 		void *on_update_data,
 		void (*on_update)(void *on_update_data, int type, void *data));
 
+/* DIALOGS */
+
 /* get dialogs - full list of chats with messages and
  * auxilary data
  * limit = -1 - to load all dialogs */
@@ -76,4 +78,38 @@ void tg_get_dialogs(
 		void *data,
 		int (*callback)(void *data, const tl_messages_dialogs_t *dialogs));
 
+/* functions to help parse tl_messages_dialogs_t and get
+ * peer. Peer is chat, channel or user dialog */
+typedef enum {
+	TG_PEER_NULL,
+	TG_PEER_USER,
+	TG_PEER_CHANNEL,
+	TG_PEER_CHAT,
+} TG_PEER;
+
+typedef struct tg_peer_ {
+	TG_PEER type;
+	const char *title;
+	tl_t *tl;
+} tg_peer_t;
+
+tg_peer_t tg_dialogs_get_peer(
+		tg_t *tg, const tl_messages_dialogs_t *dialogs, int idx);
+
+tg_peer_t tg_dialogs_get_peer_with_peer_id(
+		tg_t *tg, const tl_messages_dialogs_t *dialogs, uint64_t id);
+
+/* function to help parse tl_messages_dialogs_t and get
+ * message */
+typedef struct tg_message_ {
+	tg_peer_t from;
+	tl_message_t *msg;
+} tg_message_t;
+
+tg_message_t tg_dialogs_get_dialog_top_message(
+		tg_t *tg, const tl_messages_dialogs_t *dialogs, int idx);
+
+/* MESSAGES */
+tg_peer_t tg_message_get_peer(
+		tg_t *tg, const tl_messages_dialogs_t *dialogs, int idx);
 #endif /* ifndef LIBTG_H */
