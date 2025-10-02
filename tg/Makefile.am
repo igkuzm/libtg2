@@ -33,7 +33,7 @@ libtg_la_SOURCES = \
 	dialogs.c \
 	peer.c
 					 
-libtg_la_CFLAGS = -fPIC
+libtg_la_CFLAGS = -fPIC -I../essential
 libtg_la_LIBADD = -lcrypto -lcurl
 libtg_la_LDFLAGS = -Wl,-w
 
