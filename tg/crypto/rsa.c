@@ -6,6 +6,7 @@
 #include <openssl/bn.h>
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
