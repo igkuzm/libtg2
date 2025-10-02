@@ -11,6 +11,6 @@ libtl_la_SOURCES = \
 				   ../essential/serialize.c \
 				   ../essential/deserialize.c
 				   
-libtl_la_CFLAGS = -fPIC
+libtl_la_CFLAGS = -fPIC -I../essential
 libtl_la_LIBADD = -lz
 libtl_la_LDFLAGS = -Wl,-w
