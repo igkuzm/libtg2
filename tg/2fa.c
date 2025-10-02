@@ -53,13 +53,6 @@
 #include <assert.h>
 #include <endian.h>
 #include <openssl/bn.h>
-#include <openssl/core.h>
-#include <openssl/cryptoerr_legacy.h>
-#include <openssl/evp.h>
-#include <openssl/kdf.h>
-#include <openssl/err.h>
-#include <openssl/params.h>
-#include <openssl/core_names.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
