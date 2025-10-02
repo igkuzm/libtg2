@@ -32,6 +32,7 @@ libtg_la_SOURCES = \
 	errors.c \
 	dialogs.c \
 	peer.c \
+
 					 
 libtg_la_CFLAGS = -fPIC
 libtg_la_LIBADD = -lcrypto -lcurl
