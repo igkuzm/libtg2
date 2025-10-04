@@ -28,6 +28,7 @@ libtg_la_SOURCES = \
 	2fa.c \
 	errors.c \
 	dialogs.c \
+	images.c \
 	peer.c
 					 
 libtg_la_CFLAGS = -fPIC -I../essential
