@@ -31,7 +31,7 @@ libtg_la_SOURCES = \
 	peer.c
 					 
 libtg_la_CFLAGS = -fPIC -I../essential
-libtg_la_LIBADD = -lcrypto -lcurl -lz ../tl/*.o ../mtx/src/*.o
+libtg_la_LIBADD = -lcrypto -lcurl -lz ../tl/*.o ../essential/*.o ../mtx/src/*.o
 libtg_la_LDFLAGS = -Wl,-w
 
 if MACOS
