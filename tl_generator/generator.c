@@ -164,7 +164,7 @@ int append_macro(
 					m->name, m->args[i].type),
 				g->macro_h);
 
-		fputs(STR(buf, BLEN, "%s",
+		fputs(STR(buf, BLEN, "%s_",
 				 	m->args[i].name),
 				g->macro_h);
 		
