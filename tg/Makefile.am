@@ -4,13 +4,10 @@ lib_LTLIBRARIES = libtg.la
 libtg_la_SOURCES = \
 	crypto/aes.c \
 	crypto/cmn.c \
-	crypto/fact.cpp \
 	crypto/hsh.c \
 	crypto/rnd.c \
 	crypto/rsa.c \
-	crypto/sha1.c \
 	crypto/pbkdf2.c \
-	crypto/sha256.c \
 	transport/http.c \
 	transport/socket.c \
 	transport/header.c \
@@ -34,7 +31,7 @@ libtg_la_SOURCES = \
 	peer.c
 					 
 libtg_la_CFLAGS = -fPIC -I../essential
-libtg_la_LIBADD = -lcrypto -lcurl -lz ../tl/*.o ../mtx/libmtx.la
+libtg_la_LIBADD = -lcrypto -lcurl -lz ../tl/*.o ../mtx/src/*.o
 libtg_la_LDFLAGS = -Wl,-w
 
 if MACOS
