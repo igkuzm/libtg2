@@ -160,11 +160,12 @@ int append_macro(
 				m->args[i].type == NULL)
 			continue;
 
-		fputs(STR(buf, BLEN, "\tTL_MACRO_%s_arg(", m->name),
+		fputs(STR(buf, BLEN, "\tTL_MACRO_%s_arg_%s(", 
+					m->name, m->args[i].type),
 				g->macro_h);
 
-		fputs(STR(buf, BLEN, "%s, %s",
-				 	m->args[i].name, m->args[i].type),
+		fputs(STR(buf, BLEN, "%s",
+				 	m->args[i].name),
 				g->macro_h);
 		
 		fputs(STR(buf, BLEN, ") \\\n"),
