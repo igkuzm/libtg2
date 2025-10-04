@@ -181,7 +181,7 @@ int append_macro(
 int close_macro(generator_t *g)
 {
 	fputs(
-			"};\n"
+			"\n"
 			"#endif // TL_MACRO_\n"
 			, g->macro_h);
 	fclose(g->macro_h);
