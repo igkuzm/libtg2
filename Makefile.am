@@ -5,5 +5,5 @@ if MAKE_TEST
 bin_PROGRAMS = tgtest
 tgtest_CFLAGS = -Iessential
 tgtest_SOURCES = test.c
-tgtest_LDADD = tg/libtg.la tl/libtl.la -lstdc++ -lz
+tgtest_LDADD = tg/libtg.la -lstdc++ -lz
 endif
