@@ -19,6 +19,15 @@
 		AF8714372E6FB55300CD9927 /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AF8714362E6FB55300CD9927 /* libstdc++.dylib */; };
 		AF87143A2E6FB57F00CD9927 /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AF8714382E6FB56100CD9927 /* libcrypto.0.9.7.dylib */; };
 		AF8714412E6FBDCD00CD9927 /* aes_ige.c in Sources */ = {isa = PBXBuildFile; fileRef = AF8714402E6FBDCD00CD9927 /* aes_ige.c */; };
+		AFA1E0A22E90E6F900F2D3E8 /* connect.c in Sources */ = {isa = PBXBuildFile; fileRef = AFA1E0A12E90E6F900F2D3E8 /* connect.c */; };
+		AFA1E0A52E90E70800F2D3E8 /* 2fa.c in Sources */ = {isa = PBXBuildFile; fileRef = AFA1E0A42E90E70800F2D3E8 /* 2fa.c */; };
+		AFA1E0AA2E90E72800F2D3E8 /* errors.c in Sources */ = {isa = PBXBuildFile; fileRef = AFA1E0A62E90E72800F2D3E8 /* errors.c */; };
+		AFA1E0AB2E90E72800F2D3E8 /* dialogs.c in Sources */ = {isa = PBXBuildFile; fileRef = AFA1E0A72E90E72800F2D3E8 /* dialogs.c */; };
+		AFA1E0AC2E90E72800F2D3E8 /* peer.c in Sources */ = {isa = PBXBuildFile; fileRef = AFA1E0A82E90E72800F2D3E8 /* peer.c */; };
+		AFA1E0AD2E90E72800F2D3E8 /* updates.c in Sources */ = {isa = PBXBuildFile; fileRef = AFA1E0A92E90E72800F2D3E8 /* updates.c */; };
+		AFA1E0B42E90E87F00F2D3E8 /* pbkdf2.c in Sources */ = {isa = PBXBuildFile; fileRef = AFA1E0B32E90E87F00F2D3E8 /* pbkdf2.c */; };
+		AFA1E0B62E90E8B800F2D3E8 /* strndup.c in Sources */ = {isa = PBXBuildFile; fileRef = AFA1E0B52E90E8B800F2D3E8 /* strndup.c */; };
+		AFA1E0B92E90EA5300F2D3E8 /* libcrypto.0.9.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AF8714382E6FB56100CD9927 /* libcrypto.0.9.7.dylib */; };
 		AFDB98862E6326DA0011C842 /* api_layer.h in Headers */ = {isa = PBXBuildFile; fileRef = AFDB98762E6326DA0011C842 /* api_layer.h */; };
 		AFDB98872E6326DA0011C842 /* deserialize_table.c in Sources */ = {isa = PBXBuildFile; fileRef = AFDB98782E6326DA0011C842 /* deserialize_table.c */; };
 		AFDB98882E6326DA0011C842 /* deserialize_table.h in Headers */ = {isa = PBXBuildFile; fileRef = AFDB98792E6326DA0011C842 /* deserialize_table.h */; };
@@ -194,6 +203,14 @@
 		AF8714362E6FB55300CD9927 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "/usr/lib/gcc/powerpc-apple-darwin9/4.2.1/libstdc++.dylib"; sourceTree = "<absolute>"; };
 		AF8714382E6FB56100CD9927 /* libcrypto.0.9.7.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.7.dylib; path = /usr/lib/libcrypto.0.9.7.dylib; sourceTree = "<absolute>"; };
 		AF8714402E6FBDCD00CD9927 /* aes_ige.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aes_ige.c; path = macos/aes_ige.c; sourceTree = SOURCE_ROOT; };
+		AFA1E0A12E90E6F900F2D3E8 /* connect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = connect.c; sourceTree = "<group>"; };
+		AFA1E0A42E90E70800F2D3E8 /* 2fa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = 2fa.c; sourceTree = "<group>"; };
+		AFA1E0A62E90E72800F2D3E8 /* errors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = errors.c; sourceTree = "<group>"; };
+		AFA1E0A72E90E72800F2D3E8 /* dialogs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dialogs.c; sourceTree = "<group>"; };
+		AFA1E0A82E90E72800F2D3E8 /* peer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = peer.c; sourceTree = "<group>"; };
+		AFA1E0A92E90E72800F2D3E8 /* updates.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = updates.c; sourceTree = "<group>"; };
+		AFA1E0B32E90E87F00F2D3E8 /* pbkdf2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pbkdf2.c; sourceTree = "<group>"; };
+		AFA1E0B52E90E8B800F2D3E8 /* strndup.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = strndup.c; sourceTree = "<group>"; };
 		AFDB98762E6326DA0011C842 /* api_layer.h */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = sourcecode.c.h; path = api_layer.h; sourceTree = "<group>"; };
 		AFDB98772E6326DA0011C842 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		AFDB98782E6326DA0011C842 /* deserialize_table.c */ = {isa = PBXFileReference; fileEncoding = 2147483655; lastKnownFileType = sourcecode.c.c; path = deserialize_table.c; sourceTree = "<group>"; };
@@ -380,6 +397,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AFA1E0B92E90EA5300F2D3E8 /* libcrypto.0.9.7.dylib in Frameworks */,
 				AF2B32852E63C31800C2E464 /* libtl.a in Frameworks */,
 				AF2B32862E63C32100C2E464 /* libmtx.a in Frameworks */,
 			);
@@ -433,6 +451,7 @@
 		AFD84CAF2E5EC17600CDD013 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				AFA1E0B52E90E8B800F2D3E8 /* strndup.c */,
 				AFDB99762E632B850011C842 /* tg */,
 				AFDB98A92E6328240011C842 /* mtx */,
 				AFDB98952E6326F20011C842 /* tl_generator */,
@@ -581,6 +600,12 @@
 		AFDB99762E632B850011C842 /* tg */ = {
 			isa = PBXGroup;
 			children = (
+				AFA1E0A62E90E72800F2D3E8 /* errors.c */,
+				AFA1E0A72E90E72800F2D3E8 /* dialogs.c */,
+				AFA1E0A82E90E72800F2D3E8 /* peer.c */,
+				AFA1E0A92E90E72800F2D3E8 /* updates.c */,
+				AFA1E0A42E90E70800F2D3E8 /* 2fa.c */,
+				AFA1E0A12E90E6F900F2D3E8 /* connect.c */,
 				AFDB99772E632B850011C842 /* answer.c */,
 				AFDB99782E632B850011C842 /* answer.h */,
 				AFDB99792E632B850011C842 /* auth.c */,
@@ -613,6 +638,7 @@
 		AFDB99822E632B850011C842 /* crypto */ = {
 			isa = PBXGroup;
 			children = (
+				AFA1E0B32E90E87F00F2D3E8 /* pbkdf2.c */,
 				AFDB99832E632B850011C842 /* aes.c */,
 				AFDB99842E632B850011C842 /* cmn.c */,
 				AFDB99852E632B850011C842 /* cmn.h */,
@@ -995,6 +1021,14 @@
 				AFDB99DF2E632B850011C842 /* http.c in Sources */,
 				AFDB99E22E632B850011C842 /* socket.c in Sources */,
 				AFDB99E42E632B850011C842 /* updates.c in Sources */,
+				AFA1E0A22E90E6F900F2D3E8 /* connect.c in Sources */,
+				AFA1E0A52E90E70800F2D3E8 /* 2fa.c in Sources */,
+				AFA1E0AA2E90E72800F2D3E8 /* errors.c in Sources */,
+				AFA1E0AB2E90E72800F2D3E8 /* dialogs.c in Sources */,
+				AFA1E0AC2E90E72800F2D3E8 /* peer.c in Sources */,
+				AFA1E0AD2E90E72800F2D3E8 /* updates.c in Sources */,
+				AFA1E0B42E90E87F00F2D3E8 /* pbkdf2.c in Sources */,
+				AFA1E0B62E90E8B800F2D3E8 /* strndup.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1220,6 +1254,12 @@
 				);
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_SEARCH_PATHS = "";
+				OTHER_LDFLAGS = (
+					"-lssl",
+					"-lcurl",
+					"-lz",
+					"-lcrypto",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = tg;
 				ZERO_LINK = YES;
@@ -1240,6 +1280,12 @@
 				);
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_SEARCH_PATHS = "";
+				OTHER_LDFLAGS = (
+					"-lssl",
+					"-lcurl",
+					"-lz",
+					"-lcrypto",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = tg;
 				ZERO_LINK = NO;
