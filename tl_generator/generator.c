@@ -260,7 +260,10 @@ int close_macro(generator_t *g)
 
 		fputs("\n", fp);
 		fputs("// magick here\n", fp);
+		fputs("#ifdef TL_MACRO_EXE\n", fp);
 		fputs("TL_MACRO_EXE\n", fp);
+		fputs("#undef TL_MACRO_EXE\n", fp);
+		fputs("#endif\n", fp);
 		fputs("\n", fp);
 
 		fputs("#undef TL_MACRO_id\n", fp);
