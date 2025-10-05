@@ -27,6 +27,7 @@
 #define FREE_H "../tl/free.h"
 #define FREE_C "../tl/free.c"
 #define MACRO_H "../tl/macro.h"
+#define MACRO_NAMES_H "../tl/macro_names.h"
 
 //strndup for Apple
 #ifdef __APPLE__
@@ -51,6 +52,7 @@ typedef struct generator_ {
 	FILE *free_c;
 	FILE *macro_h;
 	array_t *type_names;
+	array_t *macro_names;
 	int isMtproto;
 } generator_t;
 
@@ -125,6 +127,9 @@ int close_id_header(generator_t *g)
 
 int open_macro(generator_t *g)
 {
+	g->macro_names = 
+		array_new(char*, perror("array_new"); return 1);	
+
 	g->macro_h = fopen(MACRO_H, "w");
 	if (!g->macro_h)
 		err(1, "can't write to: %s", MACRO_H);	
@@ -165,6 +170,9 @@ int append_macro(
 		if (type == NULL)
 			continue;
 
+		if (strcmp(type, "!X") == 0)
+			type = "X";
+
 		// skip flags
 		if (strstr(type, "flags") &&
 				m->args[i].type == NULL)
@@ -180,6 +188,22 @@ int append_macro(
 			vector = "Vector_";
 		}
 
+		// append mcro names
+		int has_type = 0;
+		array_t *a = g->macro_names;
+		char macro_name[BUFSIZ];
+		sprintf(macro_name, "TL_MACRO_arg_%s%s", vector, type);
+		array_for_each(a, char*, name){
+			if (strcmp(name, macro_name) == 0){
+				has_type = 1;
+				break;
+			}
+		}
+		if (!has_type)
+			array_append(a, char*, strdup(macro_name), 
+					perror("array_append"); return 1);
+	
+		// add macro_arg
 		fputs(STR(buf, BLEN, "\tTL_MACRO_arg_%s%s(", 
 					vector, type),
 				g->macro_h);
@@ -205,6 +229,44 @@ int close_macro(generator_t *g)
 			"#endif // TL_MACRO_\n"
 			, g->macro_h);
 	fclose(g->macro_h);
+
+	// make macro names
+	FILE *fp = fopen(MACRO_NAMES_H, "w");
+	if (fp){
+		fputs("// This file to help use of macro\n", fp);
+		fputs("\n", fp);
+		fputs("#define TL_MACRO_id(n)\n", fp);
+		fputs("#define TL_MACRO_argc(n)\n", fp);
+		
+		char buf[BLEN];
+		
+		// add types
+		{
+			array_t *a = g->macro_names;
+			array_for_each(a, char*, name){
+				STR(buf, BLEN, "#define %s(n)\n", name);
+				fputs(buf, fp);
+			}
+		}
+
+		fputs("\n", fp);
+		fputs("// Do your magick here\n", fp);
+		fputs("\n", fp);
+
+		fputs("#undef TL_MACRO_id\n", fp);
+		fputs("#undef TL_MACRO_argc\n", fp);
+		
+		{
+			array_t *a = g->macro_names;
+			array_for_each(a, char*, name){
+				STR(buf, BLEN, "#undef %s\n", name);
+				fputs(buf, fp);
+				free(name);
+			}
+		}		
+		
+		fclose(fp);
+	}
 	return 0;
 }
 
