@@ -27,7 +27,7 @@
 #define FREE_H "../tl/free.h"
 #define FREE_C "../tl/free.c"
 #define MACRO_H "../tl/macro.h"
-#define MACRO_NAMES_H "../tl/macro_names.h"
+#define MACRO_NAMES_H "../tl/macro_exe.h"
 
 //strndup for Apple
 #ifdef __APPLE__
@@ -233,10 +233,16 @@ int close_macro(generator_t *g)
 	// make macro names
 	FILE *fp = fopen(MACRO_NAMES_H, "w");
 	if (fp){
-		fputs("// This file to help use of macro\n", fp);
+		fputs("// To user this macros - define TL_MACRO_arg_%, \n", fp);
+		fputs("// define TL_MACRO_EXE, \n", fp);
+		fputs("// and include this file \n", fp);
 		fputs("\n", fp);
+		fputs("#ifndef TL_MACRO_id\n", fp);
 		fputs("#define TL_MACRO_id(n)\n", fp);
+		fputs("#endif\n", fp);
+		fputs("#ifndef TL_MACRO_argc\n", fp);
 		fputs("#define TL_MACRO_argc(n)\n", fp);
+		fputs("#endif\n", fp);
 		
 		char buf[BLEN];
 		
@@ -244,13 +250,17 @@ int close_macro(generator_t *g)
 		{
 			array_t *a = g->macro_names;
 			array_for_each(a, char*, name){
+				STR(buf, BLEN, "#ifndef %s\n", name);
+				fputs(buf, fp);
 				STR(buf, BLEN, "#define %s(n)\n", name);
 				fputs(buf, fp);
+				fputs("#endif\n", fp);
 			}
 		}
 
 		fputs("\n", fp);
-		fputs("// Do your magick here\n", fp);
+		fputs("// magick here\n", fp);
+		fputs("TL_MACRO_EXE\n", fp);
 		fputs("\n", fp);
 
 		fputs("#undef TL_MACRO_id\n", fp);
