@@ -149,19 +149,34 @@ int append_macro(
 				, m->name),
 		 	g->macro_h);
 	
-	//if (strcmp(m->name, "vector") == 0){
-		//fputs("\tbuf_free(tl->data_);\n", g->free_c);
-	//}
+	// id
+	fputs(STR(buf, BLEN, "\tTL_MACRO_id(0x%x) \\\n"
+				, m->id),
+		 	g->macro_h);
 
 	// args
 	for (i = 0; i < m->argc; ++i) {
+		char *type = m->args[i].type;
+		if (type == NULL)
+			continue;
+
 		// skip flags
-		if (strstr(m->args[i].name, "flags") &&
+		if (strstr(type, "flags") &&
 				m->args[i].type == NULL)
 			continue;
 
-		fputs(STR(buf, BLEN, "\tTL_MACRO_arg_%s(", 
-					m->args[i].type),
+		// rename vector
+		char *vector = "";
+		char *p = strstr(type, "Vector<");
+		if (p){
+			// change Vector to pointer
+			p += strlen("Vector<");
+			type = strndup(p, strstr(p, ">") - p);
+			vector = "Vector_";
+		}
+
+		fputs(STR(buf, BLEN, "\tTL_MACRO_arg_%s%s(", 
+					vector, type),
 				g->macro_h);
 
 		fputs(STR(buf, BLEN, "%s_",
