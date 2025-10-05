@@ -154,6 +154,11 @@ int append_macro(
 				, m->id),
 		 	g->macro_h);
 
+	// number of args
+	fputs(STR(buf, BLEN, "\tTL_MACRO_argc(%d) \\\n"
+				, m->argc),
+		 	g->macro_h);
+
 	// args
 	for (i = 0; i < m->argc; ++i) {
 		char *type = m->args[i].type;
