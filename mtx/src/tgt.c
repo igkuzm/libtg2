@@ -722,6 +722,8 @@ method_req_DH_params_init(method_req_pq_t m1)
   m.p.value = api.buf.add_ui32(htobe32(p));
   m.q.value = api.buf.add_ui32(htobe32(q));
   m.public_key_fingerprint = m1.ctor_ResPQ.server_public_key_fingerprints;
+  if (!is_little_endian())
+	  m.public_key_fingerprint.value = api.buf.swap(m.public_key_fingerprint.value);
   ctor_P_Q_inner_data_t c = api.tml->ctors->P_Q_inner_data.init(m1, m);
   buf_t_ d = api.tml->ctors->P_Q_inner_data.drive(c);
   buf_t_ h = api.hsh.sha1(d);
