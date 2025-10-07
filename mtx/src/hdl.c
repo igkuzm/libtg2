@@ -10,7 +10,7 @@
 #include "../include/hdl.h"
 #include "../include/buf.h"
 #include <assert.h>
-#include "../../essential/endian.h"
+#include <endian.h>
 
 extern hdl_t hdl;
 

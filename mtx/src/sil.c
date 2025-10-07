@@ -7,7 +7,7 @@
 //
 
 #include "../include/api.h"
-#include "../../essential/endian.h"
+#include <endian.h>
 
 typedef struct abstract_type_
 {
