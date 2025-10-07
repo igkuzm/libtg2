@@ -305,7 +305,7 @@ ctor_auth_SentCode_t ctor_auth_SentCode =
   .phone_registered =
   {
     .value = {},
-    .type = TYPE_BOOL,
+    .type = TYPE_MBOOL,
   },
   .phone_code_hash =
   {

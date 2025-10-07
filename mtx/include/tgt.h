@@ -22,7 +22,7 @@ typedef enum msg_
 typedef enum tl_type_
 {
   TYPE_QX,
-  TYPE_BOOL,
+  TYPE_MBOOL,
   TYPE_CHAT,
   TYPE_CHATFULL,
   TYPE_CHATPARTICIPANTS,
