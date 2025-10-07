@@ -124,6 +124,7 @@ int dialogs_callback(void *userdata, const tl_messages_dialogs_t *md)
 
 int main(int argc, char *argv[])
 {
+
 	int SETUP_API_ID(apiId)
 	char * SETUP_API_HASH(apiHash)
 
