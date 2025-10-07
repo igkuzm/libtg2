@@ -217,7 +217,10 @@ buf_t_ sel_serialize_string(buf_t_ b)
   } else if (size >= 254) {
     ui8_t start = 0xfe;
     s = api.buf.add((ui8_t *)&start, 1);
-    buf_t_ len = api.buf.add((ui8_t *)&size, 3);
+    
+	  uint32_t size_le = htole32(size);
+	buf_t_ len = api.buf.add((ui8_t *)&size_le, 3);
+	  
     s = api.buf.cat(s, len);
     s = api.buf.cat(s, b);
     int pad = (4 - (s.size % 4)) % 4;
