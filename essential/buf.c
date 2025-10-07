@@ -50,7 +50,7 @@ char * tl_log_hex(unsigned char * a, uint32_t s)
 	return str.str;
 }
 
-int buf_init(buf_t *buf)
+static int buf_init(buf_t *buf)
 {
 	buf->aptr = malloc(BUFSIZ); 
 	if (!buf->aptr){
@@ -70,7 +70,7 @@ buf_t buf_new(){
 	return b;
 }
 
-int buf_realloc(buf_t *buf, uint32_t size)
+int buf_enlarge_to(buf_t *buf, uint32_t size)
 {
 	long offset = (void *)buf->data - buf->aptr;
 	if (size > buf->asize){
@@ -88,14 +88,12 @@ int buf_realloc(buf_t *buf, uint32_t size)
 	return 0;
 }
 
-buf_t buf_add(uint8_t *data, uint32_t size)
+buf_t buf_new_data(uint8_t *data, uint32_t size)
 {
   buf_t b;
 	buf_init(&b);
 
-  if (size > b.asize) {
-		buf_realloc(&b, size);
-  }
+	buf_enlarge_to(&b, size);
 
 	uint32_t i;
   for (i = 0; i < size; ++i) {
@@ -107,12 +105,18 @@ buf_t buf_add(uint8_t *data, uint32_t size)
   return b;
 }
 
-buf_t buf_add_buf(buf_t buf)
+buf_t buf_new_buf(buf_t buf)
 {
-	return buf_add(buf.data, buf.size);
+	return buf_new_data(buf.data, buf.size);
 }
 
-buf_t buf_add_bufs(int n, ...)
+buf_t buf_new_bufs(buf_t a, buf_t b)
+{
+	buf_t c = buf_new_buf(a);
+	return buf_cat_buf(c, b);
+}
+
+buf_t buf_new_nbufs(int n, ...)
 {
 	assert(0); // this function is bugged
 	buf_t buf = buf_new();
@@ -121,19 +125,16 @@ buf_t buf_add_bufs(int n, ...)
 	int i;
 	for (i = 0; i < n; ++i) {
 		buf_t arg = va_arg(argv, buf_t);
-		buf = buf_cat(buf, arg);
+		buf = buf_cat_buf(buf, arg);
 	}
 	va_end(argv);
 	return buf;
 }
 
-buf_t buf_cat(buf_t dest, buf_t src)
+buf_t buf_cat_buf(buf_t dest, buf_t src)
 {
   uint32_t s = dest.size + src.size;
-
-  if (s > dest.asize) {
-		buf_realloc(&dest, s);
-  }
+	buf_enlarge_to(&dest, s);
 
   int offset = dest.size;
 
@@ -190,19 +191,19 @@ buf_t buf_swap(buf_t b)
   return b;
 }
 
-buf_t buf_add_ui32(uint32_t v)
+buf_t buf_new_ui32(uint32_t v)
 {
-  return buf_add((uint8_t *)&v, 4);
+  return buf_new_data((uint8_t *)&v, 4);
 }
 
-buf_t buf_add_ui64(uint64_t v)
+buf_t buf_new_ui64(uint64_t v)
 {
-  return buf_add((uint8_t *)&v, 8);
+  return buf_new_data((uint8_t *)&v, 8);
 }
 
-buf_t buf_add_double(double v)
+buf_t buf_new_double(double v)
 {
-  return buf_add((uint8_t *)&v, 8);
+  return buf_new_data((uint8_t *)&v, 8);
 }
 
 uint32_t buf_get_ui32(buf_t b)
@@ -220,7 +221,12 @@ double buf_get_double(buf_t b)
   return *(double *)b.data;
 }
 
-buf_t buf_rand(uint32_t s)
+char * buf_get_string(buf_t b)
+{
+  return strndup((char *)b.data, b.size);
+}
+
+buf_t buf_new_rand(uint32_t s)
 {
   buf_t b = {};
 	buf_init(&b);
@@ -245,7 +251,7 @@ buf_t buf_xor(buf_t a, buf_t b)
 
   buf_t r = buf_new();
   if (a.size > r.asize) {
-		buf_realloc(&r, a.size);
+		buf_enlarge_to(&r, a.size);
   }
 
   uint32_t i;
@@ -260,37 +266,37 @@ buf_t buf_xor(buf_t a, buf_t b)
 
 buf_t buf_cat_ui32(buf_t dest, uint32_t i)
 {
-	buf_t src = buf_add_ui32(i);
-	buf_t buf = buf_cat(dest, src);
+	buf_t src = buf_new_ui32(i);
+	buf_t buf = buf_cat_buf(dest, src);
 	free(src.aptr);
 	return buf; 
 }
 
 buf_t buf_cat_ui64(buf_t dest, uint64_t i){
-	buf_t src = buf_add_ui64(i);
-	buf_t buf = buf_cat(dest, src);
+	buf_t src = buf_new_ui64(i);
+	buf_t buf = buf_cat_buf(dest, src);
 	free(src.aptr);
 	return buf; 
 }
 
 buf_t buf_cat_double(buf_t dest, double i){
-	buf_t src = buf_add_double(i);
-	buf_t buf = buf_cat(dest, src);
+	buf_t src = buf_new_double(i);
+	buf_t buf = buf_cat_buf(dest, src);
 	free(src.aptr);
 	return buf; 
 }
 
 buf_t buf_cat_data(buf_t dest, uint8_t *data, uint32_t len){
-	buf_t src = buf_add(data, len);
-	buf_t buf = buf_cat(dest, src);
+	buf_t src = buf_new_data(data, len);
+	buf_t buf = buf_cat_buf(dest, src);
 	free(src.aptr);
 	return buf; 
 }
 
 buf_t buf_cat_rand(buf_t dest, uint32_t s)
 {
-	buf_t src = buf_rand(s);
-	buf_t buf = buf_cat(dest, src);
+	buf_t src = buf_new_rand(s);
+	buf_t buf = buf_cat_buf(dest, src);
 	free(src.aptr);
 	return buf; 
 }

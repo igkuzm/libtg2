@@ -124,7 +124,6 @@ int dialogs_callback(void *userdata, const tl_messages_dialogs_t *md)
 
 int main(int argc, char *argv[])
 {
-
 	int SETUP_API_ID(apiId)
 	char * SETUP_API_HASH(apiHash)
 
@@ -142,6 +141,9 @@ int main(int argc, char *argv[])
 
 	tg_set_on_error(tg, NULL, on_log);
 	tg_set_on_log(tg, NULL, on_log);
+
+//	tg_new_auth_key1(tg);
+//return 0;
 
 	if (tg_connect(tg, tg, callback))
 		return 1;

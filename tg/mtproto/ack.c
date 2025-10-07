@@ -81,7 +81,7 @@ int tg_to_drop(tg_t *tg, buf_t *buf)
 		buf_t msg = tg_mtp_message(
 				tg, &drop, NULL, true);
 		buf_free(drop);
-		*buf = buf_cat(*buf, msg);
+		*buf = buf_cat_buf(*buf, msg);
 		buf_free(msg);
 	}
 

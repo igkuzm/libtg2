@@ -40,11 +40,15 @@ int tg_new_auth_key1(tg_t *tg)
  * Following this step, it is known to all.
  */
 	tl_t *tl = NULL;
-	buf_t nonce = buf_rand(16);
-	buf_t req_pq_multi = tl_req_pq_multi(nonce);
-	ON_LOG_BUF(tg, req_pq_multi, "%s: req_pq_multi:", __func__);
+	buf_t nonce = buf_new_rand(16);
 	
-	tl = tg_send_query_sync(tg, &req_pq_multi);
+	//buf_t req_pq_multi = tl_req_pq_multi(nonce);
+	buf_t req_pq = buf_new();
+	req_pq = buf_cat_ui32(req_pq, 0x60469778);
+	req_pq = buf_cat_buf(req_pq, nonce);
+	ON_LOG_BUF(tg, req_pq, "%s: req_pq_multi:", __func__);
+	
+	tl = tg_send_rfc(tg, &req_pq);
 
 /* 2. Server sends response of the form
  * resPQ#05162463 nonce:int128 server_nonce:int128 pq:string server_public_key_fingerprints:Vector long = ResPQ; */
@@ -53,7 +57,17 @@ int tg_new_auth_key1(tg_t *tg)
 				__func__, TL_NAME_FROM_ID(tl->_id));
 		return 1;
 	}
-	tl_resPQ_t resPQ = *(tl_resPQ_t *)tl;
+	tl_resPQ_t *resPQ = (tl_resPQ_t *)tl;
+
+	// pointer to fingerprint data
+	buf_t pfpt = buf_new_buf(tl->_buf); 
+	deserialize_ui32(&pfpt); //id 
+	deserialize_buf(&pfpt, 16); //nonce:int128 
+	deserialize_buf(&pfpt, 16); //server_nonce:int128 
+	buf_t str = deserialize_bytes(&pfpt); // pq string
+	/*printf("PFPT TEST: %ld\n", buf_get_ui64(buf_swap(str)));*/
+	/*deserialize_ui32(&pfpt); //id vector */
+	/*printf("PFPT TEST: %d\n", buf_get_ui32(pfpt));*/
  
 /* Here, string pq is a representation of a natural number 
  * (in binary big endian format). This number is the product 
@@ -63,7 +77,7 @@ int tg_new_auth_key1(tg_t *tg)
  * following this step, it is known to all. */
 
 	//uint64_t pq_ = be64toh(buf_get_ui64(resPQ.pq_));
-	uint64_t pq_ = buf_get_ui64(buf_swap(resPQ.pq_));
+	uint64_t pq_ = buf_get_ui64(buf_swap(resPQ->pq_));
 	ON_LOG(tg, "%s: pq: %ld", __func__, pq_);
 
 /* server_public_key_fingerprints is a list of public RSA key
@@ -77,12 +91,12 @@ int tg_new_auth_key1(tg_t *tg)
  * fingerprint is returned as a result to */
 	int i, nfpt = -1; // fingerprint number
 	for (i = 0; 
-			i < resPQ.server_public_key_fingerprints_len;
+			i < resPQ->server_public_key_fingerprints_len;
 			++i) 
 	{
 		ON_LOG(tg, "%s: server fingerprint %d: %.16lx", 
-				__func__, i, resPQ.server_public_key_fingerprints_[i]);
-		if (resPQ.server_public_key_fingerprints_[i] ==
+				__func__, i, resPQ->server_public_key_fingerprints_[i]);
+		if (resPQ->server_public_key_fingerprints_[i] ==
 				tg->fingerprint)
 			{
 				nfpt = i;	
@@ -119,8 +133,8 @@ int tg_new_auth_key1(tg_t *tg)
 
 	//buf_t p  = buf_add_ui32(htobe32(p_));
 	//buf_t q  = buf_add_ui32(htobe32(q_));
-	buf_t p  = buf_swap(buf_add_ui32(p_));
-	buf_t q  = buf_swap(buf_add_ui32(q_));
+	buf_t p  = buf_swap(buf_new_ui32(p_));
+	buf_t q  = buf_swap(buf_new_ui32(q_));
 
 /* Presenting proof of work; Server authentication
  *
@@ -132,7 +146,7 @@ int tg_new_auth_key1(tg_t *tg)
  * • new_nonce := another (good) random number generated 
  * by the client; after this query, it is known to both 
  * client and server;*/
-	buf_t new_nonce = buf_rand(32);
+	buf_t new_nonce = buf_new_rand(32);
 
  /* • data := a serialization of 
  * p_q_inner_data#83c95aec pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data
@@ -151,23 +165,23 @@ int tg_new_auth_key1(tg_t *tg)
 
  // p_q_inner_data#83c95aec pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data
 	buf_t p_q_inner_data;
-  p_q_inner_data = buf_add_ui32(0x83c95aec);
+  p_q_inner_data = buf_new_ui32(0x83c95aec);
 	// pq:string
 	p_q_inner_data = 
-		buf_cat(p_q_inner_data, serialize_str(resPQ.pq_));
+		buf_cat_buf(p_q_inner_data, serialize_str(resPQ->pq_));
 	// p:string
 	p_q_inner_data = 
-		buf_cat(p_q_inner_data, serialize_str(p));
+		buf_cat_buf(p_q_inner_data, serialize_str(p));
   // q:string
 	p_q_inner_data = 
-		buf_cat(p_q_inner_data, serialize_str(q));
+		buf_cat_buf(p_q_inner_data, serialize_str(q));
 	// nonce:int128
-	p_q_inner_data = buf_cat(p_q_inner_data, resPQ.nonce_);
+	p_q_inner_data = buf_cat_buf(p_q_inner_data, resPQ->nonce_);
 	// server_nonce:int128
 	p_q_inner_data = 
-		buf_cat(p_q_inner_data, resPQ.server_nonce_);
+		buf_cat_buf(p_q_inner_data, resPQ->server_nonce_);
 	// new_nonce:int256
-	p_q_inner_data = buf_cat(p_q_inner_data, new_nonce);
+	p_q_inner_data = buf_cat_buf(p_q_inner_data, new_nonce);
 		
 	ON_LOG_BUF(tg, p_q_inner_data,"%s: p_q_inner_data: ", __func__);
 
@@ -175,13 +189,13 @@ int tg_new_auth_key1(tg_t *tg)
 	buf_t data_with_hash = buf_new();
 	// SHA1(data)
  	data_with_hash = 
-		buf_cat(data_with_hash, tg_hsh_sha1(p_q_inner_data));
+		buf_cat_buf(data_with_hash, tg_hsh_sha1(p_q_inner_data));
 	// data
  	data_with_hash = 
-		buf_cat(data_with_hash,	p_q_inner_data);
+		buf_cat_buf(data_with_hash,	p_q_inner_data);
 	// (any random bytes); such that the length equals 255 bytes
 	data_with_hash = buf_cat_data(data_with_hash, 
-			buf_rand(256).data, 255 - data_with_hash.size);
+			buf_new_rand(256).data, 255 - data_with_hash.size);
 	
 	ON_LOG_BUF(tg, data_with_hash,"%s: data_with_hash: ", __func__);
 
@@ -193,20 +207,21 @@ int tg_new_auth_key1(tg_t *tg)
 
 	// req_DH_params#d712e4be nonce:int128 server_nonce:int128 p:string q:string public_key_fingerprint:long encrypted_data:string = Server_DH_Params
 	buf_t req_DH_params;
-	req_DH_params = buf_add_ui32(0xd712e4be);
+	req_DH_params = buf_new_ui32(0xd712e4be);
 	// nonce:int128
-	req_DH_params = buf_cat(req_DH_params, resPQ.nonce_);
+	req_DH_params = buf_cat_buf(req_DH_params, resPQ->nonce_);
 	// server_nonce:int128
-	req_DH_params = buf_cat(req_DH_params, resPQ.server_nonce_);
+	req_DH_params = buf_cat_buf(req_DH_params, resPQ->server_nonce_);
 	// p:string
-	req_DH_params = buf_cat(req_DH_params, serialize_str(p));
+	req_DH_params = buf_cat_buf(req_DH_params, serialize_bytes(p.data, p.size));
 	// q:string
-	req_DH_params = buf_cat(req_DH_params, serialize_str(q));
+	req_DH_params = buf_cat_buf(req_DH_params, serialize_bytes(q.data, q.size));
 	// public_key_fingerprint:long
-	req_DH_params = buf_cat_ui64(req_DH_params, resPQ.server_public_key_fingerprints_[0]);
+	req_DH_params = buf_cat_ui64(req_DH_params, resPQ->server_public_key_fingerprints_[0]);
 	// encrypted_data:string
 	req_DH_params = 
-		buf_cat(req_DH_params, serialize_str(encrypted_data));
+		buf_cat_buf(req_DH_params,
+			 	serialize_bytes(encrypted_data.data, encrypted_data.size));
 	
 	ON_LOG_BUF(tg, req_DH_params,"%s: req_DH_params: ", __func__);
 
@@ -237,7 +252,7 @@ int tg_new_auth_key1(tg_t *tg)
  * Perfect Forward Secrecy (PFS) in client-server 
  * communication is achieved. Read more about PFS » */
 
-	tl = tg_send_query_sync(tg, &req_DH_params);
+	tl = tg_send_rfc(tg, &req_DH_params);
 
 	/*  5. Server responds in one of two ways:
 

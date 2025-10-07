@@ -56,26 +56,24 @@ uint64_t tg_cry_rsa_fpt(const char *pubkey){
 	const BIGNUM *e = RSA_get0_e(rsa);
 #endif
 
-	buf_t a;
-	buf_init(&a);
+	buf_t a = buf_new();
 	a.size = BN_bn2bin(n, a.data);
 	buf_t astr = serialize_bytes(a.data, a.size);
 	buf_free(a);
 
-	buf_t b;
-	buf_init(&b);
+	buf_t b = buf_new();
 	b.size = BN_bn2bin(e, b.data);
 	buf_t bstr = serialize_bytes(b.data, b.size);
 	buf_free(b);
 
-	buf_t buf = buf_cat(astr, bstr);
+	buf_t buf = buf_cat_buf(astr, bstr);
 	buf_t buf_hash = tg_hsh_sha1(buf);
 	buf_free(astr); buf_free(bstr);
 
 	// get lower 64bit
 	int c = 20 - 8; // 160 - 64 SHA1 has 164 bit
 	buf_t lower = 
-		buf_add(buf_hash.data + c, 8);
+		buf_new_data(buf_hash.data + c, 8);
 	buf_free(buf_hash);
 
 	uint64_t fingerprint = buf_get_ui64(lower);
@@ -108,10 +106,8 @@ int tg_cry_rsa_cmp(const char *pubkey, buf_t buf)
 
 buf_t tg_cry_rsa_enc(const char *pubkey, buf_t buf)
 {
-	buf_t ret;
-	buf_init(&ret);
-	if (buf.size > ret.asize)
-		buf_realloc(&ret, buf.size + 1);
+	buf_t ret = buf_new();
+	buf_enlarge_to(&ret, buf.size + 1);
 	
 	RSA *rsa = read_pubkey(pubkey);
 	if (!rsa)
@@ -212,7 +208,7 @@ buf_t tg_cry_rsa_e(const char *pubkey, buf_t b)
 buf_t tg_cry_rsa_public_enc(const char *pubkey, buf_t buf)
 {
 	buf_t ret = buf_new();
-	buf_realloc(&ret, buf.size);
+	buf_enlarge_to(&ret, buf.size);
 	
 	// RSA_public_encrypt - depricated in openssl 3.0
 

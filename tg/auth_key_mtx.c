@@ -14,12 +14,12 @@ int tg_new_auth_key_mtx(tg_t *tg)
 	if (shared_rc.key.size){
 		ON_LOG(tg, "%s: << key", __func__);
 		
-		tg->key = buf_add(
+		tg->key = buf_new_data(
 				shared_rc.key.data, shared_rc.key.size);
 
 		buf_t key_hash = tg_hsh_sha1(tg->key);
 		buf_t auth_key_id = 
-			buf_add(key_hash.data + 12, 8);
+			buf_new_data(key_hash.data + 12, 8);
 		tg->key_id = buf_get_ui64(auth_key_id);
 		buf_free(key_hash);
 		buf_free(auth_key_id);
@@ -28,11 +28,11 @@ int tg_new_auth_key_mtx(tg_t *tg)
 
 		tg->socket = shared_rc.net.sockfd;
 
-		tg->salt = buf_add( 
+		tg->salt = buf_new_data( 
 				shared_rc.salt.data, shared_rc.salt.size);
 
 		// new session
-		tg->ssid = buf_rand(8);
+		tg->ssid = buf_new_rand(8);
 
 		return 0;
 	}

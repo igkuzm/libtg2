@@ -164,6 +164,15 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 			}
 			break;
 
+		case id_resPQ:
+			{
+				// callback RFC messages
+				ON_LOG(tg, "RFC message!");
+				if (callback)
+					if (callback(ptr, tl))
+						break;
+			}
+
 		default:
 			{
 				ON_LOG(tg, "%s: don't know how to handle: %s", __func__,

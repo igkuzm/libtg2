@@ -2,8 +2,7 @@
 #include <openssl/rand.h>
 
 extern buf_t tg_cry_rnd(int l){
-	buf_t buf;
-	buf_init(&buf);
+	buf_t buf = buf_new();
 	RAND_bytes(buf.data, l);
 	buf.size = l;
 	return buf;

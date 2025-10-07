@@ -887,7 +887,7 @@ int append_deserialize_table(
 
 	// copy buf
 	fputs(
-			"\tobj->_buf = buf_add_buf(*buf);\n"
+			"\tobj->_buf = buf_new_buf(*buf);\n"
 				, g->deserialize_table_c);
 
 
@@ -898,7 +898,7 @@ int append_deserialize_table(
 	if (strcmp(m->name, "vector") == 0){
 		fputs("\tobj->len_ = deserialize_ui32(buf);\n"
 				, g->deserialize_table_c);
-		fputs("\tobj->data_ = buf_add_buf(*buf);\n", 
+		fputs("\tobj->data_ = buf_new_buf(*buf);\n", 
 				g->deserialize_table_c);
 	}
 		
@@ -1600,7 +1600,7 @@ int append_methods(
 	fputs("{\n", g->methods_c);
 	
 	// set id
-	fputs(STR(buf, BLEN, "\tbuf_t buf = buf_add_ui32(htole32(0x%.8x));\n", m->id),
+	fputs(STR(buf, BLEN, "\tbuf_t buf = buf_new_ui32(htole32(0x%.8x));\n", m->id),
 			g->methods_c);
 
 	int nflag = 0;
@@ -1800,7 +1800,7 @@ int append_methods(
 
 			fputs(
 					STR(buf, BLEN, 
-						"\t\tbuf = buf_cat(buf, serialize_str(%s_));\n", 
+						"\t\tbuf = buf_cat_buf(buf, serialize_str(%s_));\n", 
 						m->args[i].name), 
 					g->methods_c);
 
@@ -1826,7 +1826,7 @@ int append_methods(
 
 			fputs(
 					STR(buf, BLEN, 
-						"\t\tbuf = buf_cat(buf, serialize_bytes(%s_->data, %s_->size));\n", 
+						"\t\tbuf = buf_cat_buf(buf, serialize_bytes(%s_->data, %s_->size));\n", 
 						m->args[i].name, m->args[i].name), 
 					g->methods_c);
 
@@ -1851,7 +1851,7 @@ int append_methods(
 
 			fputs(
 					STR(buf, BLEN, 
-						"\t\tbuf = buf_cat(buf, serialize_string(%s_));\n", 
+						"\t\tbuf = buf_cat_buf(buf, serialize_string(%s_));\n", 
 						m->args[i].name), 
 					g->methods_c);
 
@@ -1881,7 +1881,7 @@ int append_methods(
 
 			fputs(
 					STR(buf, BLEN, 
-						"\t\tbuf = buf_cat(buf, tl_vector());\n"
+						"\t\tbuf = buf_cat_buf(buf, tl_vector());\n"
 						"\t\tbuf = buf_cat_ui32(buf, htole32(%s_len));\n"
 						"\t\tint i;\n"
 						"\t\tfor (i=0; i<%s_len; ++i){\n"
@@ -1891,14 +1891,14 @@ int append_methods(
 			if (strcmp(type, "bytes")  == 0)
 				fputs(
 						STR(buf, BLEN, 
-							"\t\t\tbuf = buf_cat(buf, serialize_bytes(%s_[i].data, %s_[i].size));\n", 
+							"\t\t\tbuf = buf_cat_buf(buf, serialize_bytes(%s_[i].data, %s_[i].size));\n", 
 							m->args[i].name, m->args[i].name), 
 						g->methods_c);
 
 			else if (strcmp(type, "string")  == 0)
 				fputs(
 						STR(buf, BLEN, 
-							"\t\t\tbuf = buf_cat(buf, serialize_string(%s_[i]));\n", 
+							"\t\t\tbuf = buf_cat_buf(buf, serialize_string(%s_[i]));\n", 
 							m->args[i].name), 
 						g->methods_c);
 
@@ -1928,7 +1928,7 @@ int append_methods(
 			else // type X
 				fputs(
 						STR(buf, BLEN, 
-							"\t\t\tbuf = buf_cat(buf, %s_[i]);\n", 
+							"\t\t\tbuf = buf_cat_buf(buf, %s_[i]);\n", 
 							m->args[i].name), 
 						g->methods_c);
 
@@ -1955,7 +1955,7 @@ int append_methods(
 
 			fputs(
 					STR(buf, BLEN, 
-						"\t\tbuf = buf_cat(buf, *%s_);\n", 
+						"\t\tbuf = buf_cat_buf(buf, *%s_);\n", 
 						m->args[i].name), 
 					g->methods_c);
 

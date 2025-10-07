@@ -14,7 +14,7 @@ buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 	
 	if (!encypt){
 		// no encryption needed
-		e = buf_cat(e, *b);	
+		e = buf_cat_buf(e, *b);	
 		return e;
 	}
 
@@ -23,7 +23,7 @@ buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 	// used independently of the protocol version.
 	buf_t key_hash = tg_hsh_sha1(tg->key);
 	buf_t auth_key_id = 
-		buf_add(key_hash.data + 12, 8);
+		buf_new_data(key_hash.data + 12, 8);
 	buf_free(key_hash);
 
 /* For MTProto 2.0, the algorithm for computing aes_key 
@@ -43,19 +43,19 @@ buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 	//msg_key_large = SHA256 (substr (auth_key, 88+x, 32) 
 	//+ plaintext + random_padding);
 	buf_t msg_key_large_ = 
-		buf_add(tg->key.data + 88, 32);
-	msg_key_large_ = buf_cat(msg_key_large_, *b);
+		buf_new_data(tg->key.data + 88, 32);
+	msg_key_large_ = buf_cat_buf(msg_key_large_, *b);
 	buf_t msg_key_large = tg_hsh_sha256(msg_key_large_);
 	buf_free(msg_key_large_);
 
 	// msg_key = substr (msg_key_large, 8, 16);
 	buf_t msg_key = 
-		buf_add(msg_key_large.data + 8, 16);
+		buf_new_data(msg_key_large.data + 8, 16);
 	buf_free(msg_key_large);
 
 	//sha256_a = SHA256 (msg_key + substr (auth_key, x, 36));
 	buf_t sha256_a_ = 
-		buf_add(msg_key.data, msg_key.size);
+		buf_new_data(msg_key.data, msg_key.size);
 	sha256_a_ = 
 		buf_cat_data(sha256_a_, tg->key.data, 36);
 	buf_t sha256_a = tg_hsh_sha256(sha256_a_);
@@ -63,7 +63,7 @@ buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 
 	//sha256_b = SHA256 (substr (auth_key, 40+x, 36) + msg_key);
 	buf_t sha256_b_ = 
-		buf_add(tg->key.data + 40, 36);
+		buf_new_data(tg->key.data + 40, 36);
 	sha256_b_ = 
 		buf_cat_data(sha256_b_, msg_key.data, msg_key.size);
 	buf_t sha256_b = tg_hsh_sha256(sha256_b_);
@@ -71,7 +71,7 @@ buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 
 	//aes_key = substr (sha256_a, 0, 8) 
 	//+ substr (sha256_b, 8, 16) + substr (sha256_a, 24, 8);
-	buf_t aes_key = buf_add(sha256_a.data, 8);
+	buf_t aes_key = buf_new_data(sha256_a.data, 8);
 	aes_key = 
 		buf_cat_data(aes_key, sha256_b.data + 8, 16);
 	aes_key = 
@@ -79,7 +79,7 @@ buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 
 	//aes_iv = substr (sha256_b, 0, 8) + 
 	//substr (sha256_a, 8, 16) + substr (sha256_b, 24, 8);
-	buf_t aes_iv = buf_add(sha256_b.data, 8);
+	buf_t aes_iv = buf_new_data(sha256_b.data, 8);
 	aes_iv = 
 		buf_cat_data(aes_iv, sha256_a.data + 8, 16);
 	aes_iv = 
@@ -95,9 +95,9 @@ buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 	// Encrypted Message
 	// auth_key_id msg_key encrypted_data
 	// int64       int128  bytes
-	e = buf_cat(e, auth_key_id);
-	e = buf_cat(e, msg_key);
-	e = buf_cat(e, enc);
+	e = buf_cat_buf(e, auth_key_id);
+	e = buf_cat_buf(e, msg_key);
+	e = buf_cat_buf(e, enc);
 	buf_free(auth_key_id);
 	buf_free(msg_key);
 	buf_free(enc);
@@ -124,7 +124,7 @@ buf_t tg_decrypt(tg_t *tg, buf_t *m, bool encypted)
 
 	if (!encypted){
 		// no decryption needed
-		d = buf_cat(d, *m);
+		d = buf_cat_buf(d, *m);
 		return d;
 	}
 
@@ -136,7 +136,7 @@ buf_t tg_decrypt(tg_t *tg, buf_t *m, bool encypted)
 	uint64_t auth_key_id = buf_get_ui64(*m);
 	// check matching
 	buf_t key_hash = tg_hsh_sha1(tg->key);
-	buf_t auth_key_id_ = buf_add(key_hash.data + 12, 8);
+	buf_t auth_key_id_ = buf_new_data(key_hash.data + 12, 8);
 	if (auth_key_id != buf_get_ui64(auth_key_id_)){
 		ON_ERR(tg, "%s: auth_key_id mismatch", __func__);
 		buf_free(auth_key_id_);
@@ -156,7 +156,7 @@ buf_t tg_decrypt(tg_t *tg, buf_t *m, bool encypted)
 	// encrypted_data
 	//sha256_a = SHA256 (msg_key + substr (auth_key, x, 36));
 	buf_t sha256_a_ = 
-		buf_add(msg_key.data, msg_key.size);
+		buf_new_data(msg_key.data, msg_key.size);
 	sha256_a_ = 
 		buf_cat_data(sha256_a_, tg->key.data + 8, 36);
 	buf_t sha256_a = tg_hsh_sha256(sha256_a_);
@@ -164,21 +164,21 @@ buf_t tg_decrypt(tg_t *tg, buf_t *m, bool encypted)
 
 	//sha256_b = SHA256 (substr (auth_key, 40+x, 36) + msg_key);
 	buf_t sha256_b_ = 
-		buf_add(tg->key.data + 40+8, 36);
+		buf_new_data(tg->key.data + 40+8, 36);
 	sha256_b_ = 
-		buf_cat(sha256_b_, msg_key);
+		buf_cat_buf(sha256_b_, msg_key);
 	buf_t sha256_b = tg_hsh_sha256(sha256_b_);
 	buf_free(sha256_b_);
 	
 	//aes_key = substr (sha256_a, 0, 8) 
 	//+ substr (sha256_b, 8, 16) + substr (sha256_a, 24, 8);
-	buf_t aes_key = buf_add(sha256_a.data, 8);
+	buf_t aes_key = buf_new_data(sha256_a.data, 8);
 	aes_key = buf_cat_data(aes_key, sha256_b.data + 8, 16);
 	aes_key = buf_cat_data(aes_key, sha256_a.data + 24, 8);
 	
 	//aes_iv = substr (sha256_b, 0, 8) + 
 	//substr (sha256_a, 8, 16) + substr (sha256_b, 24, 8);
-	buf_t aes_iv = buf_add(sha256_b.data, 8);
+	buf_t aes_iv = buf_new_data(sha256_b.data, 8);
 	aes_iv = buf_cat_data(aes_iv, sha256_a.data + 8, 16);
 	aes_iv = buf_cat_data(aes_iv, sha256_b.data + 24, 8);
 	

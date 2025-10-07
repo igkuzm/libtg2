@@ -66,9 +66,9 @@
 // SH(data, salt) := H(salt | data | salt)
 #define SH(data, salt) \
 	({buf_t _buf = buf_new(); \
-	  _buf = buf_cat(_buf, salt); \
-	  _buf = buf_cat(_buf, data); \
-	  _buf = buf_cat(_buf, salt); \
+	  _buf = buf_cat_buf(_buf, salt); \
+	  _buf = buf_cat_buf(_buf, data); \
+	  _buf = buf_cat_buf(_buf, salt); \
 		buf_t _ret = H(_buf); \
 		buf_free(_buf); \
 		_ret;})
@@ -83,7 +83,7 @@
 // PH2(password, salt1, salt2) := 
 // SH(pbkdf2(sha512, PH1(password, salt1, salt2), salt1, 100000), salt2)
 #define PH2(password, salt1, salt2) \
-	({buf_t _psw = buf_add((unsigned char*)password,strlen(password));\
+	({buf_t _psw = buf_new_data((unsigned char*)password,strlen(password));\
 		buf_t _ph1 = PH1(_psw, salt1, salt2); \
 	  buf_t _buf = tg_pbkdf2_sha512(_ph1, salt1, 100000); \
 		buf_t _ret = SH(_buf, salt2); \
@@ -112,7 +112,7 @@ static buf_t BN_bn2bin_size(BIGNUM *a, int exact_size){
 }
 
 #define buf_concat_sha256(__b1, __b2) \
-	({buf_t __b = buf_concat(__b1, __b2); \
+	({buf_t __b = buf_new_bufs(__b1, __b2); \
 	  buf_t __sh = tg_hsh_sha256(__b); \
 		buf_free(__b); \
 	  __sh; })
@@ -121,7 +121,7 @@ static buf_t tg_calc_password_hash(
 		tg_t *tg, const char *password, buf_t salt1, buf_t salt2)
 {
 	ON_LOG(tg, "Begin password hash calculation");
-	buf_t pas = buf_add((unsigned char*)password,
+	buf_t pas = buf_new_data((unsigned char*)password,
 		 	strlen(password));
 	//BufferSlice buf(32);
   //hash_sha256(password, client_salt, buf.as_mutable_slice());
@@ -224,7 +224,7 @@ static InputCheckPasswordSRP tg_get_inputCheckPasswordSRP(
 	// BufferSlice a(2048 / 8);
   // Random::secure_bytes(a.as_mutable_slice());
   // auto a_bn = BigNum::from_binary(a.as_slice());
-	buf_t a = buf_rand(2048/8);
+	buf_t a = buf_new_rand(2048/8);
 	BIGNUM *a_bn = BN_bin2bn(a.data, a.size, NULL);
 	//ON_LOG_BUF(tg, a, "%s: a: ", __func__);
 	
@@ -309,12 +309,12 @@ static InputCheckPasswordSRP tg_get_inputCheckPasswordSRP(
 
   // auto M = sha256(PSLICE() << h1 << sha256(client_salt) << sha256(server_salt) << A << B << K);
 	buf_t M1_ = buf_new(); 
-	M1_ = buf_cat(M1_, xor);
-	M1_ = buf_cat(M1_, salt1_hash);
-	M1_ = buf_cat(M1_, salt2_hash);
-	M1_ = buf_cat(M1_, A);
-	M1_ = buf_cat(M1_, B);
-	M1_ = buf_cat(M1_, K);
+	M1_ = buf_cat_buf(M1_, xor);
+	M1_ = buf_cat_buf(M1_, salt1_hash);
+	M1_ = buf_cat_buf(M1_, salt2_hash);
+	M1_ = buf_cat_buf(M1_, A);
+	M1_ = buf_cat_buf(M1_, B);
+	M1_ = buf_cat_buf(M1_, K);
 	buf_t M1  = tg_hsh_sha256(M1_);
 	buf_free(M1_);
 

@@ -73,7 +73,7 @@ buf_t tg_mtp_message(tg_t *tg, buf_t *payload,
 	msg = buf_cat_ui32(msg, payload->size);	
 
 	// body
-	msg = buf_cat(msg, *payload);
+	msg = buf_cat_buf(msg, *payload);
 
 	return msg;
 }
@@ -123,7 +123,7 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 		buf_free(*b);
 		
 		// add container id
-		*b = buf_add_ui32(id_msg_container);
+		*b = buf_new_ui32(id_msg_container);
 
 		// add size
 		buf_t todrop = buf_new();
@@ -131,11 +131,11 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 		*b =  buf_cat_ui32(*b, 2+len);
 
 		// add data
-		*b =  buf_cat(*b,msgs[0]);
-		*b =  buf_cat(*b,msgs[1]);
+		*b =  buf_cat_buf(*b,msgs[0]);
+		*b =  buf_cat_buf(*b,msgs[1]);
 
 		// add tg_to_drop
-		*b = buf_cat(*b, todrop);
+		*b = buf_cat_buf(*b, todrop);
 
 		//ON_LOG_BUF(tg, b, "CONTAINER TO SEND: ");
 		// set msgid
@@ -152,10 +152,10 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 	// int64 int64      int64      int32  int32                bytes        bytes
 		
 	// salt
-	s = buf_cat(s, tg->salt);
+	s = buf_cat_buf(s, tg->salt);
 	
 	//session_id
-	s = buf_cat(s, tg->ssid);
+	s = buf_cat_buf(s, tg->ssid);
 	
 	//message_id
 	uint64_t _msgid = tg_get_current_time(tg);
@@ -191,7 +191,7 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 	s = buf_cat_ui32(s, b->size);
 	
 	//message_data
-	s = buf_cat(s, *b);
+	s = buf_cat_buf(s, *b);
 	
 	//padding
 	uint32_t pad =  16 + (16 - (b->size % 16)) % 16;
@@ -218,7 +218,7 @@ static buf_t tg_header_noenc(tg_t *tg, buf_t *b,
 	s = buf_cat_ui32(s, b->size);
 	
 	// message_data
-	s = buf_cat(s, *b);
+	s = buf_cat_buf(s, *b);
 
 	return s;
 }
@@ -246,7 +246,7 @@ static buf_t tg_deheader_enc(tg_t *tg, buf_t *b)
 	// salt
 	uint64_t salt = deserialize_ui64(b);
 	// update server salt
-	tg->salt = buf_add_ui64(salt);
+	tg->salt = buf_new_ui64(salt);
 	
 	// session_id
 	uint64_t ssid = deserialize_ui64(b);
@@ -268,7 +268,7 @@ static buf_t tg_deheader_enc(tg_t *tg, buf_t *b)
 	// set data len without padding
 	b->size = msg_data_len;
 	
-	d = buf_cat(d, *b);
+	d = buf_cat_buf(d, *b);
 
 	return d;
 }
@@ -302,7 +302,7 @@ static buf_t tg_deheader_noenc(tg_t *tg, buf_t *b)
 	// message_data_length
 	uint32_t msg_data_len = deserialize_ui32(b);
 
-	d = buf_cat(d, *b);
+	d = buf_cat_buf(d, *b);
 
 	// check len matching
 	if (msg_data_len != b->size){
@@ -319,7 +319,7 @@ buf_t tg_deheader(tg_t *tg, buf_t *b, bool enc)
 	ON_LOG(tg, "%s", __func__);
 	if (!b->size){
 		ON_ERR(tg, "%s: got nothing", __func__);
-		return buf_add_buf(*b);
+		return buf_new_buf(*b);
 	}
 
   if (enc)

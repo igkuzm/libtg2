@@ -46,11 +46,11 @@ tg_t *tg_new(
 
 	// set auth_key
 	if (auth_key){
-		tg->key = buf_add(auth_key, 256);
+		tg->key = buf_new_data(auth_key, 256);
 		// auth key id
 		buf_t key_hash = tg_hsh_sha1(tg->key);
 		buf_t auth_key_id = 
-			buf_add(key_hash.data + 12, 8);
+			buf_new_data(key_hash.data + 12, 8);
 		tg->key_id = buf_get_ui64(auth_key_id);
 		buf_free(key_hash);
 		buf_free(auth_key_id);
@@ -58,8 +58,8 @@ tg_t *tg_new(
 	} else {
 		tg->key = buf_new();
 	}
-	tg->ssid = buf_rand(8);
-	tg->salt = buf_rand(8);
+	tg->ssid = buf_new_rand(8);
+	tg->salt = buf_new_rand(8);
 
 	// start new seqn
 	tg->seqn = 0;

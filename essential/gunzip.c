@@ -60,8 +60,8 @@ char *gunzip_buf_err(int err){
 
 int gunzip_buf(buf_t *dst, buf_t src){
 	// allocte data
-	buf_init(dst);
-	buf_realloc(dst, src.size * 10);
+	*dst = buf_new();
+	buf_enlarge_to(dst, src.size * 10);
 	
 	z_stream s;
 	s.zalloc    = Z_NULL;

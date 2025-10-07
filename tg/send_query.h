@@ -11,6 +11,9 @@ extern void tg_send_query(
 extern tl_t *tg_send_query_sync(
 		tg_t *tg, buf_t *query); 
 
+extern tl_t *tg_send_rfc(
+		tg_t *tg, buf_t *query); 
+
 extern void tg_send_query_with_progress(
 		tg_t *tg, buf_t *query, enum dc, bool enc, 
 		void *ptr, int (*callback)(void *ptr, const tl_t *tl),

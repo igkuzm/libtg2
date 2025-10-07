@@ -2,7 +2,7 @@
  * File              : socket.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 09.09.2025
+ * Last Modified Date: 07.10.2025
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "../../libtg.h"
@@ -91,7 +91,7 @@ static size_t tg_socket_receive(
 	}
 
 	// realloc buf to be enough size
-	if (buf_realloc(answer, len)){
+	if (buf_enlarge_to(answer, len)){
 		// handle error
 		ON_ERR(tg, "%s: error buf realloc to size: %d", __func__, len);
 		return 0;
