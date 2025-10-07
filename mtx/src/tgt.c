@@ -10,6 +10,7 @@
 #include "../include/tgt.h"
 #include "../include/api.h"
 #include "../include/buf.h"
+#include <endian.h>
 
 #ifdef __GNUC__
 
@@ -710,7 +711,7 @@ method_req_DH_params_init(method_req_pq_t m1)
   method_req_DH_params_t m = method_req_DH_params;
   m.nonce = m1.nonce;
   m.server_nonce = m1.ctor_ResPQ.server_nonce;
-  ui64_t pq = api.buf.get_ui64(api.buf.swap(m1.ctor_ResPQ.pq.value));
+  ui64_t pq = be64toh(api.buf.get_ui64(m1.ctor_ResPQ.pq.value));
   ui32_t p, q;
   api.cmn.fact(pq, &p, &q);
 
@@ -718,8 +719,8 @@ method_req_DH_params_init(method_req_pq_t m1)
       SWAP(p, q);
   }
 
-  m.p.value = api.buf.swap(api.buf.add_ui32(p));
-  m.q.value = api.buf.swap(api.buf.add_ui32(q));
+  m.p.value = api.buf.add_ui32(htobe32(p));
+  m.q.value = api.buf.add_ui32(htobe32(q));
   m.public_key_fingerprint = m1.ctor_ResPQ.server_public_key_fingerprints;
   ctor_P_Q_inner_data_t c = api.tml->ctors->P_Q_inner_data.init(m1, m);
   buf_t_ d = api.tml->ctors->P_Q_inner_data.drive(c);
