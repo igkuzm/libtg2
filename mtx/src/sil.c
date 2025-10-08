@@ -113,6 +113,9 @@ tg_api_type_system_t sil_concrete(abstract_t a)
     reset_tg_api_type_system_flag++;
   }
 #endif
+	if(a.size == 0)
+		return t;
+	
   ui32_t id = le32toh(api.buf.get_ui32(a.params[0].value));
   param_t p;
   p.id = id;

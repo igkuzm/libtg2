@@ -754,6 +754,8 @@ method_req_DH_params_drive(method_req_DH_params_t m)
   abstract_t a = api.sil.abstract(t);
   a.stk_mode = SEND_RECEIVE;
   a = api.stk.drive(a);
+  if (a.size == 0)
+	  return m;
   m.ctor_Server_DH_Params = api.sil.concrete(a).ctor_Server_DH_Params;
 
   return m;
@@ -895,6 +897,7 @@ method_set_client_DH_params_t
 method_set_client_DH_params_init(method_req_pq_t m1, method_req_DH_params_t m2)
 {
 	printf("%s\n", __func__);
+	method_set_client_DH_params_t m = method_set_client_DH_params;
   ctor_Server_DH_inner_data_t c = api.tml->ctors->Server_DH_inner_data.init(m1, m2);
   buf_t_ a = c.answer;
   ctor_Server_DH_inner_data_t c1 = api.tml->ctors->Server_DH_inner_data.drive(a);
@@ -910,7 +913,6 @@ method_set_client_DH_params_init(method_req_pq_t m1, method_req_DH_params_t m2)
   data_with_hash = api.buf.cat(data_with_hash, data);
   data_with_hash = api.buf.cat(data_with_hash, rand);
   buf_t_ encrypted_data = api.cry.aes_e(data_with_hash, c.tmp_aes_key, c.tmp_aes_iv);
-  method_set_client_DH_params_t m = method_set_client_DH_params;
   m.nonce = m1.nonce;
   m.server_nonce = m1.ctor_ResPQ.server_nonce;
   m.encrypted_data.value = encrypted_data;

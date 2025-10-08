@@ -244,6 +244,8 @@ buf_t_ sel_serialize(abstract_t a)
 	//buf_init(&b);
   buf_t_ s = {};
 	//buf_init(&s);
+	if (a.size == 0)
+		return s;
 
  ui32_t i; for (i = 0; i < a.size; ++i) {
     b = api.sel.serialize_param(a.params[i]);
@@ -256,7 +258,10 @@ buf_t_ sel_serialize(abstract_t a)
 
 abstract_t sel_deserialize(buf_t_ b)
 {
+	printf("%s", __func__);
   abstract_t a;
+	if (b.size == 0)
+		return a;
   ui32_t id = api.buf.get_ui32(b);
   a.params[0].type = TYPE_ID;
   a.params[0].value = api.buf.add_ui32(id);

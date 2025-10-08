@@ -17,6 +17,8 @@ extern hdl_t hdl;
 buf_t_ hdl_header(buf_t_ b, msg_t t)
 {
   buf_t_ s = {};
+	if (b.size == 0)
+		return s;
 
   switch (t) {
     case RFC:
@@ -64,7 +66,9 @@ buf_t_ hdl_header(buf_t_ b, msg_t t)
 buf_t_ hdl_deheader(buf_t_ b, msg_t t)
 {
   buf_t_ d;
-
+	if (b.size == 0)
+		return d;
+	
   switch (t) {
     case RFC:
     {

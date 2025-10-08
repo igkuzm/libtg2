@@ -14,8 +14,9 @@
 buf_t_ enl_encrypt(buf_t_ b, msg_t t)
 {
   buf_t_ e = {};
-	//buf_init(&e);
-
+  if (b.size == 0)
+	  return e;
+	
   switch (t) {
     case API:
     {
@@ -65,6 +66,8 @@ buf_t_ enl_decrypt(buf_t_ m, msg_t t)
 {
   buf_t_ d;
 	//buf_init(&d);
+	if (m.size == 0)
+		return d;
 
   switch (t) {
     case API:
@@ -109,6 +112,7 @@ buf_t_ enl_decrypt(buf_t_ m, msg_t t)
 
       if (!api.buf.cmp(key, d_key)) {
         api.log.error("trl_transport: keys mismatch");
+		  break;
       }
 
       d = api.buf.add(m.data + 8, m.size - 8);

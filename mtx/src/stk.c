@@ -31,6 +31,8 @@ abstract_t stk_drive(abstract_t a)
     case SEND_RECEIVE:
     {
       buf_t_ tr = api.trl.detransport(nr);
+	  if (tr.size == 0)
+		  return ar;
       //api.buf.dump(tr);
       buf_t_ d = api.enl.decrypt(tr, a.type);
       //api.buf.dump(d);

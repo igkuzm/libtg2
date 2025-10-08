@@ -46,10 +46,21 @@ buf_t_ trl_transport(buf_t_ buf)
 
 buf_t_ trl_detransport(buf_t_ a)
 {
-  if (!a.size) {
-    api.log.error("trl_transport: received nothing");
-  }
+	if (!a.size) {
+		api.log.error("trl_detransport: received nothing");
+	}
 
+	a = api.buf.add(a.data + 4, a.size - 4);
+
+	ui32_t err_ = htole32(0xfffffe6c);
+	buf_t_ err = api.buf.add_ui32(err_);
+	
+	if (a.size == 4 && api.buf.cmp(a, err)) {
+		api.log.error("trl_detransport: 404");
+		buf_t_ a = {};
+		exit(1);
+	}
+	
   // check len
 //  buf_t_ a_len = api.buf.add(a.data, 4);
 //  buf_t_ a_len_ = api.buf.add((ui8_t *)&a.size, 4);
@@ -76,13 +87,7 @@ buf_t_ trl_detransport(buf_t_ a)
   // remove
   //a.size -= 12;
   //a = api.buf.add(a.data + 8, a.size);
-  //ui32_t err_ = 0xfffffe6c;
-  //buf_t_ err = api.buf.add_ui32(err_);
-
-  //if (a.size == 4 && api.buf.cmp(a, err)) {
-    //api.log.error("trl_transport: 404");
-  //}
+  
 	
-	a = api.buf.add(a.data + 4, a.size - 4);
   return a;
 }
