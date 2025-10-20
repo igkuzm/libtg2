@@ -43,9 +43,10 @@ int tg_new_auth_key1(tg_t *tg)
 	buf_t nonce = buf_new_rand(16);
 	
 	//buf_t req_pq_multi = tl_req_pq_multi(nonce);
-	buf_t req_pq = buf_new();
-	req_pq = buf_cat_ui32(req_pq, 0x60469778);
-	req_pq = buf_cat_buf(req_pq, nonce);
+	buf_t req_pq = tl_req_pq_multi(nonce);
+	/*buf_t req_pq = buf_new();*/
+	//req_pq = buf_cat_ui32(req_pq, 0x60469778);
+	//req_pq = buf_cat_buf(req_pq, nonce);
 	ON_LOG_BUF(tg, req_pq, "%s: req_pq_multi:", __func__);
 	
 	tl = tg_send_rfc(tg, &req_pq);
@@ -59,16 +60,6 @@ int tg_new_auth_key1(tg_t *tg)
 	}
 	tl_resPQ_t *resPQ = (tl_resPQ_t *)tl;
 
-	// pointer to fingerprint data
-	buf_t pfpt = buf_new_buf(tl->_buf); 
-	deserialize_ui32(&pfpt); //id 
-	deserialize_buf(&pfpt, 16); //nonce:int128 
-	deserialize_buf(&pfpt, 16); //server_nonce:int128 
-	buf_t str = deserialize_bytes(&pfpt); // pq string
-	/*printf("PFPT TEST: %ld\n", buf_get_ui64(buf_swap(str)));*/
-	/*deserialize_ui32(&pfpt); //id vector */
-	/*printf("PFPT TEST: %d\n", buf_get_ui32(pfpt));*/
- 
 /* Here, string pq is a representation of a natural number 
  * (in binary big endian format). This number is the product 
  * of two different odd prime numbers. Normally,
@@ -162,26 +153,36 @@ int tg_new_auth_key1(tg_t *tg)
  * requisite power over the requisite modulus,
  * and the result is stored as a 256-byte number. */
 		
+	buf_t p_q_inner_data = tl_p_q_inner_data_dc(
+			&resPQ->pq_, 
+			&p, 
+			&q, 
+			resPQ->nonce_, 
+			resPQ->server_nonce_, 
+			new_nonce, 
+			00002);
 
  // p_q_inner_data#83c95aec pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data
-	buf_t p_q_inner_data;
-  p_q_inner_data = buf_new_ui32(0x83c95aec);
+	//buf_t p_q_inner_data;
+  //p_q_inner_data = buf_new_ui32(0x83c95aec);
 	// pq:string
-	p_q_inner_data = 
-		buf_cat_buf(p_q_inner_data, serialize_str(resPQ->pq_));
+	//p_q_inner_data = 
+	//	buf_cat_buf(p_q_inner_data, serialize_str(resPQ->pq_));
 	// p:string
-	p_q_inner_data = 
-		buf_cat_buf(p_q_inner_data, serialize_str(p));
+	//p_q_inner_data = 
+	//	buf_cat_buf(p_q_inner_data, serialize_str(p));
   // q:string
-	p_q_inner_data = 
-		buf_cat_buf(p_q_inner_data, serialize_str(q));
+	//p_q_inner_data = 
+	//	buf_cat_buf(p_q_inner_data, serialize_str(q));
 	// nonce:int128
-	p_q_inner_data = buf_cat_buf(p_q_inner_data, resPQ->nonce_);
+	//p_q_inner_data = 
+	//	buf_cat_buf(p_q_inner_data, resPQ->nonce_);
 	// server_nonce:int128
-	p_q_inner_data = 
-		buf_cat_buf(p_q_inner_data, resPQ->server_nonce_);
+	//p_q_inner_data = 
+	//	buf_cat_buf(p_q_inner_data, resPQ->server_nonce_);
 	// new_nonce:int256
-	p_q_inner_data = buf_cat_buf(p_q_inner_data, new_nonce);
+	//p_q_inner_data = 
+	//	buf_cat_buf(p_q_inner_data, new_nonce);
 		
 	ON_LOG_BUF(tg, p_q_inner_data,"%s: p_q_inner_data: ", __func__);
 
@@ -190,6 +191,7 @@ int tg_new_auth_key1(tg_t *tg)
 	// SHA1(data)
  	data_with_hash = 
 		buf_cat_buf(data_with_hash, tg_hsh_sha1(p_q_inner_data));
+	ON_LOG_BUF(tg, data_with_hash,"%s: SHA1(data): ", __func__);
 	// data
  	data_with_hash = 
 		buf_cat_buf(data_with_hash,	p_q_inner_data);
@@ -206,22 +208,34 @@ int tg_new_auth_key1(tg_t *tg)
 	ON_LOG_BUF(tg, encrypted_data,"%s: encrypted_data: ", __func__);
 
 	// req_DH_params#d712e4be nonce:int128 server_nonce:int128 p:string q:string public_key_fingerprint:long encrypted_data:string = Server_DH_Params
-	buf_t req_DH_params;
-	req_DH_params = buf_new_ui32(0xd712e4be);
+	buf_t req_DH_params = tl_req_DH_params(
+			resPQ->nonce_, 
+			resPQ->server_nonce_, 
+			&p, 
+			&q, 
+			tg->fingerprint, 
+			&encrypted_data);
+
+	//buf_t req_DH_params;
+	//req_DH_params = buf_new_ui32(0xd712e4be);
 	// nonce:int128
-	req_DH_params = buf_cat_buf(req_DH_params, resPQ->nonce_);
+	//req_DH_params = 
+	//	buf_cat_buf(req_DH_params, resPQ->nonce_);
 	// server_nonce:int128
-	req_DH_params = buf_cat_buf(req_DH_params, resPQ->server_nonce_);
+	//req_DH_params = 
+	//	buf_cat_buf(req_DH_params, resPQ->server_nonce_);
 	// p:string
-	req_DH_params = buf_cat_buf(req_DH_params, serialize_bytes(p.data, p.size));
+	//req_DH_params = 
+	//	buf_cat_buf(req_DH_params, serialize_str(p));
 	// q:string
-	req_DH_params = buf_cat_buf(req_DH_params, serialize_bytes(q.data, q.size));
+	//req_DH_params = 
+	//	buf_cat_buf(req_DH_params, serialize_str(q));
 	// public_key_fingerprint:long
-	req_DH_params = buf_cat_ui64(req_DH_params, resPQ->server_public_key_fingerprints_[0]);
+	//req_DH_params = 
+	//	buf_cat_ui64(req_DH_params, tg->fingerprint);
 	// encrypted_data:string
-	req_DH_params = 
-		buf_cat_buf(req_DH_params,
-			 	serialize_bytes(encrypted_data.data, encrypted_data.size));
+	//req_DH_params = 
+	//	buf_cat_buf(req_DH_params, serialize_str(encrypted_data));
 	
 	ON_LOG_BUF(tg, req_DH_params,"%s: req_DH_params: ", __func__);
 

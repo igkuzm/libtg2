@@ -37,7 +37,7 @@ if(APPLE)
 	set(GETTIME darwin-posix-rt/clock_gettime.c)
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -I../essential")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 add_library(${TARGET} 

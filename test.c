@@ -1,6 +1,7 @@
 #include "libtg.h"
 #include "tg/auth_key_mtx.h"
 #include "tg/auth_key1.h"
+#include "tg/auth_key2.h"
 #include "tg/auth.h"
 #include "tg/tg.h"
 #include "api_id.h"
@@ -142,8 +143,8 @@ int main(int argc, char *argv[])
 	tg_set_on_error(tg, NULL, on_log);
 	tg_set_on_log(tg, NULL, on_log);
 
-//	tg_new_auth_key1(tg);
-//return 0;
+	tg_new_auth_key1(tg);
+	return 0;
 
 	if (tg_connect(tg, tg, callback))
 		return 1;

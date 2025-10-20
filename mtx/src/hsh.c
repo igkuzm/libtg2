@@ -26,7 +26,7 @@ buf_t_ hsh_sha256(buf_t_ b)
   buf_t_ h;
 	/*buf_init(&h);*/
   sha256_bytes(b.data, b.size, h.data);
-  h.size = 256;
+  h.size = 32;
 
   return h;
 }

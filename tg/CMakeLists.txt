@@ -27,6 +27,7 @@ set(TARGET_SOURCES
   answer.c
   updates.c
 	auth_key1.c
+	auth_key2.c
 	auth_key_mtx.c
 	auth.c
 	connect.c

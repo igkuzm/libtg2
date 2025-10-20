@@ -10,6 +10,8 @@
 #include "../include/api.h"
 #include "../include/buf.h"
 #include "../../essential/endian.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 trl_t trl_init()
 {

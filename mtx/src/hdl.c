@@ -5,7 +5,7 @@
 //  Created by Pavel Morozkin on 24.01.14.
 //  Copyright (c) 2014 Pavel Morozkin. All rights reserved.
 //
-#define _POSIX_C_SOURCE 199309L
+//#define _POSIX_C_SOURCE 199309L
 #include "../include/api.h"
 #include "../include/hdl.h"
 #include "../include/buf.h"
