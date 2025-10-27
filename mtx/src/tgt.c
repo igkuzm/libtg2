@@ -785,7 +785,9 @@ ctor_P_Q_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
   rand_array.size = 32;
   //buf_t_ rand_array = buf_rand(32);
   m.new_nonce.value = rand_array; // fucking hack
-  //api.buf.dump(m.new_nonce.value);
+	printf("NEW NONCE:\n");
+api.buf.dump(m.new_nonce.value);
+  
   m.new_nonce.type = TYPE_INT256;
 
   return m;
@@ -809,20 +811,29 @@ ctor_Server_DH_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
 	printf("%s\n", __func__);
   ctor_P_Q_inner_data_t nn = api.tml->ctors->P_Q_inner_data.init(m1, m2); // hack
   buf_t_ new_nonce = nn.new_nonce.value; // hack
+	printf("NEW NONCE:\n", __func__);
+	api.buf.dump(new_nonce);
+
   buf_t_ server_nonce = m1.ctor_ResPQ.server_nonce.value;
+	printf("SERVER NONCE:\n", __func__);
+	api.buf.dump(server_nonce);
+
   // tmp_aes_key := SHA1(new_nonce + server_nonce) + substr (SHA1(server_nonce + new_nonce), 0, 12);
   buf_t_ new_nonce_plus_server_nonce = {};
   new_nonce_plus_server_nonce = api.buf.cat(new_nonce_plus_server_nonce, new_nonce);
   new_nonce_plus_server_nonce = api.buf.cat(new_nonce_plus_server_nonce, server_nonce);
   buf_t_ new_nonce_plus_server_nonce_hash = api.hsh.sha1(new_nonce_plus_server_nonce);
+  
   buf_t_ server_nonce_plus_new_nonce = {};
   server_nonce_plus_new_nonce = api.buf.cat(server_nonce_plus_new_nonce, server_nonce);
   server_nonce_plus_new_nonce = api.buf.cat(server_nonce_plus_new_nonce, new_nonce);
   buf_t_ server_nonce_plus_new_nonce_hash = api.hsh.sha1(server_nonce_plus_new_nonce);
   buf_t_ substr_sha1_server_nonce_new_nonce012 = api.buf.add(server_nonce_plus_new_nonce_hash.data, 12);
+  
   buf_t_ tmp_aes_key = {};
   tmp_aes_key = api.buf.cat(tmp_aes_key, new_nonce_plus_server_nonce_hash);
   tmp_aes_key = api.buf.cat(tmp_aes_key, substr_sha1_server_nonce_new_nonce012);
+  
   buf_t_ substr_sha1_server_nonce_new_nonce128 = api.buf.add(server_nonce_plus_new_nonce_hash.data + 12, 8);
   buf_t_ new_nonce_new_nonce = {};
   new_nonce_new_nonce = api.buf.cat(new_nonce_new_nonce, new_nonce);
@@ -833,6 +844,7 @@ ctor_Server_DH_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
   tmp_aes_iv = api.buf.cat(tmp_aes_iv, substr_sha1_server_nonce_new_nonce128);
   tmp_aes_iv = api.buf.cat(tmp_aes_iv, new_nonce_new_nonce_hash);
   tmp_aes_iv = api.buf.cat(tmp_aes_iv, substr_new_nonce04);
+	
   buf_t_ e = m2.ctor_Server_DH_Params.ctor_Server_DH_Params_ok.encrypted_answer.value;
 	printf("ENCRYPTED ANSWER:\n");
 	api.buf.dump(e);

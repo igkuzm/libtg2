@@ -181,17 +181,20 @@ buf_t_ sel_deserialize_string(buf_t_ b)
     ui32_t size = byte.data[0];
     s = api.buf.add(b.data + 1, size);
   } else if (byte.data[0] >= 254) {
-    ui8_t start = 0xfe;
-    buf_t_ s1 = api.buf.add((ui8_t *)&start, 1);
-    buf_t_ s2 = api.buf.add(b.data, 1);
-
-    if (!api.buf.cmp(s1, s2)) {
-      api.log.error("can't deserialize string");
-    }
+//    ui8_t start = 0xfe;
+//    buf_t_ s1 = api.buf.add((ui8_t *)&start, 1);
+//    buf_t_ s2 = api.buf.add(b.data, 1);
+//
+//    if (!api.buf.cmp(s1, s2)) {
+//      api.log.error("can't deserialize string");
+//    }
 
     buf_t_ len_ = api.buf.add(b.data + 1, 3);
     len_.size = 4; // hack
     ui32_t len = le32toh(api.buf.get_ui32(len_));
+	  
+	  printf("LEN: %d\n", len);
+	  
     b = api.buf.add(b.data + 4, b.size - 4);
     s = api.buf.add(b.data, len);
   } else {
