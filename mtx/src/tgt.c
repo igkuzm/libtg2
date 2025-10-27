@@ -836,14 +836,14 @@ ctor_Server_DH_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
   buf_t_ e = m2.ctor_Server_DH_Params.ctor_Server_DH_Params_ok.encrypted_answer.value;
 	printf("ENCRYPTED ANSWER:\n");
 	api.buf.dump(e);
-  buf_t_ answer = api.cry.aes_d(e, tmp_aes_key, tmp_aes_iv);
+  buf_t_ answer_with_hash = api.cry.aes_d(e, tmp_aes_key, tmp_aes_iv);
 
   // remove hash
-  answer = api.buf.add(answer.data + 20, answer.size - 20);
+  buf_t_ answer = api.buf.add(answer_with_hash.data + 20, answer_with_hash.size - 20);
   // remove 8 random bytes
   answer.size -= 8;
 	// check hash
-	buf_t_ answer_hash = api.buf.add(answer.data, 20);
+	buf_t_ answer_hash = api.buf.add(answer_with_hash.data, 20);
 	printf("ANSWER HASH:\n");
 	api.buf.dump(answer_hash);
 
