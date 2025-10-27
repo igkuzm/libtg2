@@ -180,7 +180,7 @@ buf_t_ sel_deserialize_string(buf_t_ b)
   if (byte.data[0] <= 253) {
     ui32_t size = byte.data[0];
     s = api.buf.add(b.data + 1, size);
-  } else if (byte.data[0] >= 254) {
+  } else if (byte.data[0] == 254) {
 //    ui8_t start = 0xfe;
 //    buf_t_ s1 = api.buf.add((ui8_t *)&start, 1);
 //    buf_t_ s2 = api.buf.add(b.data, 1);

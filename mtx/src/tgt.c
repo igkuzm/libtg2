@@ -7,6 +7,7 @@
 //
 
 #include <string.h>
+#include <assert.h>
 #include "../include/tgt.h"
 #include "../include/api.h"
 #include "../include/buf.h"
@@ -862,6 +863,8 @@ ctor_Server_DH_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
 	buf_t_ generated_hash = api.hsh.sha1(answer);
 	printf("GENERATED HASH:\n");
 	api.buf.dump(generated_hash);
+	
+	assert(api.buf.cmp(answer_hash, generated_hash));
 
   // additional
   ctor_Server_DH_inner_data_t c;
