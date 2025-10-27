@@ -164,7 +164,9 @@ tg_api_type_system_t sil_concrete(abstract_t a)
       c.server_nonce = api.sel.deserialize_param(p);
       //api.buf.dump(c.server_nonce.value);
       s = api.buf.add(s.data + 16, s.size - 16);
-      p.value = s;
+		printf("ENCRYPTED ANSWER STRING:\n");
+	    api.buf.dump(s);
+	  p.value = s;
       p.type = TYPE_STRING;
       c.encrypted_answer = api.sel.deserialize_param(p);
       //api.buf.dump(c.encrypted_answer.value);

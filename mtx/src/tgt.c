@@ -778,7 +778,8 @@ ctor_P_Q_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
   m.nonce = m1.nonce;
   //api.buf.dump(m.nonce.value);
   m.server_nonce = m1.ctor_ResPQ.server_nonce;
-  //api.buf.dump(m.server_nonce.value);
+  	printf("SERVER NONCE:\n");
+	api.buf.dump(m.server_nonce.value);
   //m.new_nonce.value = api.cmn.rand_array(32);
   buf_t_ rand_array = {};
 	//buf_init(&rand_array);
