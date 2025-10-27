@@ -120,6 +120,7 @@ tg_api_type_system_t sil_concrete(abstract_t a)
   param_t p;
   p.id = id;
   buf_t_ s = a.params[1].value; // hack
+	
   switch (id) {
     case _id_resPQ:
     {
@@ -171,7 +172,9 @@ tg_api_type_system_t sil_concrete(abstract_t a)
 
       break;
     }
-    case _id_server_DH_inner_data:
+	  
+	  case _id_server_DH_inner_data: 
+	 // case 0xba0d89b5: //hack
     {
       ctor_Server_DH_inner_data_t c;
       c.id__ = id;

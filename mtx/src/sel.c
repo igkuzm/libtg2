@@ -36,6 +36,7 @@ buf_t_ sel_serialize_param(param_t p)
     case TYPE_INT:
     {
 		uint32_t var = htole32(*(uint32_t *)(&p.value.data));
+		printf("INT32: %d\n", var);
 		s = api.buf.add_ui32(var);
 		
 		break;
@@ -258,11 +259,13 @@ buf_t_ sel_serialize(abstract_t a)
 
 abstract_t sel_deserialize(buf_t_ b)
 {
-	printf("%s", __func__);
+	printf("%s\n", __func__);
   abstract_t a;
 	if (b.size == 0)
 		return a;
   ui32_t id = api.buf.get_ui32(b);
+	printf("ID: 0x%x\n", id);
+ 
   a.params[0].type = TYPE_ID;
   a.params[0].value = api.buf.add_ui32(id);
   // rem id
