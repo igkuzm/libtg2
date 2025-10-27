@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 	tg_set_on_error(tg, NULL, on_log);
 	tg_set_on_log(tg, NULL, on_log);
 
-	tg_new_auth_key1(tg);
+	tg_new_auth_key_mtx(tg);
 	return 0;
 
 	if (tg_connect(tg, tg, callback))

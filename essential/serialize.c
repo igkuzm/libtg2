@@ -1,6 +1,7 @@
 #include "serialize.h"
 #include <string.h>
 #include <stdbool.h>
+#include "endian.h"
 
 buf_t serialize_bytes(
 		uint8_t *bytes, size_t size)
