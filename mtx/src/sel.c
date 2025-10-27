@@ -173,7 +173,7 @@ buf_t_ sel_deserialize_string(buf_t_ b)
 {
   buf_t_ s;
   buf_t_ byte = api.buf.add(b.data, 4);
-  int offset = byte.data[0];
+  //int offset = byte.data[0];
 
   /*if (byte.data[0] <= 253 && !b.data[1 + offset] && !b.data[2 + offset] && !b.data[3 + offset]) {*/
   if (byte.data[0] <= 253) {
