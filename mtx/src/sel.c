@@ -205,9 +205,10 @@ buf_t_ sel_serialize_string(buf_t_ b)
   buf_t_ s = {};
 	//buf_init(&s);
   ui32_t size = b.size;
+  uint32_t size_le = htole32(size);
 
   if (size <= 253) {
-    s = api.buf.add((ui8_t *)&size, 1);
+    s = api.buf.add((ui8_t *)&size_le, 1);
     s = api.buf.cat(s, b);
     int pad = (4 - (s.size % 4)) % 4;
     buf_t_ p = {};
@@ -218,7 +219,6 @@ buf_t_ sel_serialize_string(buf_t_ b)
     ui8_t start = 0xfe;
     s = api.buf.add((ui8_t *)&start, 1);
     
-	  uint32_t size_le = htole32(size);
 	buf_t_ len = api.buf.add((ui8_t *)&size_le, 3);
 	  
     s = api.buf.cat(s, len);
