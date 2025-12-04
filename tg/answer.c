@@ -13,16 +13,15 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 	ON_LOG(tg, "%s: %s", __func__,
 			tl?TL_NAME_FROM_ID(tl->_id):"NULL");
 
+	TG_ANSWER answer = TG_ANSWER_READ_AGAIN;
+
 	if (tl == NULL){
-		return TG_ANSWER_ERR;
+		return TG_ANSWER_READ_AGAIN;
 	}
 
 	switch (tl->_id) {
 		case id_rpc_result:
 			{
-				// add to ack
-				tg_add_msgid(tg, msg_id);
-				
 				// handle result
 				tl_rpc_result_t *rpc_result = 
 					(tl_rpc_result_t *)tl;
@@ -32,6 +31,11 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 					rpc_result->req_msg_id_); 
 				if (msg_id == rpc_result->req_msg_id_){
 					// got result!
+					answer = TG_ANSWER_OK;
+					
+					// add to ack
+					tg_add_msgid(tg, msg_id);
+					
 					ON_LOG(tg, "OK! We have result: %s", 
 						result?TL_NAME_FROM_ID(result->_id):"NULL");
 				
@@ -50,7 +54,6 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 						rpc_result->req_msg_id_); 
 					// drop!
 					/*tg_add_todrop(tg, rpc_result->req_msg_id_);*/
-					return TG_ANSWER_READ_AGAIN;
 				}
 			}
 			break;
@@ -65,6 +68,9 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 					msg_id_ = ((tl_msg_new_detailed_info_t *)tl)->answer_msg_id_;
 				if (msg_id == msg_id_){
 					ON_LOG(tg, "answer has been already sended!");
+					answer = TG_ANSWER_OK;
+					// add to ack
+					tg_add_msgid(tg, msg_id);
 					if (callback)
 						if (callback(ptr, tl))
 							break;
@@ -72,35 +78,49 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 					ON_ERR(tg, "%s: %s for wrong msgid: "_LD_"",
 							__func__, TL_NAME_FROM_ID(tl->_id), msg_id_);
 				}
-				// add to ack
-				tg_add_msgid(tg, msg_id_);
 			}
 			break;
 
 		case id_bad_server_salt:
 			{
 				// resend query
-				return TG_ANSWER_RESEND_QUERY;
+				answer = TG_ANSWER_RESEND_QUERY;
+				break;
 			}
 		
 		case id_rpc_error:
+			{	
+				// show error
+				char *err = tg_strerr(tl);
+				ON_ERR(tg, "%s: %s", __func__, err);
+				free(err);
+				break;
+			}
 		case id_bad_msg_notification:
 			{
 				// show error
 				char *err = tg_strerr(tl);
 				ON_ERR(tg, "%s: %s", __func__, err);
 				free(err);
-				
+
 				// add time diff
 				/* TODO:  <28-08-25, yourname> */
 				//pthread_mutex_lock(&tg->seqnm);
 				//tg->timediff = ntp_time_diff();
 				//pthread_mutex_unlock(&tg->seqnm);
 
-				// do callback
-				if (callback)
-					if (callback(ptr, tl))
-						break;
+				tl_bad_msg_notification_t *bmsgn = 
+						(tl_bad_msg_notification_t *)tl;
+
+				if (msg_id == bmsgn->bad_msg_id_){
+					answer = TG_ANSWER_OK;
+					// add to ack
+					tg_add_msgid(tg, msg_id);
+					// do callback
+					if (callback)
+						if (callback(ptr, tl))
+							break;
+				}
 			}
 			break; // run on_done
 		
@@ -124,7 +144,9 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 					mtp_message_t m = container->messages_[i];
 					// parse answer for each message
 					tl_t *tl = tl_deserialize(&m.body);
-					tg_parse_answer(tg, tl, msg_id, ptr, callback);
+					TG_ANSWER new = tg_parse_answer(tg, tl, msg_id, ptr, callback);
+					if (answer != TG_ANSWER_OK)
+						answer = new;
 					// free tl
 					tl_free(tl);
 				}
@@ -155,6 +177,7 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 				int i;
 				for (i = 0; i < ack->msg_ids_len; ++i) {
 					if (msg_id == ack->msg_ids_[i]){
+						answer = TG_ANSWER_OK;
 						ON_LOG(tg, "ACK for result!");
 						if (callback)
 							if (callback(ptr, tl))
@@ -169,8 +192,8 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 				// callback RFC messages
 				ON_LOG(tg, "RFC message!");
 				if (callback)
-					if (callback(ptr, tl))
-						break;
+					(callback(ptr, tl));
+				return TG_ANSWER_OK;
 			}
 
 		default:
@@ -181,7 +204,5 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 			}
 	}
 
-	return TG_ANSWER_OK;
+	return TG_ANSWER_READ_AGAIN;
 }
-
-
