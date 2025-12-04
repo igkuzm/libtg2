@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.0)
 
 set(TARGET mtx)
 
+include_directories("../essential")
+
+find_package(OpenSSL REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
+
 file(GLOB RESOURCE_FILES "include/*.h")
 set(TARGET_SOURCES 
 	src/aes.c
@@ -37,12 +42,12 @@ if(APPLE)
 	set(GETTIME darwin-posix-rt/clock_gettime.c)
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -I../essential")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 add_library(${TARGET} 
 	${TARGET_SOURCES} ${GETTIME} ${RESOURCE_FILES})
-target_link_libraries(${TARGET} crypto curl)
+target_link_libraries(${TARGET} ${OPENSSL_CRYPTO_LIBRARY} curl)
 
 add_executable(mtx_test src/main.c)
 target_link_libraries(mtx_test mtx)

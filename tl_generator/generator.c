@@ -31,7 +31,7 @@
 
 //strndup for Apple
 #ifdef __APPLE__
-char *strndup(char*,size_t);
+char *strndup(const char*,size_t);
 #endif
 
 typedef struct generator_ {

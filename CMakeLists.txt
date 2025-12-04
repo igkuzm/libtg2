@@ -9,7 +9,6 @@ project(${TARGET} VERSION 2.0
 		LANGUAGES C CXX
 )
 
-add_subdirectory(tl_generator)
 add_subdirectory(mtx)
 add_subdirectory(tl)
 add_subdirectory(tg)
