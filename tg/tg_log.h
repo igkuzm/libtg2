@@ -3,35 +3,36 @@
 
 #include "../essential/str.h"
 
-#define ON_UPDATE(tg, type, data)\
-	({if (tg->on_update){ \
-		tg->on_update(tg->on_update_data, type, data); \
-	 }\
+#define ON_CALLBACK(tg, type, data)\
+	({ \
+		void *ret = NULL; \
+		if (tg->callback){ \
+			ret = tg->callback(tg->userdata, type, data); \
+		}\
+		ret; \
 	})
 
 #define ON_ERR(tg, ...)\
-	({if (tg->on_err){ \
+	({ \
 		struct str _s; str_init(&_s); str_appendf(&_s, __VA_ARGS__);\
-		tg->on_err(tg->on_err_data, _s.str); \
+		ON_CALLBACK(tg, TG_ERROR, _s.str); \
 		free(_s.str);\
-	 }\
 	})
 
 #define ON_LOG(tg, ...)\
-	({if (tg->on_log){ \
+	({ \
 		struct str _s; str_init(&_s); str_appendf(&_s, __VA_ARGS__);\
-		tg->on_log(tg->on_log_data, _s.str); \
+		ON_CALLBACK(tg, TG_LOG, _s.str); \
 		free(_s.str);\
-	 }\
 	})
 
 #define ON_LOG_BUF(tg, buf, ...)\
-	({if (tg->on_log){ \
+	({ \
 		struct str _s; str_init(&_s); str_appendf(&_s, __VA_ARGS__);\
 		char *dump = buf_sdump(buf);\
 		str_append(&_s, dump, strlen(dump));\
 		free(dump);\
-		tg->on_log(tg->on_log_data, _s.str); \
+		ON_CALLBACK(tg, TG_LOG, _s.str); \
 		free(_s.str);\
 	 }\
 	})

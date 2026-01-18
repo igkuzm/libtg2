@@ -2,62 +2,58 @@
 #include "../libtg.h"
 #include "crypto/hsh.h"
 #include "tg_log.h"
+#include "database/database.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../essential/ld.h"
 
-tg_t *tg_new(
+tg_t * tg_new(
 		int apiId, 
 		const char apiHash[33], 
-		const char *pem,
-		unsigned char *auth_key
-		)
+		const char *pubkey_pem,
+		const char *database_path,
+		void *userdata,
+		void * (*callback)(void *userdata,
+			                 TG_CALLBACK_DATA_TYPE data_type,
+											 void *data))
 {
-	// check pem
-	FILE *fp = fopen(pem, "r");
-	if (!fp){
-		perror("can't open public key");
-		return NULL;
-	}
-	fclose(fp);
-
 	// allocate struct
 	tg_t *tg = NEW(tg_t, return NULL);	
+	tg->userdata = userdata;
+	tg->callback = callback;
+	
+	// set apiId and apiHash
+	tg->apiId = apiId;
+	strncpy(tg->apiHash, apiHash, 33);
+
+	// init database
+	if (tg_database_init(tg))
+		goto tg_new_error;
+
+	// check pem
+	FILE *fp = fopen(pubkey_pem, "r");
+	if (!fp){
+		ON_ERR(tg, "can't open public key");
+		goto tg_new_error;
+	}
+	fclose(fp);
 
 	tg->dc = DCs[DEFAULT_DC];
 
 	tg->socket = -1;
 	tg->port = DEFAULT_PORT;
-
-	//tg->curl = curl_easy_init();
-	//if (tg->curl == NULL){
-		//ON_ERR(tg, "%s: can't init curl", __func__);
-		//return NULL;
-	//}
-
-	// set apiId and apiHash
-	tg->apiId = apiId;
-	strncpy(tg->apiHash, apiHash, 33);
+	tg->transport = DEFAULT_TRANSPORT;
 
 	// set public_key
-	tg->pubkey = pem;
+	tg->pubkey = pubkey_pem;
 
 	// set auth_key
-	if (auth_key){
-		tg->key = buf_new_data(auth_key, 256);
-		// auth key id
-		buf_t key_hash = tg_hsh_sha1(tg->key);
-		buf_t auth_key_id = 
-			buf_new_data(key_hash.data + 12, 8);
-		tg->key_id = buf_get_ui64(auth_key_id);
-		buf_free(key_hash);
-		buf_free(auth_key_id);
-		fprintf(stderr, "key_id: %ld\n", tg->key_id);
-	} else {
+	if (tg_database_authkey_load(tg))
 		tg->key = buf_new();
-	}
+	
 	tg->ssid = buf_new_rand(8);
 	tg->salt = buf_new_rand(8);
 
@@ -65,66 +61,39 @@ tg_t *tg_new(
 	tg->seqn = 0;
 
 	if (pthread_mutex_init(
-				&tg->msgidsm, NULL))
+				&tg->lock, NULL))
 	{
-		/*ON_ERR(tg, "%s: can't init mutex", __func__);*/
-		perror("can't init mutex");
-		return NULL;
-	}
-
-	if (pthread_mutex_init(
-				&tg->seqnm, NULL))
-	{
-		/*ON_ERR(tg, "%s: can't init mutex", __func__);*/
-		perror("can't init mutex");
-		return NULL;
+		ON_ERR(tg, "%s: can't init mutex", __func__);
+		goto tg_new_error;
 	}
 
 	return tg;
+
+tg_new_error:
+	free(tg);
+	return NULL;
 }
 
 void tg_close(tg_t *tg)
 {
 	// close Telegram
 	/* TODO:  <28-08-25, yourname> */
+
+	
 	
 	// free
 	free(tg);
 }
 
-unsigned char * tg_auth_key(tg_t *tg)
+void tg_auth_key_id_update(tg_t *tg)
 {
-	return tg->key.data;
-}
-
-void tg_set_on_error(tg_t *tg,
-		void *on_err_data,
-		void (*on_err)(void *on_err_data, const char *err))
-{
-	if (tg){
-		tg->on_err = on_err;
-		tg->on_err_data = on_err_data;
-	}
-}
-
-void tg_set_on_log(tg_t *tg,
-		void *on_log_data,
-		void (*on_log)(void *on_log_data, const char *msg))
-{
-	if (tg){
-		tg->on_log = on_log;
-		tg->on_log_data = on_log_data;
-	}
-}
-
-void tg_set_on_update(tg_t *tg,
-		void *on_update_data,
-		void (*on_update)(void *on_update_data, int type, void *data))
-{
-	if (tg){
-		tg->on_update = on_update;
-		tg->on_update_data = on_update_data;
-	}
+	buf_t key_hash = tg_hsh_sha1(tg->key);
+	buf_t auth_key_id = 
+		buf_new_data(key_hash.data + 12, 8);
+	tg->key_id = buf_get_ui64(auth_key_id);
+	buf_free(key_hash);
+	buf_free(auth_key_id);
+	ON_LOG(tg, "%s: key_id: "_LD_"\n", __func__, tg->key_id);
 }
 
 void tg_set_transport(tg_t *tg, TG_TRANSPORT transport)

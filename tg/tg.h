@@ -2,6 +2,7 @@
 #define TG_H 
 
 #include <pthread.h>
+#include <sqlite3.h>
 #include "tg_log.h"
 #include "dc.h"
 #include "../essential/buf.h"
@@ -11,34 +12,37 @@
 /*#define DEFAULT_DC   DC2t*/
 #define DEFAULT_DC   DC2
 #define DEFAULT_PORT 443
+#define DEFAULT_TRANSPORT TG_TRANSPORT_SOCKET
 
 struct tg_t {
-	dc_t dc;
-	int apiId;
-	char apiHash[33];
-	const char *pubkey;
-	TG_TRANSPORT transport;
+	int id;                    // id for multiple Telegram
+	dc_t dc;                   // default dc - see dc.h
+	int apiId;                 // apiId 
+	char apiHash[33];          // apiHash
+	const char *pubkey;        // pubkey pem
+	const char *database_path; // filepath to database
+	sqlite3 *db;
 	int seqn;
 	int socket;
-	int port;
-	pthread_mutex_t seqnm;
+	int port;                  // default port 
+	pthread_mutex_t lock;      // lock libtg data
 	buf_t key;
 	uint64_t key_id;
 	buf_t salt;
 	buf_t ssid;
-	void *on_err_data;
-	void (*on_err)(void *on_err_data, const char *err);
-	void *on_log_data;
-	void (*on_log)(void *on_log_data, const char *msg);
-	void *on_update_data;
-	void (*on_update)(void *on_update_data, int type, void *data);
 	uint64_t *msgids; 
-	pthread_mutex_t msgidsm;
 	uint64_t *todrop; 
-	pthread_mutex_t todropm;
 	time_t timediff;
 	uint64_t fingerprint;
 	tl_config_t *config;
+	tl_user_t *user;
+	void *userdata;
+	void * (*callback)(void *userdata,
+			               TG_CALLBACK_DATA_TYPE data_type,
+										 void *data);
+	TG_TRANSPORT transport;
 };
+
+void tg_auth_key_id_update(tg_t *);
 
 #endif /* ifndef TG_H */

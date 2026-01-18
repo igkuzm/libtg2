@@ -16,6 +16,7 @@ libtg_la_SOURCES = \
 	mtproto/header.c \
 	mtproto/encrypt.c \
 	mtproto/mtproto.c \
+	database/database.c \
 	tg.c \
 	strerr.c \
 	send_query.c \

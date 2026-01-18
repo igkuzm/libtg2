@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 set(TARGET tg)
 
-file(GLOB RESOURCE_FILES "*.h" "crypto/*.h")
+file(GLOB RESOURCE_FILES "*.h" "crypto/*.h" "mtproto/*.h" "database/*.h")
 set(TARGET_SOURCES 
 	crypto/aes.c
 	crypto/cmn.c
@@ -21,6 +21,7 @@ set(TARGET_SOURCES
   mtproto/header.c
   mtproto/encrypt.c
   mtproto/mtproto.c
+  database/database.c
   tg.c
   strerr.c
   send_query.c
