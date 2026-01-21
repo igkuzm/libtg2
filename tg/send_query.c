@@ -13,13 +13,19 @@
 #define TG_TEST 1
 #endif /* ifndef TG_TEST */
 
-void tg_send_query(
-		tg_t *tg, buf_t *query, 
-		void *ptr, int (*callback)(void *ptr, const tl_t *tl))
+
+tl_t *tg_send_query_sync(tg_t *tg, buf_t *query);
+
+void tg_send_query_with_progress(
+		tg_t *tg, buf_t *query, enum dc dc, bool enc, 
+		void *ptr, int (*callback)(void *ptr, const tl_t *tl),
+		void *progressp, tg_progress_fun *progress);
+
+void tg_send_query(tg_t *tg, buf_t *query) 
 {
 	tg_send_query_with_progress(
 			tg, query, tg->dc.dc, true, 
-			ptr, callback,
+			NULL, NULL,
 			NULL, NULL);
 }
 
@@ -42,17 +48,6 @@ void tg_send_query_with_progress(
 	buf_t pack = tg_mtproto_pack(tg, query, enc, &msgid);
 	
 	if (pack.size){
-		//buf_t answer = tg_http_send_query(
-				//tg, dc, 443, false,
-				 //TG_TEST, &pack, 
-				//progressp, progress);
-
-		//ON_LOG(tg, "%s: answer: %s", __func__, answer.data);
-
-		//buf_t payload = tg_mtproto_unpack(tg, &answer, enc);
-		//buf_free(answer);
-	
-		//tl_t *tl	= tl_deserialize(&payload);
 
 		int socket = tg_socket_open(tg, tg->dc.ipv4, tg->port);
 		if (socket < 0 ||
@@ -125,7 +120,10 @@ static tl_t * tg_send_query_sync_receive(
 	return tl;
 }
 
-static tl_t *tg_send_query_sync_enc(tg_t *tg, buf_t *query, bool enc)
+static tl_t *tg_send_query_sync_enc_dc_with_progress(
+		tg_t *tg, buf_t *query, 
+		bool enc, enum dc dc,
+		void *progressp, tg_progress_fun *progress)
 {
 	tl_t *tl = NULL;
 	uint64_t msgid;
@@ -163,17 +161,29 @@ static tl_t *tg_send_query_sync_enc(tg_t *tg, buf_t *query, bool enc)
 
 	return tl;
 }	
-
-
 		
 tl_t *tg_send_query_sync(tg_t *tg, buf_t *query)
 {
-	tl_t *tl = tg_send_query_sync_enc(tg, query, true);
+	tl_t *tl = tg_send_query_sync_enc_dc_with_progress(
+			tg, query, true, tg->dc.dc, 
+			NULL, NULL);
 	return tl;
 }	
 
 tl_t *tg_send_rfc(tg_t *tg, buf_t *query)
 {
-	tl_t *tl = tg_send_query_sync_enc(tg, query, false);
+	tl_t *tl = tg_send_query_sync_enc_dc_with_progress(
+			tg, query, false, tg->dc.dc,
+			NULL, NULL);
 	return tl;
 }	
+
+tl_t *tg_file_transfer(
+		tg_t *tg, buf_t *query, enum dc dc, 
+		void *progressp, tg_progress_fun *progress)
+{
+	tl_t *tl = tg_send_query_sync_enc_dc_with_progress(
+			tg, query, false, tg->dc.dc,
+			progressp, progress);
+	return tl;
+}

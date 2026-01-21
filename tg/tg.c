@@ -17,7 +17,7 @@ tg_t * tg_new(
 		const char *database_path,
 		void *userdata,
 		void * (*callback)(void *userdata,
-			                 TG_CALLBACK_DATA_TYPE data_type,
+			                 int data_type,
 											 void *data))
 {
 	// allocate struct
@@ -62,6 +62,27 @@ tg_t * tg_new(
 
 	if (pthread_mutex_init(
 				&tg->lock, NULL))
+	{
+		ON_ERR(tg, "%s: can't init mutex", __func__);
+		goto tg_new_error;
+	}
+	
+	if (pthread_mutex_init(
+				&tg->lock_msgids, NULL))
+	{
+		ON_ERR(tg, "%s: can't init mutex", __func__);
+		goto tg_new_error;
+	}
+
+	if (pthread_mutex_init(
+				&tg->lock_todrop, NULL))
+	{
+		ON_ERR(tg, "%s: can't init mutex", __func__);
+		goto tg_new_error;
+	}
+
+	if (pthread_mutex_init(
+				&tg->lock_seqn, NULL))
 	{
 		ON_ERR(tg, "%s: can't init mutex", __func__);
 		goto tg_new_error;

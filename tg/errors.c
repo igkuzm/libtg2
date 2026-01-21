@@ -42,25 +42,25 @@ tg_error_flood_wait(tg_t *tg, const char *error)
 	return 0;
 }
 
-AUTH_ERR_CODE tg_error_auth_err_code(tg_t *tg, const char *error)
+int tg_error_auth_err_code(tg_t *tg, const char *error)
 {
 	if (!error)
-		return AUTH_ERR_CODE_OK;
+		return 0;
 
 	if (strcmp(error, "SESSION_PASSWORD_NEEDED") == 0)
-		return SESSION_PASSWORD_NEEDED;
+		return TG_SESSION_PASSWORD_NEEDED;
 	
 	if (strcmp(error, "AUTH_RESTART") == 0)
-		return AUTH_RESTART;
+		return TG_AUTH_RESTART;
 	
 	if (strcmp(error, "PHONE_CODE_EXPIRED") == 0)
-		return PHONE_CODE_EXPIRED;
+		return TG_PHONE_CODE_EXPIRED;
 	
 	if (strcmp(error, "PHONE_NUMBER_UNOCCUPIED") == 0)
-		return PHONE_NUMBER_UNOCCUPIED;
+		return TG_PHONE_NUMBER_UNOCCUPIED;
 	
 	if (strcmp(error, "SESSION_PASSWORD_NEEDED") == 0)
-		return SESSION_PASSWORD_NEEDED;
+		return TG_SESSION_PASSWORD_NEEDED;
 
-	return AUTH_ERR_CODE_OK;
+	return 0;
 }

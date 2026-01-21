@@ -29,6 +29,11 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 				ON_LOG(tg, "got msg result: (%s) for msg_id: "_LD_"",
 					result?TL_NAME_FROM_ID(result->_id):"NULL", 
 					rpc_result->req_msg_id_); 
+
+				// async callback
+				if (tg->callback)
+					tg->callback(tg->userdata, result->_id, result);
+
 				if (msg_id == rpc_result->req_msg_id_){
 					// got result!
 					answer = TG_ANSWER_OK;

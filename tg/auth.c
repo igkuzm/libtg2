@@ -202,7 +202,7 @@ tg_auth_sendCode(tg_t *tg, const char *phone_number)
 tl_auth_authorization_t *
 tg_auth_signIn(tg_t *tg, tl_auth_sentCode_t *sentCode, 
 		const char *phone_number, const char *phone_code,
-		AUTH_ERR_CODE *err_code) 
+		int *err_code) 
 {
 	ON_LOG(tg, "%s", __func__);
 
@@ -225,9 +225,9 @@ tg_auth_signIn(tg_t *tg, tl_auth_sentCode_t *sentCode,
 
 	if (tl->_id == id_rpc_error){
 		// check auth err codes
-		AUTH_ERR_CODE code = 
+		int code = 
 			tg_error_auth_err_code(tg, RPC_ERROR(tl));
-		if (code != AUTH_ERR_CODE_OK)
+		if (code != 0)
 		{
 			if (err_code)
 				*err_code = code;

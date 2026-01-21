@@ -57,17 +57,16 @@ buf_t tg_mtp_message(tg_t *tg, buf_t *payload,
 	  * be incremented by 1 after generation).*/
 
 	// lock header for seqno
-	int err = pthread_mutex_lock(&tg->seqnm);
-	if (err){
-		ON_ERR(tg, "%s: can't lock mutex: %d", __func__, err);
+	tg_do_in_seqn_locked(tg)
+	{
+		if (content)
+			msg = buf_cat_ui32(msg, tg->seqn++ * 2 + 1);
+		else {
+			msg = buf_cat_ui32(msg, tg->seqn * 2);
+		}
+	}
+	if (_error)
 		return msg;
-	}
-	if (content)
-		msg = buf_cat_ui32(msg, tg->seqn++ * 2 + 1);
-	else {
-		msg = buf_cat_ui32(msg, tg->seqn * 2);
-	}
-	pthread_mutex_unlock(&tg->seqnm);
 
 	// bytes
 	msg = buf_cat_ui32(msg, payload->size);	
@@ -173,19 +172,16 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 	//seq_no
 	//s = buf_cat_ui32(s, tg->seqn);
 	// lock header for seqno
-	int err = pthread_mutex_lock(&tg->seqnm);
-	if (err){
-		ON_ERR(tg, "%s: can't lock mutex: %d", __func__, err);
+	tg_do_in_seqn_locked(tg)
+	{
+		if (content)
+			s = buf_cat_ui32(s, tg->seqn++ * 2 + 1);
+		else {
+			s = buf_cat_ui32(s, tg->seqn * 2);
+		}
+	}
+	if (_error)
 		return s;
-	}
-
-	if (content)
-		s = buf_cat_ui32(s, tg->seqn++ * 2 + 1);
-	else {
-		s = buf_cat_ui32(s, tg->seqn * 2);
-	}
-	
-	pthread_mutex_unlock(&tg->seqnm);
 
 	//message_data_length
 	s = buf_cat_ui32(s, b->size);

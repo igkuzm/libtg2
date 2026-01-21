@@ -9,6 +9,7 @@
 typedef struct tg_t tg_t;
 
 typedef enum {
+	TG_NULL,
 	TG_LOG,
 	TG_ERROR,
 	TG_AUTH_PHONE_NUMBER_NEEDED,
@@ -16,7 +17,10 @@ typedef enum {
 	TG_AUTH_PASSWORD_NEEDED,
 	TG_AUTH_NEW_AUTHORIZATION,
 	TG_AUTH_AUTHORIZED_AS_USER,
-	TG_DIALOGS_SLICE,
+	TG_AUTH_RESTART,
+	TG_PHONE_CODE_EXPIRED,
+	TG_PHONE_NUMBER_UNOCCUPIED,
+	TG_SESSION_PASSWORD_NEEDED,
 } TG_CALLBACK_DATA_TYPE;
 
 /* create new libtg connection */
@@ -27,7 +31,7 @@ tg_t * tg_new(
 		const char *database_path,
 		void *userdata,
 		void * (*callback)(void *userdata,
-			                 TG_CALLBACK_DATA_TYPE data_type,
+			                 int data_type,
 											 void *data));
 
 void tg_connect(tg_t *tg); // connect Telegram

@@ -34,7 +34,6 @@
 		free(dump);\
 		ON_CALLBACK(tg, TG_LOG, _s.str); \
 		free(_s.str);\
-	 }\
 	})
 
 #endif /* ifndef TG_LOG_H */

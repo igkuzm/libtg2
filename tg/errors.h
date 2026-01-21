@@ -12,6 +12,6 @@ tg_error_phone_migrate(tg_t*, const char *);
 
 int tg_error_flood_wait(tg_t *tg, const char *error);
 
-AUTH_ERR_CODE tg_error_auth_err_code(tg_t *tg, const char *error);
+int tg_error_auth_err_code(tg_t *tg, const char *error);
 
 #endif /* ifndef TG_ERRORS_H */
