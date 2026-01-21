@@ -6,20 +6,6 @@
 #include "../crypto/hsh.h"
 #include "../../essential/ld.h"
 
-#define tg_sqlite3_for_each(tg, sql, stmt) \
-	sqlite3_stmt *stmt;\
-	int sqlite_step;\
-	if (tg_sqlite3_prepare(tg, sql, &stmt) == 0)\
-		for (sqlite_step = sqlite3_step(stmt);\
-				sqlite_step	!= SQLITE_DONE || ({sqlite3_finalize(stmt); 0;});\
-				sqlite_step = sqlite3_step(stmt))\
-			 
-#define tg_sqlite3_do_crytical(tg) \
-	sqlite3_mutex *mutex;\
-	for(mutex = sqlite3_db_mutex(tg->db), sqlite3_mutex_enter(mutex); \
-			mutex; \
-			sqlite3_mutex_leave(mutex), mutex = NULL)
-
 sqlite3 * tg_sqlite3_open(tg_t *tg) 
 {
 	ON_LOG(tg, "%s", __func__);
@@ -78,6 +64,19 @@ int tg_sqlite3_exec(
 	return 0;
 }
 
+static void tg_dialogs_create_table(tg_t *tg){
+	char sql[] = 
+			"CREATE TABLE IF NOT EXISTS dialogs ("
+			"peer_id INT UNIQUE, "
+			"pinned INT, "
+			"top_message_id INT, "
+			"top_message_date INT, "
+			"folder_id INT, "
+			"data BLOB);";
+	ON_LOG(tg, "%s", sql);
+	tg_sqlite3_exec(tg, sql);	
+}
+
 int tg_database_init(tg_t *tg)
 {
 	ON_LOG(tg, "%s", __func__);	
@@ -98,10 +97,10 @@ int tg_database_init(tg_t *tg)
 		"CREATE TABLE IF NOT EXISTS photos (id INT); "
 		"CREATE TABLE IF NOT EXISTS peer_photos (id INT); "
 	;
-	
 	tg_sqlite3_exec(tg, sql);
+	
+	tg_dialogs_create_table(tg);
 
-	//
 	//tg_messages_create_table(tg);
 	//tg_dialogs_create_table(tg);
 	//tg_chat_create_table(tg);

@@ -187,3 +187,14 @@ tl_t *tg_file_transfer(
 			progressp, progress);
 	return tl;
 }
+
+
+void tg_send_query_async(tg_t *tg, buf_t *query, 
+	void *userdata, 
+	int callback(void *userdata, const tl_t *tl))
+{
+	return tg_send_query_with_progress(
+			tg, query, tg->dc.dc, true, 
+			userdata, callback, 
+			NULL, NULL);
+}	

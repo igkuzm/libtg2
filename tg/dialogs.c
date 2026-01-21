@@ -7,8 +7,10 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include "peer.h"
+#include "database/database.h"
 #ifdef _WIN32
 #include <windows.h> 
 #else
@@ -105,7 +107,7 @@ static int tg_get_dialogs_callback(void *data, const tl_t *tl)
 	return 0;
 }
 
-void tg_get_dialogs(
+void tg_update_dialogs(
 		tg_t *tg, 
 		int limit, 
 		uint32_t offset_date, 
@@ -133,7 +135,7 @@ void tg_get_dialogs(
 				limit>0?limit:20,
 				hash?*t.hash:0);
 
-		tg_send_query(tg, &getDialogs, 
+		tg_send_query_async(tg, &getDialogs, 
 				&t, tg_get_dialogs_callback);
 		
 		buf_free(getDialogs);
@@ -143,6 +145,11 @@ void tg_get_dialogs(
 
 	buf_free(inputPeer);
 }
+
+void tg_get_dialogs(tg_t *tg, uint32_t msgid_offset, int count)
+{
+
+}	
 
 tg_message_t tg_dialogs_get_dialog_top_message(
 		tg_t *tg, const tl_messages_dialogs_t *dialogs, int idx)
@@ -222,3 +229,30 @@ tg_peer_t tg_dialogs_get_peer(
 	
 	return tg_dialogs_get_peer_with_peer_id(tg, dialogs, id);
 }
+
+void tg_get_dialogs(tg_t *tg, 
+		uint32_t msgid_offset, int count, 
+		uint32_t *folder_id, 
+		void *userdata, 
+		int (*callback)(void *, const tl_messages_dialogs_t *))
+{
+	ON_LOG(tg, "%s", __func__);
+	char sql[BUFSIZ];
+	sprintf(sql, 
+			"SELECT data "
+			"FROM dialogs WHERE msgid_offset <= %d " 
+			"ORDER BY \'pinned\' DESC, \'top_message_date\' DESC "
+			"LIMIT %d;"
+			, msgid_offset, count);
+
+	tl_messages_dialogs_t dialogs;
+
+	tg_sqlite3_for_each(tg, sql, stmt)
+	{
+		slice._id = id_messages_dialogsSlice;
+		slice.count_;
+
+	}
+}
+
+

@@ -7,9 +7,7 @@
 void tg_add_msgid(tg_t *tg, uint64_t msgid){
 	ON_LOG(tg, "%s", __func__);
 	tg_do_in_msgids_locked(tg)
-	{
 		arrput(tg->msgids, msgid);
-	}
 }
 
 buf_t tg_ack(tg_t *tg)
@@ -21,11 +19,8 @@ buf_t tg_ack(tg_t *tg)
 	tg_do_in_msgids_locked(tg)
 	{
 		int i, len = arrlen(tg->msgids);
-		if (len < 1){
-			// no messages to acknolage
-			pthread_mutex_unlock(&tg->lock_msgids);
-			return ack;
-		}
+		if (len < 1) // no messages to acknolage
+			continue;
 
 		//for (i = 0; i < len; ++i) {
 			//ON_ERR(tg, "ACK: "_LD_"", tg->msgids[i]);
@@ -45,9 +40,7 @@ buf_t tg_ack(tg_t *tg)
 void tg_add_todrop(tg_t *tg, uint64_t msgid){
 	ON_LOG(tg, "%s", __func__);
 	tg_do_in_todrop_locked(tg)
-	{
 		arrput(tg->todrop, msgid);
-	}
 }
 
 int tg_to_drop(tg_t *tg, buf_t *buf)
@@ -59,10 +52,8 @@ int tg_to_drop(tg_t *tg, buf_t *buf)
 	tg_do_in_todrop_locked(tg)
 	{
 		len = arrlen(tg->todrop);
-		if (len < 1){
-			pthread_mutex_unlock(&tg->lock_todrop);
-			return 0;
-		}
+		if (len < 1)
+			continue;
 	
 		for (i = 0; i < len; ++i) {
 			buf_t drop = tl_rpc_drop_answer(tg->todrop[i]);

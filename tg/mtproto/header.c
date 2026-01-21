@@ -57,7 +57,7 @@ buf_t tg_mtp_message(tg_t *tg, buf_t *payload,
 	  * be incremented by 1 after generation).*/
 
 	// lock header for seqno
-	tg_do_in_seqn_locked(tg)
+	tg_do_in_seqn_locked(tg, return msg;)
 	{
 		if (content)
 			msg = buf_cat_ui32(msg, tg->seqn++ * 2 + 1);
@@ -65,8 +65,6 @@ buf_t tg_mtp_message(tg_t *tg, buf_t *payload,
 			msg = buf_cat_ui32(msg, tg->seqn * 2);
 		}
 	}
-	if (_error)
-		return msg;
 
 	// bytes
 	msg = buf_cat_ui32(msg, payload->size);	
@@ -172,7 +170,7 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 	//seq_no
 	//s = buf_cat_ui32(s, tg->seqn);
 	// lock header for seqno
-	tg_do_in_seqn_locked(tg)
+	tg_do_in_seqn_locked(tg, return s;)
 	{
 		if (content)
 			s = buf_cat_ui32(s, tg->seqn++ * 2 + 1);
@@ -180,8 +178,6 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 			s = buf_cat_ui32(s, tg->seqn * 2);
 		}
 	}
-	if (_error)
-		return s;
 
 	//message_data_length
 	s = buf_cat_ui32(s, b->size);

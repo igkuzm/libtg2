@@ -41,7 +41,11 @@ void tg_close(tg_t *);
 
 /* get dialogs - full list of chats with messages and
  * auxilary data */
-void tg_get_dialogs(tg_t *tg); 
+void tg_get_dialogs_slice(tg_t *tg, 
+		uint32_t msgid_offset, int count, 
+		uint32_t *folder_id, 
+		void *userdata, 
+		int (*callback)(void *userdata, const tl_messages_dialogsSlice_t *));
 
 /* functions to help parse tl_messages_dialogs_t and get
  * peer. Peer is chat, channel or user dialog */
