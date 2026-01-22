@@ -15,8 +15,8 @@ add_subdirectory(tg)
 
 if (MAKE_TEST)
 	add_executable(tgtest test.c)
-	add_dependencies(tgtest generator)
-	target_link_libraries(tgtest tg tl)
+	#add_dependencies(tgtest generator)
+	target_link_libraries(tgtest tg tl sqlite3)
 endif()
 
 #copy public key to binary dir

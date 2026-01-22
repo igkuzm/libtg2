@@ -13,6 +13,7 @@
 
 void cmn_fact(ui64_t pq, ui32_t * p, ui32_t * q)
 {
+	printf("%s: %d\n", __func__, __LINE__);
   factor(pq, p, q);
 }
 

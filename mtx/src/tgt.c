@@ -7,11 +7,9 @@
 //
 
 #include <string.h>
-#include <assert.h>
 #include "../include/tgt.h"
 #include "../include/api.h"
 #include "../include/buf.h"
-#include "../../essential/endian.h"
 
 #ifdef __GNUC__
 
@@ -712,7 +710,7 @@ method_req_DH_params_init(method_req_pq_t m1)
   method_req_DH_params_t m = method_req_DH_params;
   m.nonce = m1.nonce;
   m.server_nonce = m1.ctor_ResPQ.server_nonce;
-  ui64_t pq = be64toh(api.buf.get_ui64(m1.ctor_ResPQ.pq.value));
+  ui64_t pq = api.buf.get_ui64(api.buf.swap(m1.ctor_ResPQ.pq.value));
   ui32_t p, q;
   api.cmn.fact(pq, &p, &q);
 
@@ -720,13 +718,9 @@ method_req_DH_params_init(method_req_pq_t m1)
       SWAP(p, q);
   }
 
-  m.p.value = api.buf.add_ui32(htobe32(p));
-  m.q.value = api.buf.add_ui32(htobe32(q));
+  m.p.value = api.buf.swap(api.buf.add_ui32(p));
+  m.q.value = api.buf.swap(api.buf.add_ui32(q));
   m.public_key_fingerprint = m1.ctor_ResPQ.server_public_key_fingerprints;
-
-  if (!is_little_endian())
-	  m.public_key_fingerprint.value = api.buf.swap(m.public_key_fingerprint.value);
-	
   ctor_P_Q_inner_data_t c = api.tml->ctors->P_Q_inner_data.init(m1, m);
   buf_t_ d = api.tml->ctors->P_Q_inner_data.drive(c);
   buf_t_ h = api.hsh.sha1(d);
@@ -757,8 +751,6 @@ method_req_DH_params_drive(method_req_DH_params_t m)
   abstract_t a = api.sil.abstract(t);
   a.stk_mode = SEND_RECEIVE;
   a = api.stk.drive(a);
-  if (a.size == 0)
-	  return m;
   m.ctor_Server_DH_Params = api.sil.concrete(a).ctor_Server_DH_Params;
 
   return m;
@@ -778,8 +770,7 @@ ctor_P_Q_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
   m.nonce = m1.nonce;
   //api.buf.dump(m.nonce.value);
   m.server_nonce = m1.ctor_ResPQ.server_nonce;
-  	printf("SERVER NONCE:\n");
-	api.buf.dump(m.server_nonce.value);
+  //api.buf.dump(m.server_nonce.value);
   //m.new_nonce.value = api.cmn.rand_array(32);
   buf_t_ rand_array = {};
 	//buf_init(&rand_array);
@@ -787,9 +778,7 @@ ctor_P_Q_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
   rand_array.size = 32;
   //buf_t_ rand_array = buf_rand(32);
   m.new_nonce.value = rand_array; // fucking hack
-	printf("NEW NONCE:\n");
-api.buf.dump(m.new_nonce.value);
-  
+  //api.buf.dump(m.new_nonce.value);
   m.new_nonce.type = TYPE_INT256;
 
   return m;
@@ -813,29 +802,20 @@ ctor_Server_DH_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
 	printf("%s\n", __func__);
   ctor_P_Q_inner_data_t nn = api.tml->ctors->P_Q_inner_data.init(m1, m2); // hack
   buf_t_ new_nonce = nn.new_nonce.value; // hack
-	printf("NEW NONCE:\n", __func__);
-	api.buf.dump(new_nonce);
-
   buf_t_ server_nonce = m1.ctor_ResPQ.server_nonce.value;
-	printf("SERVER NONCE:\n", __func__);
-	api.buf.dump(server_nonce);
-
   // tmp_aes_key := SHA1(new_nonce + server_nonce) + substr (SHA1(server_nonce + new_nonce), 0, 12);
   buf_t_ new_nonce_plus_server_nonce = {};
   new_nonce_plus_server_nonce = api.buf.cat(new_nonce_plus_server_nonce, new_nonce);
   new_nonce_plus_server_nonce = api.buf.cat(new_nonce_plus_server_nonce, server_nonce);
   buf_t_ new_nonce_plus_server_nonce_hash = api.hsh.sha1(new_nonce_plus_server_nonce);
-  
   buf_t_ server_nonce_plus_new_nonce = {};
   server_nonce_plus_new_nonce = api.buf.cat(server_nonce_plus_new_nonce, server_nonce);
   server_nonce_plus_new_nonce = api.buf.cat(server_nonce_plus_new_nonce, new_nonce);
   buf_t_ server_nonce_plus_new_nonce_hash = api.hsh.sha1(server_nonce_plus_new_nonce);
   buf_t_ substr_sha1_server_nonce_new_nonce012 = api.buf.add(server_nonce_plus_new_nonce_hash.data, 12);
-  
   buf_t_ tmp_aes_key = {};
   tmp_aes_key = api.buf.cat(tmp_aes_key, new_nonce_plus_server_nonce_hash);
   tmp_aes_key = api.buf.cat(tmp_aes_key, substr_sha1_server_nonce_new_nonce012);
-  
   buf_t_ substr_sha1_server_nonce_new_nonce128 = api.buf.add(server_nonce_plus_new_nonce_hash.data + 12, 8);
   buf_t_ new_nonce_new_nonce = {};
   new_nonce_new_nonce = api.buf.cat(new_nonce_new_nonce, new_nonce);
@@ -846,27 +826,12 @@ ctor_Server_DH_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
   tmp_aes_iv = api.buf.cat(tmp_aes_iv, substr_sha1_server_nonce_new_nonce128);
   tmp_aes_iv = api.buf.cat(tmp_aes_iv, new_nonce_new_nonce_hash);
   tmp_aes_iv = api.buf.cat(tmp_aes_iv, substr_new_nonce04);
-	
   buf_t_ e = m2.ctor_Server_DH_Params.ctor_Server_DH_Params_ok.encrypted_answer.value;
-	printf("ENCRYPTED ANSWER:\n");
-	api.buf.dump(e);
-  buf_t_ answer_with_hash = api.cry.aes_d(e, tmp_aes_key, tmp_aes_iv);
-
+  buf_t_ answer = api.cry.aes_d(e, tmp_aes_key, tmp_aes_iv);
   // remove hash
-  buf_t_ answer = api.buf.add(answer_with_hash.data + 20, answer_with_hash.size - 20);
+  answer = api.buf.add(answer.data + 20, answer.size - 20);
   // remove 8 random bytes
   answer.size -= 8;
-	// check hash
-	buf_t_ answer_hash = api.buf.add(answer_with_hash.data, 20);
-	printf("ANSWER HASH:\n");
-	api.buf.dump(answer_hash);
-
-	buf_t_ generated_hash = api.hsh.sha1(answer);
-	printf("GENERATED HASH:\n");
-	api.buf.dump(generated_hash);
-	
-	assert(api.buf.cmp(answer_hash, generated_hash));
-
   // additional
   ctor_Server_DH_inner_data_t c;
   c.answer = answer;
@@ -877,13 +842,13 @@ ctor_Server_DH_inner_data_init(method_req_pq_t m1, method_req_DH_params_t m2)
 }
 
 ctor_Server_DH_inner_data_t
-ctor_Server_DH_inner_data_drive(buf_t_ answer)
+ctor_Server_DH_inner_data_drive(buf_t_ b)
 {
 	printf("%s\n", __func__);
   ctor_Server_DH_inner_data_t c = ctor_Server_DH_inner_data;
   tg_api_type_system_t t = {};
   t.ctor_Server_DH_inner_data = c;
-  abstract_t a = api.sel.deserialize(answer);
+  abstract_t a = api.sel.deserialize(b);
   c = api.sil.concrete(a).ctor_Server_DH_inner_data;
 
   return c;
@@ -892,7 +857,7 @@ ctor_Server_DH_inner_data_drive(buf_t_ answer)
 ctor_Client_DH_Inner_Data_t
 ctor_Client_DH_Inner_Data_init(method_req_pq_t m1, ctor_Server_DH_inner_data_t c1)
 {
-  printf("%s\n", __func__);
+	printf("%s\n", __func__);
   ctor_Client_DH_Inner_Data_t c = ctor_Client_DH_Inner_Data;
   c.nonce = c1.nonce;
   c.server_nonce = c1.server_nonce;
@@ -900,16 +865,9 @@ ctor_Client_DH_Inner_Data_init(method_req_pq_t m1, ctor_Server_DH_inner_data_t c
   c.retry_id.value = api.buf.add_ui32(retry_id_);
   c.retry_id.type = TYPE_LONG;
   buf_t_ g = c1.g.value;
-	int32_t g_ = *(int32_t *)(&g.data);
-	printf("G: %d\n", g_);
-
-  if (is_little_endian())
-    g = api.buf.swap(g);
-
+  g = api.buf.swap(g);
   buf_t_ b = api.buf.rand(256);
-
   buf_t_ m = c1.dh_prime.value;
-	
   c.g_b.value = api.cmn.pow_mod(g, b, m);
   c.g_b.type = TYPE_STRING;
   // additional
@@ -934,17 +892,11 @@ method_set_client_DH_params_t
 method_set_client_DH_params_init(method_req_pq_t m1, method_req_DH_params_t m2)
 {
 	printf("%s\n", __func__);
-	method_set_client_DH_params_t m = method_set_client_DH_params;
   ctor_Server_DH_inner_data_t c = api.tml->ctors->Server_DH_inner_data.init(m1, m2);
   buf_t_ a = c.answer;
-	printf("ANSWER: \n");
-	api.buf.dump(a);
-
   ctor_Server_DH_inner_data_t c1 = api.tml->ctors->Server_DH_inner_data.drive(a);
   ctor_Client_DH_Inner_Data_t c2 = api.tml->ctors->Client_DH_Inner_Data.init(m1, c1);
   buf_t_ data = api.tml->ctors->Client_DH_Inner_Data.drive(c2);
-	printf("Client_DH_Inner_Data: \n");
-	api.buf.dump(data);
   buf_t_ hash = api.hsh.sha1(data);
   ui32_t pad_ = hash.size + data.size;
   pad_ = (16 - (pad_ % 16)) % 16;
@@ -955,6 +907,7 @@ method_set_client_DH_params_init(method_req_pq_t m1, method_req_DH_params_t m2)
   data_with_hash = api.buf.cat(data_with_hash, data);
   data_with_hash = api.buf.cat(data_with_hash, rand);
   buf_t_ encrypted_data = api.cry.aes_e(data_with_hash, c.tmp_aes_key, c.tmp_aes_iv);
+  method_set_client_DH_params_t m = method_set_client_DH_params;
   m.nonce = m1.nonce;
   m.server_nonce = m1.ctor_ResPQ.server_nonce;
   m.encrypted_data.value = encrypted_data;

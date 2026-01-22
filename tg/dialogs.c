@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "peer.h"
 #include "database/database.h"
@@ -17,10 +18,10 @@
 #include <unistd.h>
 #endif
 
-struct tg_get_dialogs_t {
+#define DEFAULT_LIMIT 20
+
+struct tg_update_dialogs_t {
 	tg_t *tg; 
-	void *data; 
-	int (*callback)(void *, const tl_messages_dialogs_t *);
 	int count;
 	int total;
 	uint64_t *hash; 
@@ -28,10 +29,10 @@ struct tg_get_dialogs_t {
 	uint32_t offset_date; 
 };
 
-static int tg_get_dialogs_callback(void *data, const tl_t *tl)
+static int tg_update_dialogs_callback(void *data, const tl_t *tl)
 {
 	assert(data && tl);
-	struct tg_get_dialogs_t *t = (struct tg_get_dialogs_t *)data;
+	struct tg_update_dialogs_t *t = (struct tg_update_dialogs_t *)data;
 	
 	ON_LOG(t->tg, "%s", __func__);
 
@@ -98,8 +99,10 @@ static int tg_get_dialogs_callback(void *data, const tl_t *tl)
 	else
 		ON_ERR(t->tg, "%s: can't get last message", __func__);
 
-	if (t->callback)
-		t->callback(t->data, md);
+	/* TODO: Parse dialogs and save to database <22-01-26, yourname> */
+
+	if (t->tg->callback)
+		t->tg->callback(t->tg->userdata, 0, NULL);
 
 	if (should_free_md)
 		free(md);
@@ -107,20 +110,13 @@ static int tg_get_dialogs_callback(void *data, const tl_t *tl)
 	return 0;
 }
 
-void tg_update_dialogs(
-		tg_t *tg, 
-		int limit, 
-		uint32_t offset_date, 
-		uint64_t *hash, 
-		uint32_t *folder_id, 
-		void *data, 
-		int (*callback)(void *, const tl_messages_dialogs_t *))
+void tg_dialogs_update(tg_t *tg, int limit, 
+		                   uint32_t offset_date, uint64_t *hash) 
 {
 	ON_LOG(tg, "%s", __func__);
-	struct tg_get_dialogs_t t =
-	{tg, data, callback,
-  	0, 1, hash, -1,
-	offset_date};
+	struct tg_update_dialogs_t t =
+	{tg, 0, 1, hash, 
+		-1, offset_date};
 
 	InputPeer inputPeer = tl_inputPeerSelf();
 
@@ -128,15 +124,15 @@ void tg_update_dialogs(
 		buf_t getDialogs = 
 			tl_messages_getDialogs(
 					NULL,
-				folder_id, 
+				NULL, 
 				t.offset_date,
 				t.offset_id, 
 				&inputPeer, 
 				limit>0?limit:20,
 				hash?*t.hash:0);
 
-		tg_send_query_async(tg, &getDialogs, 
-				&t, tg_get_dialogs_callback);
+		tg_send_query(tg, &getDialogs, 
+				&t, tg_update_dialogs_callback);
 		
 		buf_free(getDialogs);
 		if (limit > 0)
@@ -145,11 +141,6 @@ void tg_update_dialogs(
 
 	buf_free(inputPeer);
 }
-
-void tg_get_dialogs(tg_t *tg, uint32_t msgid_offset, int count)
-{
-
-}	
 
 tg_message_t tg_dialogs_get_dialog_top_message(
 		tg_t *tg, const tl_messages_dialogs_t *dialogs, int idx)
@@ -231,28 +222,78 @@ tg_peer_t tg_dialogs_get_peer(
 }
 
 void tg_get_dialogs(tg_t *tg, 
-		uint32_t msgid_offset, int count, 
 		uint32_t *folder_id, 
+		uint32_t offset_date, int limit, 
 		void *userdata, 
-		int (*callback)(void *, const tl_messages_dialogs_t *))
+		void (*callback)(void *userdata, tl_t **dialogs))
 {
-	ON_LOG(tg, "%s", __func__);
+	int i, ndialogs = 0;
+	tl_t **dialogs; 
 	char sql[BUFSIZ];
-	sprintf(sql, 
-			"SELECT data "
-			"FROM dialogs WHERE msgid_offset <= %d " 
-			"ORDER BY \'pinned\' DESC, \'top_message_date\' DESC "
-			"LIMIT %d;"
-			, msgid_offset, count);
+	
+	ON_LOG(tg, "%s", __func__);
 
-	tl_messages_dialogs_t dialogs;
+	if (limit < 1)
+		limit = DEFAULT_LIMIT;
+
+	if (folder_id)
+		sprintf(sql, 
+			"SELECT data "
+			"FROM dialogs WHERE %d > top_message_date " 
+			"AND folder_id == %d " 
+			"ORDER BY pinned DESC, top_message_date ASC "
+			"LIMIT %d;"
+			, offset_date, *folder_id, limit);
+	else
+		sprintf(sql, 
+			"SELECT data "
+			"FROM dialogs WHERE %d > top_message_date " 
+			"ORDER BY pinned DESC, top_message_date ASC "
+			"LIMIT %d;"
+			, offset_date, limit);
+
+	dialogs = MALLOC(sizeof(tl_t*) * limit, return);
 
 	tg_sqlite3_for_each(tg, sql, stmt)
 	{
-		slice._id = id_messages_dialogsSlice;
-		slice.count_;
-
+		int size = sqlite3_column_bytes(stmt, 0);
+		const void *data = sqlite3_column_blob(stmt, 0);
+		buf_t buf = buf_new_data((uint8_t *)data, size);
+		tl_t *tl = tl_deserialize(&buf);
+		buf_free(buf);
+		dialogs[ndialogs++] = tl;
 	}
+	dialogs[ndialogs] = NULL;
+
+	if (callback)
+		callback(userdata, dialogs);
+
+	// cleenup
+	for (i = 0; i < ndialogs; ++i)
+		tl_free(dialogs[i]);
+	free(dialogs);
 }
 
+uint32_t tg_dialogs_get_top_message_id(tg_t  *tg)
+{
+	uint32_t top_message_id = 0;
+	char sql[BUFSIZ] = 
+		"SELECT top_message_id FROM dialogs "
+		"ORDER by top_message_date DESC LIMIT 1;";
+	tg_sqlite3_for_each(tg, sql, stmt)
+		top_message_id = sqlite3_column_int(stmt, 0);
 
+	return top_message_id;
+}
+
+uint32_t tg_dialogs_get_top_message_date(tg_t  *tg)
+{
+	uint32_t top_message_date = 0;
+	char sql[BUFSIZ] = 
+		"SELECT top_message_date FROM dialogs "
+		"ORDER by top_message_date DESC LIMIT 1;";
+	tg_sqlite3_for_each(tg, sql, stmt)
+		top_message_date = sqlite3_column_int(stmt, 0);
+
+	return top_message_date;
+}

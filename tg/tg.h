@@ -47,6 +47,13 @@ struct tg_t {
 
 void tg_auth_key_id_update(tg_t *);
 
+// dialogs
+uint32_t tg_dialogs_get_top_message_id(tg_t  *tg);
+uint32_t tg_dialogs_get_top_message_date(tg_t  *tg);
+void tg_dialogs_update(tg_t *tg, int limit, 
+		                   uint32_t offset_date, uint64_t *hash); 
+
+
 #define tg_do_in_mutex_locked(_tg, _m, _on_error) \
 	int _m_error = pthread_mutex_lock(_m); \
 	if (_m_error) { \

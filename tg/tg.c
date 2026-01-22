@@ -15,6 +15,7 @@ tg_t * tg_new(
 		const char apiHash[33], 
 		const char *pubkey_pem,
 		const char *database_path,
+		unsigned char *auth_key,
 		void *userdata,
 		void * (*callback)(void *userdata,
 			                 int data_type,
@@ -30,6 +31,7 @@ tg_t * tg_new(
 	strncpy(tg->apiHash, apiHash, 33);
 
 	// init database
+	tg->database_path = database_path;
 	if (tg_database_init(tg))
 		goto tg_new_error;
 
@@ -51,7 +53,10 @@ tg_t * tg_new(
 	tg->pubkey = pubkey_pem;
 
 	// set auth_key
-	if (tg_database_authkey_load(tg))
+	if (auth_key){
+		tg->key = buf_new_data(auth_key, 256);
+		tg_auth_key_id_update(tg);
+	} else
 		tg->key = buf_new();
 	
 	tg->ssid = buf_new_rand(8);
@@ -99,8 +104,6 @@ void tg_close(tg_t *tg)
 {
 	// close Telegram
 	/* TODO:  <28-08-25, yourname> */
-
-	
 	
 	// free
 	free(tg);
@@ -114,10 +117,26 @@ void tg_auth_key_id_update(tg_t *tg)
 	tg->key_id = buf_get_ui64(auth_key_id);
 	buf_free(key_hash);
 	buf_free(auth_key_id);
-	ON_LOG(tg, "%s: key_id: "_LD_"\n", __func__, tg->key_id);
+	ON_LOG(tg, "%s: key_id: "_LX_"", __func__, tg->key_id);
 }
 
 void tg_set_transport(tg_t *tg, TG_TRANSPORT transport)
 {
 	tg->transport = transport;
 }
+
+void tg_update(tg_t *tg)
+{
+	uint32_t top_message_date = 
+		tg_dialogs_get_top_message_date(tg);
+
+	tg_dialogs_update(tg, 0, top_message_date,
+		 	NULL);
+}
+
+unsigned char * tg_auth_key(tg_t *tg)
+{
+	return tg->key.data;
+}
+
+

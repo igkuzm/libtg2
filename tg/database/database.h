@@ -5,8 +5,6 @@
 
 int tg_database_init(tg_t *tg);
 int tg_database_close(tg_t *tg);
-int tg_database_authkey_load(tg_t *tg);
-int tg_database_authkey_save(tg_t *tg);
 
 int tg_sqlite3_prepare(
 		tg_t *tg, const char *sql, sqlite3_stmt **stmt);
@@ -19,7 +17,7 @@ int tg_sqlite3_prepare(
 				sqlite_step	!= SQLITE_DONE || ({sqlite3_finalize(stmt); 0;});\
 				sqlite_step = sqlite3_step(stmt))\
 			 
-#define tg_sqlite3_do_crytical(tg) \
+#define tg_do_in_database_lock(tg) \
 	sqlite3_mutex *mutex;\
 	for(mutex = sqlite3_db_mutex(tg->db), sqlite3_mutex_enter(mutex); \
 			mutex; \

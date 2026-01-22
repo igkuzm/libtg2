@@ -29,23 +29,45 @@ tg_t * tg_new(
 		const char apiHash[33], 
 		const char *pubkey_pem,
 		const char *database_path,
+		unsigned char *auth_key,
 		void *userdata,
 		void * (*callback)(void *userdata,
 			                 int data_type,
 											 void *data));
 
-void tg_connect(tg_t *tg); // connect Telegram
+int tg_connect(tg_t *tg); // connect Telegram
+unsigned char * tg_auth_key(tg_t *tg); // get auth_key
+void tg_update(tg_t *tg);  // update dialogs from server
 
 /* free libtg structure and free memory */
 void tg_close(tg_t *);
 
-/* get dialogs - full list of chats with messages and
- * auxilary data */
-void tg_get_dialogs_slice(tg_t *tg, 
-		uint32_t msgid_offset, int count, 
+/* get NULL-terminated auto-free dialogs array - full list 
+ * of chats with messages and auxilary data */
+void tg_get_dialogs(tg_t *tg, 
 		uint32_t *folder_id, 
+		uint32_t offset_date, int limit, 
 		void *userdata, 
-		int (*callback)(void *userdata, const tl_messages_dialogsSlice_t *));
+		void (*callback)(void *userdata, tl_t **dialogs));
+
+/* get NULL-terminated auto-free messages array */
+void tg_get_messages(tg_t *tg, 
+		int nids, uint32_t *ids,
+		void *userdata, 
+		void (*callback)(void *userdata, tl_t **messages));
+
+/* get NULL-terminated auto-free chats array */
+void tg_get_chats(tg_t *tg, 
+		int nids, uint32_t *ids,
+		void *userdata, 
+		void (*callback)(void *userdata, tl_t **chats));
+
+/* get NULL-terminated auto-free users array */
+void tg_get_users(tg_t *tg, 
+		int nids, uint32_t *ids,
+		void *userdata, 
+		void (*callback)(void *userdata, tl_t **chats));
+
 
 /* functions to help parse tl_messages_dialogs_t and get
  * peer. Peer is chat, channel or user dialog */

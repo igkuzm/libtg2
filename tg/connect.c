@@ -19,14 +19,14 @@
 	 ret;\
 	})
 
-void tg_connect(tg_t *tg)
+int tg_connect(tg_t *tg)
 {
 	// check connection
 	int socket = tg_socket_open(tg, tg->dc.ipv4, tg->port);
 	if (socket < 0){
 		// no connection
 		ON_ERR(tg, "%s: no connection", __func__);
-		return;
+		return 1;
 	}
 	tg_socket_close(tg, socket);
 
@@ -34,13 +34,13 @@ void tg_connect(tg_t *tg)
 	tl_user_t *user = tg_is_authorized(tg);
 	if (user){
 		_TG_CB(tg, TG_AUTH_AUTHORIZED_AS_USER, user);
-		return;
+		return 1;
 	}
 
 	// get new auth key
 	if (tg_new_auth_key_mtx(tg)){
 		ON_ERR(tg, "%s: no connection", __func__);
-		return;
+		return 1;
 	}
 	ON_LOG(tg, "%s: got new auth key with len: %d and id: %ld", 
 			__func__, tg->key.size, tg->key_id);
@@ -51,7 +51,7 @@ void tg_connect(tg_t *tg)
 	
 	if (!phone_number){
 		ON_ERR(tg, "phone number is NULL");
-		return;
+		return 1;
 	}
 	ON_LOG(tg, "phone number: %s", phone_number);
 
@@ -60,14 +60,14 @@ void tg_connect(tg_t *tg)
 		tg_auth_sendCode(tg, phone_number);
 
 	if (!sentCode)
-		return;
+		return 1;
 
 	// ask user for code
 	char *phone_code = 
 		(char *)_TG_CB(tg, TG_AUTH_PHONE_CODE_NEEDED, sentCode);
 	if (!phone_code){
 		ON_ERR(tg, "phone code is NULL");
-		return;
+		return 1;
 	}
 	ON_LOG(tg, "phone code: %s", phone_code);
 
@@ -100,11 +100,11 @@ void tg_connect(tg_t *tg)
 					// authorized!
 					_TG_CB(tg, TG_AUTH_NEW_AUTHORIZATION, auth);
 					_TG_CB(tg, TG_AUTH_AUTHORIZED_AS_USER, auth->user_);
-					return;
+					return 0;
 
 				} else {
 					ON_ERR(tg, "password is incorrect!");
-					return;
+					return 1;
 				}
 
 			}
@@ -133,4 +133,6 @@ void tg_connect(tg_t *tg)
 			break;
 			
 	}
+
+	return 1;
 }

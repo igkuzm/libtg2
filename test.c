@@ -13,13 +13,12 @@ void on_log(void *d, const char *msg){
 	printf("%s\n", msg);
 }
 
-char * callback(
+void * callback(
 			void *userdata,
-			TG_AUTH auth,
-			const tl_t *tl, 
-			const char *msg)
+			int data_type,
+			void *data)
 {
-	switch (auth) {
+	switch (data_type) {
 		case TG_AUTH_PHONE_NUMBER_NEEDED:
 			{
 				char phone[32];
@@ -31,7 +30,7 @@ char * callback(
 		case TG_AUTH_PHONE_CODE_NEEDED:
 			{
 				tl_auth_sentCode_t *sentCode =
-					(tl_auth_sentCode_t *)tl;
+					(tl_auth_sentCode_t *)data;
 				
 				char *type = NULL;
 				switch (sentCode->type_->_id) {
@@ -77,7 +76,7 @@ char * callback(
 		case TG_AUTH_AUTHORIZED_AS_USER:
 			{
 				printf("Connected as ");
-				tl_user_t *user = (tl_user_t *)tl;
+				tl_user_t *user = (tl_user_t *)data;
 				printf("%s (%s)!\n", 
 						(char *)user->username_.data, 
 						(char *)user->phone_.data);
@@ -93,12 +92,19 @@ char * callback(
 			}
 			break;
 
-		case TG_AUTH_ERROR:
+		case TG_LOG:
 			{
-				printf("%s: %s\n", __func__, msg);
+				if (data)
+					printf("%s\n", (char *)data);
 			}
 			break;
 
+		case TG_ERROR:
+			{
+				if (data)
+					printf("\x1B[31mERROR!: %s\x1B[0m\n", (char *)data);
+			}
+			break;
 
 		default:
 			break;
@@ -107,21 +113,21 @@ char * callback(
 	return NULL;
 }
 
-int dialogs_callback(void *userdata, const tl_messages_dialogs_t *md)
-{
-	tg_t *tg = userdata;
-	int i;
-	for (i = 0; i < md->dialogs_len; ++i) {
-		tg_peer_t peer = tg_dialogs_get_peer(tg, md, i);
-		tg_message_t msg = tg_dialogs_get_dialog_top_message(tg, 
-				md, i);
-		printf("%d: %s: %s: %20s\n\n", i, peer.title,
-			 msg.from.title,	
-				msg.msg->message_.data);
-	}
+//int dialogs_callback(void *userdata, const tl_messages_dialogs_t *md)
+//{
+	//tg_t *tg = userdata;
+	//int i;
+	//for (i = 0; i < md->dialogs_len; ++i) {
+		//tg_peer_t peer = tg_dialogs_get_peer(tg, md, i);
+		//tg_message_t msg = tg_dialogs_get_dialog_top_message(tg, 
+				//md, i);
+		//printf("%d: %s: %s: %20s\n\n", i, peer.title,
+			 //msg.from.title,	
+				//msg.msg->message_.data);
+	//}
 
-	return 0;
-}
+	//return 0;
+//}
 
 int main(int argc, char *argv[])
 {
@@ -136,21 +142,24 @@ int main(int argc, char *argv[])
 	}
 
 	tg_t *tg = tg_new(apiId, apiHash, 
-			"pub.pkcs", key);
+			"pub.pkcs", "libtg.db", 
+			key[0]?key:NULL, NULL, callback);
 	if (!tg)
 		return 1;
 
-	tg_set_on_error(tg, NULL, on_log);
-	tg_set_on_log(tg, NULL, on_log);
+	//tg_new_auth_key_mtx(tg);
+	tg_new_auth_key1(tg);
 
-	tg_new_auth_key_mtx(tg);
+	/*if (tg_connect(tg))*/
+		/*return 1;*/
 
-	if (tg_connect(tg, tg, callback))
-		return 1;
+	tg_update(tg);
 
-	tg_get_dialogs(tg, 10, 0, 
-			NULL, NULL, 
-			tg, dialogs_callback);
+	/*tg_get_dialogs(tg, 10, 0, */
+			/*NULL, NULL, */
+			/*tg, dialogs_callback);*/
+
+	getchar();
 
 	return 0;
 }

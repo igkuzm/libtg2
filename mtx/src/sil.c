@@ -116,7 +116,8 @@ tg_api_type_system_t sil_concrete(abstract_t a)
 	if(a.size == 0)
 		return t;
 	
-  ui32_t id = le32toh(api.buf.get_ui32(a.params[0].value));
+  /*ui32_t id = le32toh(api.buf.get_ui32(a.params[0].value));*/
+  ui32_t id = api.buf.get_ui32(a.params[0].value);
   param_t p;
   p.id = id;
   buf_t_ s = a.params[1].value; // hack
@@ -139,7 +140,8 @@ tg_api_type_system_t sil_concrete(abstract_t a)
       p.value = s;
       p.type = TYPE_STRING;
       t.ctor_ResPQ.pq = api.sel.deserialize_param(p);
-      //api.buf.dump(t.ctor_ResPQ.pq.value);
+			printf("PQ VALUE:\n");
+      api.buf.dump(t.ctor_ResPQ.pq.value);
       ui32_t l = t.ctor_ResPQ.pq.value.size + 4; // hack
       s = api.buf.add(s.data + l, s.size - l);
       p.value = s;
@@ -199,7 +201,8 @@ tg_api_type_system_t sil_concrete(abstract_t a)
       p.value = s;
       p.type = TYPE_STRING;
       c.dh_prime = api.sel.deserialize_param(p);
-      ui32_t l = le32toh(c.dh_prime.value.size + 4); // hack
+      //ui32_t l = le32toh(c.dh_prime.value.size + 4); // hack
+      ui32_t l = c.dh_prime.value.size + 4; // hack
       //api.buf.dump(c.dh_prime.value);
       s = api.buf.add(s.data + l, s.size - l);
       p.value = s;

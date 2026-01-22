@@ -160,7 +160,7 @@ int tg_new_auth_key1(tg_t *tg)
 			resPQ->nonce_, 
 			resPQ->server_nonce_, 
 			new_nonce, 
-			00002);
+			tg->dc.number);
 
  // p_q_inner_data#83c95aec pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data
 	//buf_t p_q_inner_data;

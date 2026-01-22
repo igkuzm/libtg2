@@ -110,7 +110,7 @@ tg_is_authorized(tg_t *tg)
 
 end:
 	tg_socket_close(tg, tg->socket);
-	ON_ERR(tg, "NEED_TO_AUTHORIZE");
+	ON_LOG(tg, "NEED_TO_AUTHORIZE");
 	return NULL;
 }
 

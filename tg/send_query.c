@@ -21,7 +21,7 @@ void tg_send_query_with_progress(
 		void *ptr, int (*callback)(void *ptr, const tl_t *tl),
 		void *progressp, tg_progress_fun *progress);
 
-void tg_send_query(tg_t *tg, buf_t *query) 
+void tg_send_query_async(tg_t *tg, buf_t *query) 
 {
 	tg_send_query_with_progress(
 			tg, query, tg->dc.dc, true, 
@@ -189,7 +189,7 @@ tl_t *tg_file_transfer(
 }
 
 
-void tg_send_query_async(tg_t *tg, buf_t *query, 
+void tg_send_query(tg_t *tg, buf_t *query, 
 	void *userdata, 
 	int callback(void *userdata, const tl_t *tl))
 {

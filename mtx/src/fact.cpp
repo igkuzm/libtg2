@@ -731,18 +731,23 @@ void factorize(const T & n, std::map<T, unsigned> & result, T2 unused)
 EXTERNC
 void factor(uint64_t pq, uint32_t * p, uint32_t * q)
 {
+	printf("%s: %d\n", __func__, __LINE__);
   typedef map <long long, unsigned> Map;
   Map m;
+	printf("%s: %d\n", __func__, __LINE__);
 
   factorize((long long)pq, m, (long long) 0);
+	printf("%s: %d\n", __func__, __LINE__);
 
   uint32_t r[2];
+	printf("%s: %d\n", __func__, __LINE__);
 
   for (uint32_t i = 0; i < m.size(); ++i) {
     Map::iterator it = m.begin();
     std::advance(it, i);
     r[i] = (uint32_t)it->first;
   }
+	printf("%s: %d\n", __func__, __LINE__);
 
   *p = r[0];
   *q = r[1];

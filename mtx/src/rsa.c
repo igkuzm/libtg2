@@ -27,7 +27,7 @@
 #include "../include/api.h"
 #include "../include/rsa.h"
 
-unsigned rsax(unsigned char * from, int from_len, unsigned char * to, int to_len, const BIGNUM * N, const BIGNUM * E)
+unsigned rsax(unsigned char * from, int from_len, unsigned char * to, int to_len, BIGNUM * N, BIGNUM * E)
 {
   BIGNUM *x = BN_new();
 	BIGNUM *y = BN_new();
