@@ -761,7 +761,7 @@ int close_deserialize_table_header(generator_t *g)
 			,g->deserialize_table_h);
 		
 	fputs("\n\n#define TL_DESERIALIZE(id, name) \\\n"
-			"tl_deserialize_function name;\n"
+			"extern tl_deserialize_function name;\n"
 			"TL_DESERIALIZES\n"
 			"#undef TL_DESERIALIZE\n"
 		 	, g->deserialize_table_h);
