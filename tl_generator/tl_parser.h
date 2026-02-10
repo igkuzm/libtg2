@@ -1,5 +1,6 @@
 #ifndef TL_PARSER_H
 #define TL_PARSER_H
+#include <stdio.h>
 struct method_t {
 	char *name;
 	int  id;
@@ -10,7 +11,7 @@ struct method_t {
 };
 
 int tl_parse(
-		const char *schema_file, 
+		FILE *schema, 
 		void *userdata,
 		int (*callback)(
 			void *userdata, 

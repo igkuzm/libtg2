@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 struct arg_t {
 	char *name;
@@ -185,23 +186,17 @@ static int parse_schema(
 }
 
 int tl_parse(
-		const char *schema_file, 
+		FILE *schema, 
 		void *userdata,
 		int (*callback)(
 			void *userdata, 
 			const struct method_t *m,
 			const char *error))
 {
-	// open schema
-	FILE *fp = fopen(schema_file, "r");
-	if (!fp){
-		if (callback)
-			callback(userdata, NULL, "can't open file");
-		return 1;
-	}
-
-	int err = parse_schema(
-			fp, userdata, callback);
-	fclose(fp);
+	int err = 0;
+	assert(schema);
+	printf("HELLO\n");
+	err = parse_schema(
+			schema, userdata, callback);
 	return err;
 }

@@ -11,23 +11,23 @@
 	({snprintf(buf, len-1, __VA_ARGS__); buf[len-1]=0; buf;})
 
 #define API_LAYER_H "../tl/api_layer.h"
-#define TL_H "../tl/tl.h"
-#define LIBTL_H "../tl/libtl.h"
-#define LIBTL_C "../tl/libtl.c"
-#define ID_H "../tl/id.h"
-#define METHODS_H "../tl/methods.h"
-#define METHODS_C "../tl/methods.c"
-#define TYPES_H "../tl/types.h"
-#define STRUCT_H "../tl/struct.h"
-#define NAMES_H "../tl/names.h"
-#define DESERIALIZE_TABLE_H "../tl/deserialize_table.h"
-#define DESERIALIZE_TABLE_C "../tl/deserialize_table.c"
-#define TOJSON_TABLE_H "../tl/tojson_table.h"
-#define TOJSON_TABLE_C "../tl/tojson_table.c"
-#define FREE_H "../tl/free.h"
-#define FREE_C "../tl/free.c"
-#define MACRO_H "../tl/macro.h"
-#define MACRO_NAMES_H "../tl/macro_exe.h"
+#define TL_H "tl.h"
+#define LIBTL_H "libtl.h"
+#define LIBTL_C "libtl.c"
+#define ID_H "id.h"
+#define METHODS_H "methods.h"
+#define METHODS_C "methods.c"
+#define TYPES_H "types.h"
+#define STRUCT_H "struct.h"
+#define NAMES_H "names.h"
+#define DESERIALIZE_TABLE_H "deserialize_table.h"
+#define DESERIALIZE_TABLE_C "deserialize_table.c"
+#define TOJSON_TABLE_H "tojson_table.h"
+#define TOJSON_TABLE_C "tojson_table.c"
+#define FREE_H "free.h"
+#define FREE_C "free.c"
+#define MACRO_H "macro.h"
+#define MACRO_NAMES_H "macro_exe.h"
 
 //strndup for Apple
 #ifdef __APPLE__
@@ -35,6 +35,8 @@ char *strndup(const char*,size_t);
 #endif
 
 typedef struct generator_ {
+	FILE *mtproto_api;
+	FILE *telegram_api;
 	FILE *id_h;
 	FILE *tl_h;
 	FILE *libtl_h;
@@ -2027,34 +2029,44 @@ static int cb(
 
 int main(int argc, char *argv[])
 {
-	if (argc < 2){
+	if (argc < 3){
 		fprintf(stderr,
-				"Usage: %s DIRECTORY\n"
-				"Generate libtl DIRECTORY with headers and source from"
-				"mtproto_api.tl and telegram_api.tl\n\n", argv[0]);
+				"Usage: %s API_DIRECTORY OUTPUT_DIRECTORY\n"
+				"Generate libtl OUTPUT_DIRECTORY with headers and source from "
+				"mtproto_api.tl and telegram_api.tl from API_DIRECTORY\n\n", argv[0]);
 		return 1;
 	}
+	
+	generator_t g;
+	memset(&g, 0, sizeof(g));
+	
+	// change dir
+	chdir(argv[2]);
+	
+	char mtproto_api[BUFSIZ];
+	sprintf(mtproto_api, "%s/%s", argv[1], "mtproto_api.tl");
+	
+	char telegram_api[BUFSIZ];
+	sprintf(telegram_api, "%s/%s", argv[1], "telegram_api.tl");
 
-	// check tl files
-	const char *tl_sources[] = 
-		{"mtproto_api.tl", "telegram_api.tl"};
-	int i;
-	for (i = 0; i < sizeof(tl_sources)/sizeof(tl_sources[0]); ++i) {
-		FILE *fp = fopen(tl_sources[i], "r");
-		if (fp == NULL){
-			fprintf(stderr,
-					"Can't open source %s: ", tl_sources[i]);
-			perror("");
-			fprintf(stderr,
-					"Run %s from the directory with "
-					"mtproto_api.tl and telegram_api.tl\n", argv[0]);
-			return 1;
-		}
+	// open tl files
+	g.mtproto_api = fopen(mtproto_api, "r");
+	if (g.mtproto_api == NULL){
+		fprintf(stderr,
+				"Can't open source %s: ", mtproto_api);
+		perror("");
+		return 1;
+	}
+	g.telegram_api = fopen(telegram_api, "r");
+	if (g.telegram_api == NULL){
+		fprintf(stderr,
+				"Can't open source %s: ", telegram_api);
+		perror("");
+		return 1;
 	}
 	
 	fprintf(stderr,"%s: starting...\n", argv[0]);
-	generator_t g;
-
+	
 	FILE *api_layer = fopen(API_LAYER_H, "w");
 	if (!api_layer)
 		return 1;
@@ -2076,14 +2088,19 @@ int main(int argc, char *argv[])
 	if (open_free_header(&g)) return 1;
 	if (open_free(&g)) return 1;
 	if (open_macro(&g)) return 1;
+	
+	printf("%s: %d\n", __func__, __LINE__);
 
 	g.isMtproto = 1;
-	tl_parse("mtproto_api.tl",
+			printf("TL FP: %p\n", g.mtproto_api);
+	tl_parse(g.mtproto_api,
 		 	&g,cb);
-	
+		printf("%s: %d\n", __func__, __LINE__);
+
 	g.isMtproto = 0;
-	tl_parse("telegram_api.tl",
+	tl_parse(g.telegram_api,
 		 	&g, cb);
+	printf("%s: %d\n", __func__, __LINE__);
 
 	close_tl_header(&g);
 	close_libtl_header(&g);

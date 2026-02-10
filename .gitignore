@@ -2,3 +2,8 @@ tl
 ..*
 api_id.h
 .*
+*~
+#*
+build
+*.pbxuser
+*.mode2*
