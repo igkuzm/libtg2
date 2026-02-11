@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include "../../essential/alloc.h"
+#include "../../essential/endian.h"
 #include "progress.h"
 #include "socket.h"
 #include "header.h"
@@ -82,6 +83,7 @@ static size_t tg_socket_receive(
 				__func__, __LINE__, s);
 		return 0;
 	}
+	len = le32toh(len);
 
 	ON_LOG(tg, "%s: prepare to receive len: %d", __func__, len);
 	if (len < 0) {
@@ -109,6 +111,11 @@ static size_t tg_socket_receive(
 			ON_ERR(tg, "%s: %d: socket error: %d", 
 					__func__, __LINE__, s);
 			return 0;
+		}
+		if (s==0){
+			ON_ERR(tg, "%s: %d: nothing to receive", 
+				   __func__, __LINE__);
+			return received;			
 		}
 		received += s;
 		

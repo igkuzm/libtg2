@@ -59,6 +59,9 @@ int tg_new_auth_key1(tg_t *tg)
 		return 1;
 	}
 	tl_resPQ_t *resPQ = (tl_resPQ_t *)tl;
+	
+	return 1;
+
 
 /* Here, string pq is a representation of a natural number 
  * (in binary big endian format). This number is the product 

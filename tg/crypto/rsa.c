@@ -1,4 +1,5 @@
 #include "../../essential/serialize.h"
+#include "../../essential/endian.h"
 #include "cry.h"
 #include "hsh.h"
 #include <openssl/rsa.h>
