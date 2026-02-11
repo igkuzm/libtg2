@@ -6,7 +6,7 @@
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "sha1.h"
-/*#include "sha256.h"*/
+#include "sha256.h"
 #include "hsh.h"
 #include <openssl/sha.h>
 
@@ -23,8 +23,8 @@ buf_t tg_hsh_sha1(buf_t b)
 buf_t tg_hsh_sha256(buf_t b)
 {
   buf_t h = buf_new();
-	SHA256(b.data, b.size, h.data);
-  /*sha256_bytes(b.data, b.size, h.data);*/
+  //SHA256(b.data, b.size, h.data);
+  sha256_bytes(b.data, b.size, h.data);
   h.size = 32;
 
   return h;

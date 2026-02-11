@@ -110,13 +110,92 @@
 		AF3B3C0F2F3B4D8200BED406 /* socket.h in Headers */ = {isa = PBXBuildFile; fileRef = AF3B3BCC2F3B4D8200BED406 /* socket.h */; };
 		AF3B3C102F3B4D8200BED406 /* updates.c in Sources */ = {isa = PBXBuildFile; fileRef = AF3B3BCD2F3B4D8200BED406 /* updates.c */; };
 		AF3B3C112F3B4D8200BED406 /* updates.h in Headers */ = {isa = PBXBuildFile; fileRef = AF3B3BCE2F3B4D8200BED406 /* updates.h */; };
-		AF3B3C222F3B4F5C00BED406 /* sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = AF3B3C1F2F3B4F5C00BED406 /* sqlite3.c */; };
 		AF3B3C232F3B4F5C00BED406 /* sqlite3.h in Headers */ = {isa = PBXBuildFile; fileRef = AF3B3C212F3B4F5C00BED406 /* sqlite3.h */; };
 		AF3B3C292F3B4FF600BED406 /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = AF3B3C282F3B4FF600BED406 /* test.c */; };
 		AF3B3C352F3B53C700BED406 /* liblibtg2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF212A522F3A98DB00819E2F /* liblibtg2.a */; };
 		AF3B3C432F3B558C00BED406 /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AF3B3C422F3B558C00BED406 /* libstdc++.dylib */; };
 		AF3B3C482F3B55E800BED406 /* aes_ige.c in Sources */ = {isa = PBXBuildFile; fileRef = AF3B3C472F3B55E800BED406 /* aes_ige.c */; };
 		AF3B3C4B2F3B564600BED406 /* libessential.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF212AD52F3A998600819E2F /* libessential.a */; };
+		AFC628262F3CB3C300A647AA /* aes.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627DA2F3CB3C300A647AA /* aes.h */; };
+		AFC628272F3CB3C300A647AA /* asn1.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627DB2F3CB3C300A647AA /* asn1.h */; };
+		AFC628282F3CB3C300A647AA /* asn1_mac.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627DC2F3CB3C300A647AA /* asn1_mac.h */; };
+		AFC628292F3CB3C300A647AA /* asn1t.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627DD2F3CB3C300A647AA /* asn1t.h */; };
+		AFC6282A2F3CB3C300A647AA /* bio.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627DE2F3CB3C300A647AA /* bio.h */; };
+		AFC6282B2F3CB3C300A647AA /* blowfish.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627DF2F3CB3C300A647AA /* blowfish.h */; };
+		AFC6282C2F3CB3C300A647AA /* bn.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627E02F3CB3C300A647AA /* bn.h */; };
+		AFC6282D2F3CB3C300A647AA /* buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627E12F3CB3C300A647AA /* buffer.h */; };
+		AFC6282E2F3CB3C300A647AA /* camellia.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627E22F3CB3C300A647AA /* camellia.h */; };
+		AFC6282F2F3CB3C300A647AA /* cast.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627E32F3CB3C300A647AA /* cast.h */; };
+		AFC628302F3CB3C300A647AA /* cmac.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627E42F3CB3C300A647AA /* cmac.h */; };
+		AFC628312F3CB3C300A647AA /* cms.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627E52F3CB3C300A647AA /* cms.h */; };
+		AFC628322F3CB3C300A647AA /* comp.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627E62F3CB3C300A647AA /* comp.h */; };
+		AFC628332F3CB3C300A647AA /* conf.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627E72F3CB3C300A647AA /* conf.h */; };
+		AFC628342F3CB3C300A647AA /* conf_api.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627E82F3CB3C300A647AA /* conf_api.h */; };
+		AFC628352F3CB3C300A647AA /* crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627E92F3CB3C300A647AA /* crypto.h */; };
+		AFC628362F3CB3C300A647AA /* des.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627EA2F3CB3C300A647AA /* des.h */; };
+		AFC628372F3CB3C300A647AA /* des_old.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627EB2F3CB3C300A647AA /* des_old.h */; };
+		AFC628382F3CB3C300A647AA /* dh.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627EC2F3CB3C300A647AA /* dh.h */; };
+		AFC628392F3CB3C300A647AA /* dsa.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627ED2F3CB3C300A647AA /* dsa.h */; };
+		AFC6283A2F3CB3C300A647AA /* dso.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627EE2F3CB3C300A647AA /* dso.h */; };
+		AFC6283B2F3CB3C300A647AA /* dtls1.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627EF2F3CB3C300A647AA /* dtls1.h */; };
+		AFC6283C2F3CB3C300A647AA /* e_os2.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627F02F3CB3C300A647AA /* e_os2.h */; };
+		AFC6283D2F3CB3C300A647AA /* ebcdic.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627F12F3CB3C300A647AA /* ebcdic.h */; };
+		AFC6283E2F3CB3C300A647AA /* ec.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627F22F3CB3C300A647AA /* ec.h */; };
+		AFC6283F2F3CB3C300A647AA /* ecdh.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627F32F3CB3C300A647AA /* ecdh.h */; };
+		AFC628402F3CB3C300A647AA /* ecdsa.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627F42F3CB3C300A647AA /* ecdsa.h */; };
+		AFC628412F3CB3C300A647AA /* engine.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627F52F3CB3C300A647AA /* engine.h */; };
+		AFC628422F3CB3C300A647AA /* err.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627F62F3CB3C300A647AA /* err.h */; };
+		AFC628432F3CB3C300A647AA /* evp.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627F72F3CB3C300A647AA /* evp.h */; };
+		AFC628442F3CB3C300A647AA /* hmac.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627F82F3CB3C300A647AA /* hmac.h */; };
+		AFC628452F3CB3C300A647AA /* idea.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627F92F3CB3C300A647AA /* idea.h */; };
+		AFC628462F3CB3C300A647AA /* krb5_asn.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627FA2F3CB3C300A647AA /* krb5_asn.h */; };
+		AFC628472F3CB3C300A647AA /* kssl.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627FB2F3CB3C300A647AA /* kssl.h */; };
+		AFC628482F3CB3C300A647AA /* lhash.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627FC2F3CB3C300A647AA /* lhash.h */; };
+		AFC628492F3CB3C300A647AA /* md4.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627FD2F3CB3C300A647AA /* md4.h */; };
+		AFC6284A2F3CB3C300A647AA /* md5.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627FE2F3CB3C300A647AA /* md5.h */; };
+		AFC6284B2F3CB3C300A647AA /* mdc2.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC627FF2F3CB3C300A647AA /* mdc2.h */; };
+		AFC6284C2F3CB3C300A647AA /* modes.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628002F3CB3C300A647AA /* modes.h */; };
+		AFC6284D2F3CB3C300A647AA /* obj_mac.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628012F3CB3C300A647AA /* obj_mac.h */; };
+		AFC6284E2F3CB3C300A647AA /* objects.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628022F3CB3C300A647AA /* objects.h */; };
+		AFC6284F2F3CB3C300A647AA /* ocsp.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628032F3CB3C300A647AA /* ocsp.h */; };
+		AFC628502F3CB3C300A647AA /* opensslconf.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628042F3CB3C300A647AA /* opensslconf.h */; };
+		AFC628512F3CB3C300A647AA /* opensslv.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628062F3CB3C300A647AA /* opensslv.h */; };
+		AFC628522F3CB3C300A647AA /* ossl_typ.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628072F3CB3C300A647AA /* ossl_typ.h */; };
+		AFC628532F3CB3C300A647AA /* pem.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628082F3CB3C300A647AA /* pem.h */; };
+		AFC628542F3CB3C300A647AA /* pem2.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628092F3CB3C300A647AA /* pem2.h */; };
+		AFC628552F3CB3C300A647AA /* pkcs12.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6280A2F3CB3C300A647AA /* pkcs12.h */; };
+		AFC628562F3CB3C300A647AA /* pkcs7.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6280B2F3CB3C300A647AA /* pkcs7.h */; };
+		AFC628572F3CB3C300A647AA /* pqueue.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6280C2F3CB3C300A647AA /* pqueue.h */; };
+		AFC628582F3CB3C300A647AA /* rand.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6280D2F3CB3C300A647AA /* rand.h */; };
+		AFC628592F3CB3C300A647AA /* rc2.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6280E2F3CB3C300A647AA /* rc2.h */; };
+		AFC6285A2F3CB3C300A647AA /* rc4.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6280F2F3CB3C300A647AA /* rc4.h */; };
+		AFC6285B2F3CB3C300A647AA /* ripemd.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628102F3CB3C300A647AA /* ripemd.h */; };
+		AFC6285C2F3CB3C300A647AA /* rsa.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628112F3CB3C300A647AA /* rsa.h */; };
+		AFC6285D2F3CB3C300A647AA /* safestack.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628122F3CB3C300A647AA /* safestack.h */; };
+		AFC6285E2F3CB3C300A647AA /* seed.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628132F3CB3C300A647AA /* seed.h */; };
+		AFC6285F2F3CB3C300A647AA /* sha.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628142F3CB3C300A647AA /* sha.h */; };
+		AFC628602F3CB3C300A647AA /* srp.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628152F3CB3C300A647AA /* srp.h */; };
+		AFC628612F3CB3C300A647AA /* srtp.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628162F3CB3C300A647AA /* srtp.h */; };
+		AFC628622F3CB3C300A647AA /* ssl.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628172F3CB3C300A647AA /* ssl.h */; };
+		AFC628632F3CB3C300A647AA /* ssl2.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628182F3CB3C300A647AA /* ssl2.h */; };
+		AFC628642F3CB3C300A647AA /* ssl23.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628192F3CB3C300A647AA /* ssl23.h */; };
+		AFC628652F3CB3C300A647AA /* ssl3.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6281A2F3CB3C300A647AA /* ssl3.h */; };
+		AFC628662F3CB3C300A647AA /* stack.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6281B2F3CB3C300A647AA /* stack.h */; };
+		AFC628672F3CB3C300A647AA /* symhacks.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6281C2F3CB3C300A647AA /* symhacks.h */; };
+		AFC628682F3CB3C300A647AA /* tls1.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6281D2F3CB3C300A647AA /* tls1.h */; };
+		AFC628692F3CB3C300A647AA /* ts.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6281E2F3CB3C300A647AA /* ts.h */; };
+		AFC6286A2F3CB3C300A647AA /* txt_db.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC6281F2F3CB3C300A647AA /* txt_db.h */; };
+		AFC6286B2F3CB3C300A647AA /* ui.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628202F3CB3C300A647AA /* ui.h */; };
+		AFC6286C2F3CB3C300A647AA /* ui_compat.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628212F3CB3C300A647AA /* ui_compat.h */; };
+		AFC6286D2F3CB3C300A647AA /* whrlpool.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628222F3CB3C300A647AA /* whrlpool.h */; };
+		AFC6286E2F3CB3C300A647AA /* x509.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628232F3CB3C300A647AA /* x509.h */; };
+		AFC6286F2F3CB3C300A647AA /* x509_vfy.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628242F3CB3C300A647AA /* x509_vfy.h */; };
+		AFC628702F3CB3C300A647AA /* x509v3.h in Headers */ = {isa = PBXBuildFile; fileRef = AFC628252F3CB3C300A647AA /* x509v3.h */; };
+		AFC628722F3CB43400A647AA /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AFC628712F3CB43400A647AA /* libcrypto.a */; };
+		AFC628742F3CB48500A647AA /* strndup.c in Sources */ = {isa = PBXBuildFile; fileRef = AF212B0D2F3A9A4B00819E2F /* strndup.c */; };
+		AFC628752F3CB4A000A647AA /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AF3B3C4D2F3B568C00BED406 /* libz.dylib */; };
+		AFC628862F3CB94300A647AA /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AFC628852F3CB94300A647AA /* libsqlite3.dylib */; };
+		AFC628932F3CBBA800A647AA /* pub.pkcs in CopyFiles */ = {isa = PBXBuildFile; fileRef = AFC628912F3CBB7800A647AA /* pub.pkcs */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -145,7 +224,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = AF212A3D2F3A984B00819E2F /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = AF212AE22F3A99E500819E2F /* tl_generator */;
+			remoteGlobalIDString = AF212AE22F3A99E500819E2F;
 			remoteInfo = tl_generator;
 		};
 /* End PBXContainerItemProxy section */
@@ -159,6 +238,16 @@
 			files = (
 				AF212B232F3A9B8C00819E2F /* mtproto_api.tl in CopyFiles */,
 				AF212B242F3A9B8C00819E2F /* telegram_api.tl in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AFC628982F3CBC1500A647AA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				AFC628932F3CBBA800A647AA /* pub.pkcs in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -179,7 +268,6 @@
 		AF212A612F3A98E700819E2F /* serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = serialize.h; path = essential/serialize.h; sourceTree = "<group>"; };
 		AF212A622F3A98E700819E2F /* str.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = str.h; path = essential/str.h; sourceTree = "<group>"; };
 		AF212A632F3A98E700819E2F /* strtok_foreach.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = strtok_foreach.h; path = essential/strtok_foreach.h; sourceTree = "<group>"; };
-		AF212A642F3A98E700819E2F /* openssl */ = {isa = PBXFileReference; lastKnownFileType = folder; name = openssl; path = essential/openssl; sourceTree = "<group>"; };
 		AF212AB22F3A98E700819E2F /* gunzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gunzip.c; path = essential/gunzip.c; sourceTree = "<group>"; };
 		AF212AB32F3A98E700819E2F /* buf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = buf.c; path = essential/buf.c; sourceTree = "<group>"; };
 		AF212AC62F3A991D00819E2F /* libtg2_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = libtg2_test; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -276,13 +364,91 @@
 		AF3B3BCC2F3B4D8200BED406 /* socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = socket.h; sourceTree = "<group>"; };
 		AF3B3BCD2F3B4D8200BED406 /* updates.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = updates.c; sourceTree = "<group>"; };
 		AF3B3BCE2F3B4D8200BED406 /* updates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updates.h; sourceTree = "<group>"; };
-		AF3B3C1F2F3B4F5C00BED406 /* sqlite3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sqlite3.c; sourceTree = "<group>"; };
 		AF3B3C212F3B4F5C00BED406 /* sqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sqlite3.h; sourceTree = "<group>"; };
 		AF3B3C282F3B4FF600BED406 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 		AF3B3C2C2F3B516F00BED406 /* api_id.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = api_id.h; sourceTree = "<group>"; };
 		AF3B3C422F3B558C00BED406 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "/usr/lib/gcc/i686-apple-darwin9/4.0.1/libstdc++.dylib"; sourceTree = "<absolute>"; };
 		AF3B3C472F3B55E800BED406 /* aes_ige.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aes_ige.c; path = darwin/aes_ige.c; sourceTree = "<group>"; };
 		AF3B3C4D2F3B568C00BED406 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
+		AFC627DA2F3CB3C300A647AA /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
+		AFC627DB2F3CB3C300A647AA /* asn1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1.h; sourceTree = "<group>"; };
+		AFC627DC2F3CB3C300A647AA /* asn1_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1_mac.h; sourceTree = "<group>"; };
+		AFC627DD2F3CB3C300A647AA /* asn1t.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn1t.h; sourceTree = "<group>"; };
+		AFC627DE2F3CB3C300A647AA /* bio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bio.h; sourceTree = "<group>"; };
+		AFC627DF2F3CB3C300A647AA /* blowfish.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = blowfish.h; sourceTree = "<group>"; };
+		AFC627E02F3CB3C300A647AA /* bn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bn.h; sourceTree = "<group>"; };
+		AFC627E12F3CB3C300A647AA /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buffer.h; sourceTree = "<group>"; };
+		AFC627E22F3CB3C300A647AA /* camellia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camellia.h; sourceTree = "<group>"; };
+		AFC627E32F3CB3C300A647AA /* cast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cast.h; sourceTree = "<group>"; };
+		AFC627E42F3CB3C300A647AA /* cmac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmac.h; sourceTree = "<group>"; };
+		AFC627E52F3CB3C300A647AA /* cms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cms.h; sourceTree = "<group>"; };
+		AFC627E62F3CB3C300A647AA /* comp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = comp.h; sourceTree = "<group>"; };
+		AFC627E72F3CB3C300A647AA /* conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = conf.h; sourceTree = "<group>"; };
+		AFC627E82F3CB3C300A647AA /* conf_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = conf_api.h; sourceTree = "<group>"; };
+		AFC627E92F3CB3C300A647AA /* crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypto.h; sourceTree = "<group>"; };
+		AFC627EA2F3CB3C300A647AA /* des.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = des.h; sourceTree = "<group>"; };
+		AFC627EB2F3CB3C300A647AA /* des_old.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = des_old.h; sourceTree = "<group>"; };
+		AFC627EC2F3CB3C300A647AA /* dh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dh.h; sourceTree = "<group>"; };
+		AFC627ED2F3CB3C300A647AA /* dsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dsa.h; sourceTree = "<group>"; };
+		AFC627EE2F3CB3C300A647AA /* dso.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dso.h; sourceTree = "<group>"; };
+		AFC627EF2F3CB3C300A647AA /* dtls1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dtls1.h; sourceTree = "<group>"; };
+		AFC627F02F3CB3C300A647AA /* e_os2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = e_os2.h; sourceTree = "<group>"; };
+		AFC627F12F3CB3C300A647AA /* ebcdic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ebcdic.h; sourceTree = "<group>"; };
+		AFC627F22F3CB3C300A647AA /* ec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ec.h; sourceTree = "<group>"; };
+		AFC627F32F3CB3C300A647AA /* ecdh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ecdh.h; sourceTree = "<group>"; };
+		AFC627F42F3CB3C300A647AA /* ecdsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ecdsa.h; sourceTree = "<group>"; };
+		AFC627F52F3CB3C300A647AA /* engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = engine.h; sourceTree = "<group>"; };
+		AFC627F62F3CB3C300A647AA /* err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = err.h; sourceTree = "<group>"; };
+		AFC627F72F3CB3C300A647AA /* evp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = evp.h; sourceTree = "<group>"; };
+		AFC627F82F3CB3C300A647AA /* hmac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hmac.h; sourceTree = "<group>"; };
+		AFC627F92F3CB3C300A647AA /* idea.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = idea.h; sourceTree = "<group>"; };
+		AFC627FA2F3CB3C300A647AA /* krb5_asn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = krb5_asn.h; sourceTree = "<group>"; };
+		AFC627FB2F3CB3C300A647AA /* kssl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kssl.h; sourceTree = "<group>"; };
+		AFC627FC2F3CB3C300A647AA /* lhash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lhash.h; sourceTree = "<group>"; };
+		AFC627FD2F3CB3C300A647AA /* md4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md4.h; sourceTree = "<group>"; };
+		AFC627FE2F3CB3C300A647AA /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md5.h; sourceTree = "<group>"; };
+		AFC627FF2F3CB3C300A647AA /* mdc2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mdc2.h; sourceTree = "<group>"; };
+		AFC628002F3CB3C300A647AA /* modes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = modes.h; sourceTree = "<group>"; };
+		AFC628012F3CB3C300A647AA /* obj_mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = obj_mac.h; sourceTree = "<group>"; };
+		AFC628022F3CB3C300A647AA /* objects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = objects.h; sourceTree = "<group>"; };
+		AFC628032F3CB3C300A647AA /* ocsp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ocsp.h; sourceTree = "<group>"; };
+		AFC628042F3CB3C300A647AA /* opensslconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opensslconf.h; sourceTree = "<group>"; };
+		AFC628052F3CB3C300A647AA /* opensslconf.h.orig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = opensslconf.h.orig; sourceTree = "<group>"; };
+		AFC628062F3CB3C300A647AA /* opensslv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opensslv.h; sourceTree = "<group>"; };
+		AFC628072F3CB3C300A647AA /* ossl_typ.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ossl_typ.h; sourceTree = "<group>"; };
+		AFC628082F3CB3C300A647AA /* pem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pem.h; sourceTree = "<group>"; };
+		AFC628092F3CB3C300A647AA /* pem2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pem2.h; sourceTree = "<group>"; };
+		AFC6280A2F3CB3C300A647AA /* pkcs12.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pkcs12.h; sourceTree = "<group>"; };
+		AFC6280B2F3CB3C300A647AA /* pkcs7.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pkcs7.h; sourceTree = "<group>"; };
+		AFC6280C2F3CB3C300A647AA /* pqueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pqueue.h; sourceTree = "<group>"; };
+		AFC6280D2F3CB3C300A647AA /* rand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rand.h; sourceTree = "<group>"; };
+		AFC6280E2F3CB3C300A647AA /* rc2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rc2.h; sourceTree = "<group>"; };
+		AFC6280F2F3CB3C300A647AA /* rc4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rc4.h; sourceTree = "<group>"; };
+		AFC628102F3CB3C300A647AA /* ripemd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ripemd.h; sourceTree = "<group>"; };
+		AFC628112F3CB3C300A647AA /* rsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rsa.h; sourceTree = "<group>"; };
+		AFC628122F3CB3C300A647AA /* safestack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = safestack.h; sourceTree = "<group>"; };
+		AFC628132F3CB3C300A647AA /* seed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = seed.h; sourceTree = "<group>"; };
+		AFC628142F3CB3C300A647AA /* sha.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sha.h; sourceTree = "<group>"; };
+		AFC628152F3CB3C300A647AA /* srp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = srp.h; sourceTree = "<group>"; };
+		AFC628162F3CB3C300A647AA /* srtp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = srtp.h; sourceTree = "<group>"; };
+		AFC628172F3CB3C300A647AA /* ssl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssl.h; sourceTree = "<group>"; };
+		AFC628182F3CB3C300A647AA /* ssl2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssl2.h; sourceTree = "<group>"; };
+		AFC628192F3CB3C300A647AA /* ssl23.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssl23.h; sourceTree = "<group>"; };
+		AFC6281A2F3CB3C300A647AA /* ssl3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssl3.h; sourceTree = "<group>"; };
+		AFC6281B2F3CB3C300A647AA /* stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
+		AFC6281C2F3CB3C300A647AA /* symhacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = symhacks.h; sourceTree = "<group>"; };
+		AFC6281D2F3CB3C300A647AA /* tls1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tls1.h; sourceTree = "<group>"; };
+		AFC6281E2F3CB3C300A647AA /* ts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ts.h; sourceTree = "<group>"; };
+		AFC6281F2F3CB3C300A647AA /* txt_db.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = txt_db.h; sourceTree = "<group>"; };
+		AFC628202F3CB3C300A647AA /* ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui.h; sourceTree = "<group>"; };
+		AFC628212F3CB3C300A647AA /* ui_compat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui_compat.h; sourceTree = "<group>"; };
+		AFC628222F3CB3C300A647AA /* whrlpool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = whrlpool.h; sourceTree = "<group>"; };
+		AFC628232F3CB3C300A647AA /* x509.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509.h; sourceTree = "<group>"; };
+		AFC628242F3CB3C300A647AA /* x509_vfy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509_vfy.h; sourceTree = "<group>"; };
+		AFC628252F3CB3C300A647AA /* x509v3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509v3.h; sourceTree = "<group>"; };
+		AFC628712F3CB43400A647AA /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = darwin/libcrypto.a; sourceTree = "<group>"; };
+		AFC628852F3CB94300A647AA /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
+		AFC628912F3CBB7800A647AA /* pub.pkcs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pub.pkcs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -300,6 +466,9 @@
 			files = (
 				AF3B3C352F3B53C700BED406 /* liblibtg2.a in Frameworks */,
 				AF3B3C432F3B558C00BED406 /* libstdc++.dylib in Frameworks */,
+				AFC628722F3CB43400A647AA /* libcrypto.a in Frameworks */,
+				AFC628752F3CB4A000A647AA /* libz.dylib in Frameworks */,
+				AFC628862F3CB94300A647AA /* libsqlite3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,9 +495,12 @@
 				AF3B3C2C2F3B516F00BED406 /* api_id.h */,
 				AF212B182F3A9A9F00819E2F /* API */,
 				AF212A4B2F3A988600819E2F /* Sources */,
+				AFC628892F3CBB6200A647AA /* Resources */,
 				AF212A532F3A98DB00819E2F /* Products */,
 				AF3B3C422F3B558C00BED406 /* libstdc++.dylib */,
 				AF3B3C4D2F3B568C00BED406 /* libz.dylib */,
+				AFC628712F3CB43400A647AA /* libcrypto.a */,
+				AFC628852F3CB94300A647AA /* libsqlite3.dylib */,
 			);
 			sourceTree = "<group>";
 		};
@@ -339,9 +511,9 @@
 				AF212B052F3A9A4A00819E2F /* tl_generator */,
 				AF3B3B5F2F3B4C8F00BED406 /* tl */,
 				AF3B3C1E2F3B4F5C00BED406 /* sqlite3 */,
+				AFC627D82F3CB38900A647AA /* crypto */,
 				AF3B3B852F3B4D8200BED406 /* tg */,
 				AF3B3C272F3B4FD100BED406 /* tg_test */,
-				AF3B3C472F3B55E800BED406 /* aes_ige.c */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -362,7 +534,6 @@
 				AF212A612F3A98E700819E2F /* serialize.h */,
 				AF212A622F3A98E700819E2F /* str.h */,
 				AF212A632F3A98E700819E2F /* strtok_foreach.h */,
-				AF212A642F3A98E700819E2F /* openssl */,
 				AF212AB22F3A98E700819E2F /* gunzip.c */,
 				AF212AB32F3A98E700819E2F /* buf.c */,
 			);
@@ -534,7 +705,6 @@
 		AF3B3C1E2F3B4F5C00BED406 /* sqlite3 */ = {
 			isa = PBXGroup;
 			children = (
-				AF3B3C1F2F3B4F5C00BED406 /* sqlite3.c */,
 				AF3B3C212F3B4F5C00BED406 /* sqlite3.h */,
 			);
 			path = sqlite3;
@@ -546,6 +716,107 @@
 				AF3B3C282F3B4FF600BED406 /* test.c */,
 			);
 			name = tg_test;
+			sourceTree = "<group>";
+		};
+		AFC627D82F3CB38900A647AA /* crypto */ = {
+			isa = PBXGroup;
+			children = (
+				AFC627D92F3CB3C300A647AA /* openssl */,
+				AF3B3C472F3B55E800BED406 /* aes_ige.c */,
+			);
+			name = crypto;
+			sourceTree = "<group>";
+		};
+		AFC627D92F3CB3C300A647AA /* openssl */ = {
+			isa = PBXGroup;
+			children = (
+				AFC627DA2F3CB3C300A647AA /* aes.h */,
+				AFC627DB2F3CB3C300A647AA /* asn1.h */,
+				AFC627DC2F3CB3C300A647AA /* asn1_mac.h */,
+				AFC627DD2F3CB3C300A647AA /* asn1t.h */,
+				AFC627DE2F3CB3C300A647AA /* bio.h */,
+				AFC627DF2F3CB3C300A647AA /* blowfish.h */,
+				AFC627E02F3CB3C300A647AA /* bn.h */,
+				AFC627E12F3CB3C300A647AA /* buffer.h */,
+				AFC627E22F3CB3C300A647AA /* camellia.h */,
+				AFC627E32F3CB3C300A647AA /* cast.h */,
+				AFC627E42F3CB3C300A647AA /* cmac.h */,
+				AFC627E52F3CB3C300A647AA /* cms.h */,
+				AFC627E62F3CB3C300A647AA /* comp.h */,
+				AFC627E72F3CB3C300A647AA /* conf.h */,
+				AFC627E82F3CB3C300A647AA /* conf_api.h */,
+				AFC627E92F3CB3C300A647AA /* crypto.h */,
+				AFC627EA2F3CB3C300A647AA /* des.h */,
+				AFC627EB2F3CB3C300A647AA /* des_old.h */,
+				AFC627EC2F3CB3C300A647AA /* dh.h */,
+				AFC627ED2F3CB3C300A647AA /* dsa.h */,
+				AFC627EE2F3CB3C300A647AA /* dso.h */,
+				AFC627EF2F3CB3C300A647AA /* dtls1.h */,
+				AFC627F02F3CB3C300A647AA /* e_os2.h */,
+				AFC627F12F3CB3C300A647AA /* ebcdic.h */,
+				AFC627F22F3CB3C300A647AA /* ec.h */,
+				AFC627F32F3CB3C300A647AA /* ecdh.h */,
+				AFC627F42F3CB3C300A647AA /* ecdsa.h */,
+				AFC627F52F3CB3C300A647AA /* engine.h */,
+				AFC627F62F3CB3C300A647AA /* err.h */,
+				AFC627F72F3CB3C300A647AA /* evp.h */,
+				AFC627F82F3CB3C300A647AA /* hmac.h */,
+				AFC627F92F3CB3C300A647AA /* idea.h */,
+				AFC627FA2F3CB3C300A647AA /* krb5_asn.h */,
+				AFC627FB2F3CB3C300A647AA /* kssl.h */,
+				AFC627FC2F3CB3C300A647AA /* lhash.h */,
+				AFC627FD2F3CB3C300A647AA /* md4.h */,
+				AFC627FE2F3CB3C300A647AA /* md5.h */,
+				AFC627FF2F3CB3C300A647AA /* mdc2.h */,
+				AFC628002F3CB3C300A647AA /* modes.h */,
+				AFC628012F3CB3C300A647AA /* obj_mac.h */,
+				AFC628022F3CB3C300A647AA /* objects.h */,
+				AFC628032F3CB3C300A647AA /* ocsp.h */,
+				AFC628042F3CB3C300A647AA /* opensslconf.h */,
+				AFC628052F3CB3C300A647AA /* opensslconf.h.orig */,
+				AFC628062F3CB3C300A647AA /* opensslv.h */,
+				AFC628072F3CB3C300A647AA /* ossl_typ.h */,
+				AFC628082F3CB3C300A647AA /* pem.h */,
+				AFC628092F3CB3C300A647AA /* pem2.h */,
+				AFC6280A2F3CB3C300A647AA /* pkcs12.h */,
+				AFC6280B2F3CB3C300A647AA /* pkcs7.h */,
+				AFC6280C2F3CB3C300A647AA /* pqueue.h */,
+				AFC6280D2F3CB3C300A647AA /* rand.h */,
+				AFC6280E2F3CB3C300A647AA /* rc2.h */,
+				AFC6280F2F3CB3C300A647AA /* rc4.h */,
+				AFC628102F3CB3C300A647AA /* ripemd.h */,
+				AFC628112F3CB3C300A647AA /* rsa.h */,
+				AFC628122F3CB3C300A647AA /* safestack.h */,
+				AFC628132F3CB3C300A647AA /* seed.h */,
+				AFC628142F3CB3C300A647AA /* sha.h */,
+				AFC628152F3CB3C300A647AA /* srp.h */,
+				AFC628162F3CB3C300A647AA /* srtp.h */,
+				AFC628172F3CB3C300A647AA /* ssl.h */,
+				AFC628182F3CB3C300A647AA /* ssl2.h */,
+				AFC628192F3CB3C300A647AA /* ssl23.h */,
+				AFC6281A2F3CB3C300A647AA /* ssl3.h */,
+				AFC6281B2F3CB3C300A647AA /* stack.h */,
+				AFC6281C2F3CB3C300A647AA /* symhacks.h */,
+				AFC6281D2F3CB3C300A647AA /* tls1.h */,
+				AFC6281E2F3CB3C300A647AA /* ts.h */,
+				AFC6281F2F3CB3C300A647AA /* txt_db.h */,
+				AFC628202F3CB3C300A647AA /* ui.h */,
+				AFC628212F3CB3C300A647AA /* ui_compat.h */,
+				AFC628222F3CB3C300A647AA /* whrlpool.h */,
+				AFC628232F3CB3C300A647AA /* x509.h */,
+				AFC628242F3CB3C300A647AA /* x509_vfy.h */,
+				AFC628252F3CB3C300A647AA /* x509v3.h */,
+			);
+			name = openssl;
+			path = darwin/openssl;
+			sourceTree = "<group>";
+		};
+		AFC628892F3CBB6200A647AA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AFC628912F3CBB7800A647AA /* pub.pkcs */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -611,6 +882,81 @@
 				AF3B3C0F2F3B4D8200BED406 /* socket.h in Headers */,
 				AF3B3C112F3B4D8200BED406 /* updates.h in Headers */,
 				AF3B3C232F3B4F5C00BED406 /* sqlite3.h in Headers */,
+				AFC628262F3CB3C300A647AA /* aes.h in Headers */,
+				AFC628272F3CB3C300A647AA /* asn1.h in Headers */,
+				AFC628282F3CB3C300A647AA /* asn1_mac.h in Headers */,
+				AFC628292F3CB3C300A647AA /* asn1t.h in Headers */,
+				AFC6282A2F3CB3C300A647AA /* bio.h in Headers */,
+				AFC6282B2F3CB3C300A647AA /* blowfish.h in Headers */,
+				AFC6282C2F3CB3C300A647AA /* bn.h in Headers */,
+				AFC6282D2F3CB3C300A647AA /* buffer.h in Headers */,
+				AFC6282E2F3CB3C300A647AA /* camellia.h in Headers */,
+				AFC6282F2F3CB3C300A647AA /* cast.h in Headers */,
+				AFC628302F3CB3C300A647AA /* cmac.h in Headers */,
+				AFC628312F3CB3C300A647AA /* cms.h in Headers */,
+				AFC628322F3CB3C300A647AA /* comp.h in Headers */,
+				AFC628332F3CB3C300A647AA /* conf.h in Headers */,
+				AFC628342F3CB3C300A647AA /* conf_api.h in Headers */,
+				AFC628352F3CB3C300A647AA /* crypto.h in Headers */,
+				AFC628362F3CB3C300A647AA /* des.h in Headers */,
+				AFC628372F3CB3C300A647AA /* des_old.h in Headers */,
+				AFC628382F3CB3C300A647AA /* dh.h in Headers */,
+				AFC628392F3CB3C300A647AA /* dsa.h in Headers */,
+				AFC6283A2F3CB3C300A647AA /* dso.h in Headers */,
+				AFC6283B2F3CB3C300A647AA /* dtls1.h in Headers */,
+				AFC6283C2F3CB3C300A647AA /* e_os2.h in Headers */,
+				AFC6283D2F3CB3C300A647AA /* ebcdic.h in Headers */,
+				AFC6283E2F3CB3C300A647AA /* ec.h in Headers */,
+				AFC6283F2F3CB3C300A647AA /* ecdh.h in Headers */,
+				AFC628402F3CB3C300A647AA /* ecdsa.h in Headers */,
+				AFC628412F3CB3C300A647AA /* engine.h in Headers */,
+				AFC628422F3CB3C300A647AA /* err.h in Headers */,
+				AFC628432F3CB3C300A647AA /* evp.h in Headers */,
+				AFC628442F3CB3C300A647AA /* hmac.h in Headers */,
+				AFC628452F3CB3C300A647AA /* idea.h in Headers */,
+				AFC628462F3CB3C300A647AA /* krb5_asn.h in Headers */,
+				AFC628472F3CB3C300A647AA /* kssl.h in Headers */,
+				AFC628482F3CB3C300A647AA /* lhash.h in Headers */,
+				AFC628492F3CB3C300A647AA /* md4.h in Headers */,
+				AFC6284A2F3CB3C300A647AA /* md5.h in Headers */,
+				AFC6284B2F3CB3C300A647AA /* mdc2.h in Headers */,
+				AFC6284C2F3CB3C300A647AA /* modes.h in Headers */,
+				AFC6284D2F3CB3C300A647AA /* obj_mac.h in Headers */,
+				AFC6284E2F3CB3C300A647AA /* objects.h in Headers */,
+				AFC6284F2F3CB3C300A647AA /* ocsp.h in Headers */,
+				AFC628502F3CB3C300A647AA /* opensslconf.h in Headers */,
+				AFC628512F3CB3C300A647AA /* opensslv.h in Headers */,
+				AFC628522F3CB3C300A647AA /* ossl_typ.h in Headers */,
+				AFC628532F3CB3C300A647AA /* pem.h in Headers */,
+				AFC628542F3CB3C300A647AA /* pem2.h in Headers */,
+				AFC628552F3CB3C300A647AA /* pkcs12.h in Headers */,
+				AFC628562F3CB3C300A647AA /* pkcs7.h in Headers */,
+				AFC628572F3CB3C300A647AA /* pqueue.h in Headers */,
+				AFC628582F3CB3C300A647AA /* rand.h in Headers */,
+				AFC628592F3CB3C300A647AA /* rc2.h in Headers */,
+				AFC6285A2F3CB3C300A647AA /* rc4.h in Headers */,
+				AFC6285B2F3CB3C300A647AA /* ripemd.h in Headers */,
+				AFC6285C2F3CB3C300A647AA /* rsa.h in Headers */,
+				AFC6285D2F3CB3C300A647AA /* safestack.h in Headers */,
+				AFC6285E2F3CB3C300A647AA /* seed.h in Headers */,
+				AFC6285F2F3CB3C300A647AA /* sha.h in Headers */,
+				AFC628602F3CB3C300A647AA /* srp.h in Headers */,
+				AFC628612F3CB3C300A647AA /* srtp.h in Headers */,
+				AFC628622F3CB3C300A647AA /* ssl.h in Headers */,
+				AFC628632F3CB3C300A647AA /* ssl2.h in Headers */,
+				AFC628642F3CB3C300A647AA /* ssl23.h in Headers */,
+				AFC628652F3CB3C300A647AA /* ssl3.h in Headers */,
+				AFC628662F3CB3C300A647AA /* stack.h in Headers */,
+				AFC628672F3CB3C300A647AA /* symhacks.h in Headers */,
+				AFC628682F3CB3C300A647AA /* tls1.h in Headers */,
+				AFC628692F3CB3C300A647AA /* ts.h in Headers */,
+				AFC6286A2F3CB3C300A647AA /* txt_db.h in Headers */,
+				AFC6286B2F3CB3C300A647AA /* ui.h in Headers */,
+				AFC6286C2F3CB3C300A647AA /* ui_compat.h in Headers */,
+				AFC6286D2F3CB3C300A647AA /* whrlpool.h in Headers */,
+				AFC6286E2F3CB3C300A647AA /* x509.h in Headers */,
+				AFC6286F2F3CB3C300A647AA /* x509_vfy.h in Headers */,
+				AFC628702F3CB3C300A647AA /* x509v3.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -649,6 +995,7 @@
 			buildPhases = (
 				AF212AC32F3A991D00819E2F /* Sources */,
 				AF212AC42F3A991D00819E2F /* Frameworks */,
+				AFC628982F3CBC1500A647AA /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -738,6 +1085,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AFC628742F3CB48500A647AA /* strndup.c in Sources */,
 				AF3B3B732F3B4C8F00BED406 /* deserialize_table.c in Sources */,
 				AF3B3B752F3B4C8F00BED406 /* free.c in Sources */,
 				AF3B3B782F3B4C8F00BED406 /* libtl.c in Sources */,
@@ -777,7 +1125,6 @@
 				AF3B3C0B2F3B4D8200BED406 /* http.c in Sources */,
 				AF3B3C0E2F3B4D8200BED406 /* socket.c in Sources */,
 				AF3B3C102F3B4D8200BED406 /* updates.c in Sources */,
-				AF3B3C222F3B4F5C00BED406 /* sqlite3.c in Sources */,
 				AF3B3C482F3B55E800BED406 /* aes_ige.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -894,8 +1241,10 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"/usr/lib/gcc/i686-apple-darwin9/4.0.1\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/darwin\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = libtg2_test;
 				ZERO_LINK = YES;
@@ -913,8 +1262,10 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"/usr/lib/gcc/i686-apple-darwin9/4.0.1\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/darwin\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = libtg2_test;
 				ZERO_LINK = NO;

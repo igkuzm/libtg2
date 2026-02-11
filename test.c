@@ -146,6 +146,9 @@ int main(int argc, char *argv[])
 			key[0]?key:NULL, NULL, callback);
 	if (!tg)
 		return 1;
+	
+	getchar();
+	return 0;
 
 	//tg_new_auth_key_mtx(tg);
 	tg_new_auth_key1(tg);
