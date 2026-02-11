@@ -1,6 +1,5 @@
 #include "tl_parser.h"
 #include "array.h"
-#include <err.h>
 #include <stdio.h>
 #include <string.h>
 
