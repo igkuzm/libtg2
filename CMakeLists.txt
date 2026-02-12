@@ -9,9 +9,11 @@ project(${TARGET} VERSION 2.0
 	LANGUAGES C CXX
 )
 
-add_subdirectory(mtx)
+add_subdirectory(tl_generator)
 add_subdirectory(tl)
 add_subdirectory(tg)
+
+add_dependencies(tl tl_generator)
 
 if (MAKE_TEST)
 	add_executable(tgtest test.c)

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
+project(tl_generator)
 set(TARGET generator)
 
 # build generator binary in tl_generator directory
