@@ -13,11 +13,9 @@ sqlite3 * tg_sqlite3_open(tg_t *tg)
 	ON_LOG(tg, "%s", __func__);
 	assert(tg->database_path);
 
-	int err = sqlite3_open_v2(
+	int err = sqlite3_open(
 			tg->database_path,
-		 	&tg->db, 
-			SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_CREATE, 
-			NULL);
+		 	&tg->db);
 	if (err){
 		ON_ERR(tg, "%s: %s", __func__, (char *)sqlite3_errmsg(tg->db));
 		return NULL;
@@ -33,7 +31,7 @@ int tg_sqlite3_prepare(
 		tg_t *tg, const char *sql, sqlite3_stmt **stmt) 
 {
 	ON_LOG(tg, "%s", __func__);
-	int res = sqlite3_prepare_v2(
+	int res = sqlite3_prepare(
 			tg->db, 
 			sql, 
 			-1, 

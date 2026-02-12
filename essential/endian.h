@@ -15,7 +15,7 @@ extern "C"{
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <byteswap.h>
+#include "byteswap.h"
 
 static bool is_little_endian()
 {

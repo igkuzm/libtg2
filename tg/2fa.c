@@ -51,7 +51,7 @@
 #include "tg.h"
 #include "send_query.h"
 #include <assert.h>
-#include <endian.h>
+#include "../essential/endian.h"
 #include <openssl/bn.h>
 #include <stdint.h>
 #include <stdio.h>

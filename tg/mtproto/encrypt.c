@@ -2,7 +2,7 @@
 #include "../../libtg.h"
 #include "../crypto/hsh.h"
 #include "../crypto/cry.h"
-#include <endian.h>
+#include "../../essential/endian.h"
 #include <stdio.h>
 #include "encrypt.h"
 
