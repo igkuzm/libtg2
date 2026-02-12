@@ -44,17 +44,22 @@ if(APPLE)
 	set(GETTIME mtproto/clock_gettime.c)
 endif()
 
-#if (OPENSSL_VERSION < 1.0)
-#endif()
+if (OPENSSL_VERSION VERSION_LESS 1.0)
+	list(APPEND TARGET_SOURCES ../support/aes_ige.c)
+endif()
+
+if (MTX_SUPPORT)
+	set(MTX mtx)
+endif()
 
 #build both shared and static libs
 add_library(${TARGET} SHARED 
 	${TARGET_SOURCES} ${GETTIME} ${RESOURCE_FILES})
-target_link_libraries(${TARGET} OpenSSL::Crypto tl sqlite3)
+target_link_libraries(${TARGET} OpenSSL::Crypto tl ${MTX})
 
 add_library(${TARGET}_static STATIC 
 	${TARGET_SOURCES} ${GETTIME} ${RESOURCE_FILES})
-target_link_libraries(${TARGET}_static OpenSSL::Crypto tl sqlite3)
+target_link_libraries(${TARGET}_static OpenSSL::Crypto tl ${MTX})
 set_target_properties(${TARGET}_static PROPERTIES 
 	OUTPUT_NAME tg
 	ARCHIVE_OUTPUT_DIRECTORY static) 

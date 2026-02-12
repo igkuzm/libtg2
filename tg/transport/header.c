@@ -9,7 +9,7 @@ buf_t tg_transport_pack(tg_t *tg, buf_t *buf)
   buf_t b = buf_new();
 	
 	// intermediate header
-	b = buf_cat_ui32(b, buf->size);
+	b = buf_cat_ui32(b, htole32(buf->size));
 	b = buf_cat_buf(b, *buf);
 
 	// add size

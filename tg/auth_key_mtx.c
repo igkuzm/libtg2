@@ -6,6 +6,7 @@
 
 int tg_new_auth_key_mtx(tg_t *tg)
 {
+#ifdef MTX_SUPPORT
 	net_t net = api.net.open(tg->dc.ipv4, tg->port);
   api.srl.init();
 	ON_LOG(tg, "%s: >> auth", __func__);
@@ -39,4 +40,8 @@ int tg_new_auth_key_mtx(tg_t *tg)
 
 	ON_ERR(tg, "%s: can't get new auth key", __func__);
 	return -1;
+#else 
+	ON_ERR(tg, "%s: libtg2 compiled without mtx support", __func__);
+	return -1;
+#endif
 }

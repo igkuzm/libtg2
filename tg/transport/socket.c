@@ -76,14 +76,23 @@ static size_t tg_socket_receive(
 	ON_LOG(tg, "%s", __func__);
 	
 	// get length of the package
-	uint32_t len;
-	int s = recv(sockfd, &len, 4, 0);
+	int32_t len;
+	char buf[4];
+	int s = recv(sockfd, buf, 4, 0);
 	if (s<0){
 		ON_ERR(tg, "%s: %d: socket error: %d", 
 				__func__, __LINE__, s);
 		return 0;
 	}
+	printf("BUF: ");
+	int i;
+	for (i = 0; i < 4; i++) {
+			printf("%X ", buf[i]);
+	}
+	printf("\n");
+	printf("LEN: %d\n", len);
 	len = le32toh(len);
+	printf("LEN: %d\n", len);
 
 	ON_LOG(tg, "%s: prepare to receive len: %d", __func__, len);
 	if (len < 0) {

@@ -16,6 +16,12 @@ add_subdirectory(tg)
 add_dependencies(generator essential)
 add_dependencies(tl generator)
 
+if (MTX_SUPPORT)
+	add_subdirectory(mtx)	
+	string(APPEND CFLAGS " -DMTX_SUPPORT")
+	string(APPEND CXXFLAGS " -DMTX_SUPPORT")
+endif()
+
 if (MAKE_TEST)
 	add_executable(tgtest test.c)
 	target_link_libraries(tgtest tg)

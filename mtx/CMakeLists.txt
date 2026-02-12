@@ -42,11 +42,15 @@ if(APPLE)
 	set(GETTIME darwin-posix-rt/clock_gettime.c)
 endif()
 
-list(APPEND CMAKE_C_FLAGS "-fPIC")
-list(APPEND CMAKE_CXX_FLAGS "-fPIC")
+if (OPENSSL_VERSION VERSION_LESS 1.0)
+	list(APPEND TARGET_SOURCES ../support/aes_ige.c)
+endif()
+
+string(APPEND CMAKE_C_FLAGS " -fPIC")
+string(APPEND CMAKE_CXX_FLAGS " -fPIC")
 
 if (IOS OR ANDROID)
-	list(APPEND CMAKE_CXX_FLAGS "-stdlib=libc++")
+	string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
 endif()
 
 add_library(${TARGET} 

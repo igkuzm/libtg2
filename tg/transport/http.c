@@ -172,96 +172,96 @@ buf_t tg_http_send_query(
 		void *ptr, 
 		tg_progress_fun *progress)
 {
-	buf_t buf = buf_new();
-	
-	CURL *curl = curl_easy_init();
-	if (!curl){
-		ON_ERR(tg, "%s: can't init curl", __func__);
-		return buf;
-	}
-	
-	//debug
-	/*curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);*/
-		
-	char url[BUFSIZ];
-	/*snprintf(url, BUFSIZ-1, URI, */
-			/*DCs[dc].name, maximum_limit?"-1":"", port, test?"_test":"");*/
-	snprintf(url, BUFSIZ-1, URI_IP, 
-			DCs[dc].ipv4, port, test?"_test":"");
-	
-	ON_LOG(tg, "%s: open url: %s", __func__, url);
-	
-	struct curl_slist *header = NULL;
-	
-	curl_easy_setopt(curl, CURLOPT_URL, url);
-	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");		
-
-	curl_easy_setopt(curl, CURLOPT_HEADER, 0);
-	curl_easy_setopt(curl, CURLOPT_POST, 1L);		
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, query->data);
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, query->size);
-
-	/* enable TCP keep-alive for this transfer */
-#if LIBCURL_VERSION_NUM < 0x072050
-	header = curl_slist_append(header, "Keep-alive");
-#else
-  curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
-#endif
-	
-	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-
-	/*curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);*/
-	/*curl_easy_setopt(curl, CURLOPT_READDATA, query);*/
-	/*curl_easy_setopt(curl, CURLOPT_READFUNCTION, tg_http_readfunc);*/
-	/*curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, query->size);*/
-		
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buf);		
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tg_http_writefunc);
-
-  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, VERIFY_SSL);		
-
-	if (progress) {
-#if LIBCURL_VERSION_NUM < 0x072000
-		curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, ptr);
-		curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, 
-				progress);
-#else
-		curl_easy_setopt(curl, CURLOPT_XFERINFODATA, ptr);
-		curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, 
-				progress);
-#endif
-		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
-	}
-		
-	CURLcode err = curl_easy_perform(curl);
-	//curl_easy_cleanup(curl);
-	//if (err){
-		//ON_ERR(tg, "%s: %s", __func__, curl_easy_strerror(err));
-		//return buf;
-	//}
-
-	/* now extract transfer info */
-	curl_off_t usize, dsize;
-	
-#if LIBCURL_VERSION_NUM < 0x072000
-	curl_easy_getinfo(curl, 
-					  CURLINFO_CONTENT_LENGTH_UPLOAD, &usize);
-	curl_easy_getinfo(curl, 
-					  CURLINFO_CONTENT_LENGTH_DOWNLOAD, &dsize);
-#else
-	curl_easy_getinfo(curl, 
-			CURLINFO_CONTENT_LENGTH_UPLOAD_T, &usize);
-	
-	curl_easy_getinfo(curl, 
-			CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &dsize);
-#endif
-	
-	ON_LOG(tg, "%s: uploaded: %ld", __func__, usize);
-	ON_LOG(tg, "%s: downloaded: %ld", __func__, dsize);
-	
-	/* always cleanup */
-	curl_easy_cleanup(curl);
-	curl_slist_free_all(header);
-	
-	return buf;
+//	buf_t buf = buf_new();
+//	
+//	CURL *curl = curl_easy_init();
+//	if (!curl){
+//		ON_ERR(tg, "%s: can't init curl", __func__);
+//		return buf;
+//	}
+//	
+//	//debug
+//	/*curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);*/
+//		
+//	char url[BUFSIZ];
+//	/*snprintf(url, BUFSIZ-1, URI, */
+//			/*DCs[dc].name, maximum_limit?"-1":"", port, test?"_test":"");*/
+//	snprintf(url, BUFSIZ-1, URI_IP, 
+//			DCs[dc].ipv4, port, test?"_test":"");
+//	
+//	ON_LOG(tg, "%s: open url: %s", __func__, url);
+//	
+//	struct curl_slist *header = NULL;
+//	
+//	curl_easy_setopt(curl, CURLOPT_URL, url);
+//	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");		
+//
+//	curl_easy_setopt(curl, CURLOPT_HEADER, 0);
+//	curl_easy_setopt(curl, CURLOPT_POST, 1L);		
+//	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, query->data);
+//	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, query->size);
+//
+//	/* enable TCP keep-alive for this transfer */
+//#if LIBCURL_VERSION_NUM < 0x072050
+//	header = curl_slist_append(header, "Keep-alive");
+//#else
+//  curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+//#endif
+//	
+//	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+//
+//	/*curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);*/
+//	/*curl_easy_setopt(curl, CURLOPT_READDATA, query);*/
+//	/*curl_easy_setopt(curl, CURLOPT_READFUNCTION, tg_http_readfunc);*/
+//	/*curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, query->size);*/
+//		
+//	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buf);		
+//	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, tg_http_writefunc);
+//
+//  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, VERIFY_SSL);		
+//
+//	if (progress) {
+//#if LIBCURL_VERSION_NUM < 0x072000
+//		curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, ptr);
+//		curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, 
+//				progress);
+//#else
+//		curl_easy_setopt(curl, CURLOPT_XFERINFODATA, ptr);
+//		curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, 
+//				progress);
+//#endif
+//		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
+//	}
+//		
+//	CURLcode err = curl_easy_perform(curl);
+//	//curl_easy_cleanup(curl);
+//	//if (err){
+//		//ON_ERR(tg, "%s: %s", __func__, curl_easy_strerror(err));
+//		//return buf;
+//	//}
+//
+//	/* now extract transfer info */
+//	curl_off_t usize, dsize;
+//	
+//#if LIBCURL_VERSION_NUM < 0x072000
+//	curl_easy_getinfo(curl, 
+//					  CURLINFO_CONTENT_LENGTH_UPLOAD, &usize);
+//	curl_easy_getinfo(curl, 
+//					  CURLINFO_CONTENT_LENGTH_DOWNLOAD, &dsize);
+//#else
+//	curl_easy_getinfo(curl, 
+//			CURLINFO_CONTENT_LENGTH_UPLOAD_T, &usize);
+//	
+//	curl_easy_getinfo(curl, 
+//			CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &dsize);
+//#endif
+//	
+//	ON_LOG(tg, "%s: uploaded: %ld", __func__, usize);
+//	ON_LOG(tg, "%s: downloaded: %ld", __func__, dsize);
+//	
+//	/* always cleanup */
+//	curl_easy_cleanup(curl);
+//	curl_slist_free_all(header);
+//	
+//	return buf;
 }	
