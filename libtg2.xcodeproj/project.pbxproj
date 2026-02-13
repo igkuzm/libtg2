@@ -449,6 +449,8 @@
 		AFCCDEDD2F3EA641003745C0 /* sqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sqlite3.h; path = essential/sqlite3.h; sourceTree = "<group>"; };
 		AFCCDEF02F3EB57E003745C0 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = log.h; path = essential/log.h; sourceTree = "<group>"; };
 		AFCCDEF22F3EB585003745C0 /* array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = array.h; path = essential/array.h; sourceTree = "<group>"; };
+		AFCCDF092F3ECE4E003745C0 /* api_id.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = api_id.h; sourceTree = "<group>"; };
+		AFCCDF0A2F3ECE57003745C0 /* libtg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libtg.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -494,6 +496,7 @@
 			children = (
 				AF3B3C2C2F3B516F00BED406 /* api_id.h */,
 				AF212B182F3A9A9F00819E2F /* API */,
+				AFCCDF062F3ECE08003745C0 /* Headers */,
 				AF212A4B2F3A988600819E2F /* Sources */,
 				AFC628892F3CBB6200A647AA /* Resources */,
 				AF212A532F3A98DB00819E2F /* Products */,
@@ -506,7 +509,6 @@
 		AF212A4B2F3A988600819E2F /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				AFCCDE3E2F3E9E72003745C0 /* openssl */,
 				AF212A4C2F3A989400819E2F /* essential */,
 				AF212B052F3A9A4A00819E2F /* tl_generator */,
 				AF3B3B5F2F3B4C8F00BED406 /* tl */,
@@ -800,6 +802,16 @@
 			);
 			name = openssl;
 			path = darwin/openssl;
+			sourceTree = "<group>";
+		};
+		AFCCDF062F3ECE08003745C0 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				AFCCDF092F3ECE4E003745C0 /* api_id.h */,
+				AFCCDF0A2F3ECE57003745C0 /* libtg.h */,
+				AFCCDE3E2F3E9E72003745C0 /* openssl */,
+			);
+			name = Headers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
