@@ -363,7 +363,6 @@
 		AF3B3BCD2F3B4D8200BED406 /* updates.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = updates.c; sourceTree = "<group>"; };
 		AF3B3BCE2F3B4D8200BED406 /* updates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updates.h; sourceTree = "<group>"; };
 		AF3B3C282F3B4FF600BED406 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
-		AF3B3C2C2F3B516F00BED406 /* api_id.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = api_id.h; sourceTree = "<group>"; };
 		AF3B3C422F3B558C00BED406 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "/usr/lib/gcc/i686-apple-darwin9/4.0.1/libstdc++.dylib"; sourceTree = "<absolute>"; };
 		AF3B3C4D2F3B568C00BED406 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
 		AFC628712F3CB43400A647AA /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = darwin/libcrypto.a; sourceTree = "<group>"; };
@@ -494,7 +493,6 @@
 		AF212A3B2F3A984B00819E2F = {
 			isa = PBXGroup;
 			children = (
-				AF3B3C2C2F3B516F00BED406 /* api_id.h */,
 				AF212B182F3A9A9F00819E2F /* API */,
 				AFCCDF062F3ECE08003745C0 /* Headers */,
 				AF212A4B2F3A988600819E2F /* Sources */,
