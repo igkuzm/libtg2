@@ -2,7 +2,7 @@
  * File              : hsh.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 20.10.2025
+ * Last Modified Date: 13.02.2026
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "sha1.h"
@@ -12,12 +12,18 @@
 
 buf_t tg_hsh_sha1(buf_t b)
 {
-  buf_t h = buf_new();
-	SHA1(b.data, b.size, h.data);
-	/* sha1(b.data, b.size, h.data); */
-  h.size = 20;
+  buf_t h1 = buf_new();
+  buf_t h2 = buf_new();
+	SHA1(b.data, b.size, h1.data);
+	sha1(b.data, b.size, h2.data); 
+  h1.size = 20;
+  h2.size = 20;
 
-  return h;
+	printf("SHA1:\n");
+	buf_dump(h1);
+	buf_dump(h2);
+
+  return h1;
 }
 
 buf_t tg_hsh_sha256(buf_t b)

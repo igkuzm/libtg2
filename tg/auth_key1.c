@@ -18,8 +18,10 @@
 int tg_new_auth_key1(tg_t *tg)
 {
 	// open connection
+	/*tg->socket = */
+		/*tg_socket_open(tg, tg->dc.ipv4, tg->port);	*/
 	tg->socket = 
-		tg_socket_open(tg, tg->dc.ipv4, tg->port);	
+		tg_socket_open(tg, "149.154.167.50", tg->port);	
 	if (tg->socket < 0)
 		return 1;
 
@@ -60,9 +62,6 @@ int tg_new_auth_key1(tg_t *tg)
 	}
 	tl_resPQ_t *resPQ = (tl_resPQ_t *)tl;
 	
-	return 1;
-
-
 /* Here, string pq is a representation of a natural number 
  * (in binary big endian format). This number is the product 
  * of two different odd prime numbers. Normally,
@@ -156,57 +155,74 @@ int tg_new_auth_key1(tg_t *tg)
  * requisite power over the requisite modulus,
  * and the result is stored as a 256-byte number. */
 		
-	buf_t p_q_inner_data = tl_p_q_inner_data_dc(
+	//buf_t p_q_inner_data = tl_p_q_inner_data_dc(
+			//&resPQ->pq_, 
+			//&p, 
+			//&q, 
+			//resPQ->nonce_, 
+			//resPQ->server_nonce_, 
+			//new_nonce, 
+			//tg->dc.number);
+	
+	buf_t p_q_inner_data = tl_p_q_inner_data(
 			&resPQ->pq_, 
 			&p, 
 			&q, 
 			resPQ->nonce_, 
 			resPQ->server_nonce_, 
-			new_nonce, 
-			tg->dc.number);
+			new_nonce);
 
- // p_q_inner_data#83c95aec pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data
-	//buf_t p_q_inner_data;
-  //p_q_inner_data = buf_new_ui32(0x83c95aec);
-	// pq:string
-	//p_q_inner_data = 
-	//	buf_cat_buf(p_q_inner_data, serialize_str(resPQ->pq_));
-	// p:string
-	//p_q_inner_data = 
-	//	buf_cat_buf(p_q_inner_data, serialize_str(p));
-  // q:string
-	//p_q_inner_data = 
-	//	buf_cat_buf(p_q_inner_data, serialize_str(q));
-	// nonce:int128
-	//p_q_inner_data = 
-	//	buf_cat_buf(p_q_inner_data, resPQ->nonce_);
-	// server_nonce:int128
-	//p_q_inner_data = 
-	//	buf_cat_buf(p_q_inner_data, resPQ->server_nonce_);
-	// new_nonce:int256
-	//p_q_inner_data = 
-	//	buf_cat_buf(p_q_inner_data, new_nonce);
+
+	/* p_q_inner_data#83c95aec pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data */
+	/*buf_t p_q_inner_data;*/
+	/*p_q_inner_data = buf_new_ui32(0x83c95aec);*/
+	/*// pq:string*/
+	/*p_q_inner_data = */
+		/*buf_cat_buf(p_q_inner_data, serialize_str(resPQ->pq_));*/
+	/*// p:string*/
+	/*p_q_inner_data = */
+		/*buf_cat_buf(p_q_inner_data, serialize_str(p));*/
+	/*// q:string*/
+	/*p_q_inner_data = */
+		/*buf_cat_buf(p_q_inner_data, serialize_str(q));*/
+	/*// nonce:int128*/
+	/*p_q_inner_data = */
+		/*buf_cat_buf(p_q_inner_data, resPQ->nonce_);*/
+	/*// server_nonce:int128*/
+	/*p_q_inner_data = */
+		/*buf_cat_buf(p_q_inner_data, resPQ->server_nonce_);*/
+	/*// new_nonce:int256*/
+	/*p_q_inner_data = */
+		/*buf_cat_buf(p_q_inner_data, new_nonce);*/
 		
 	ON_LOG_BUF(tg, p_q_inner_data,"%s: p_q_inner_data: ", __func__);
 
- // data_with_hash := SHA1(data) + data + (any random bytes); such that the length equals 255 bytes;
-	buf_t data_with_hash = buf_new();
-	// SHA1(data)
- 	data_with_hash = 
-		buf_cat_buf(data_with_hash, tg_hsh_sha1(p_q_inner_data));
-	ON_LOG_BUF(tg, data_with_hash,"%s: SHA1(data): ", __func__);
-	// data
- 	data_with_hash = 
-		buf_cat_buf(data_with_hash,	p_q_inner_data);
-	// (any random bytes); such that the length equals 255 bytes
-	data_with_hash = buf_cat_data(data_with_hash, 
-			buf_new_rand(256).data, 255 - data_with_hash.size);
+  buf_t h = tg_hsh_sha1(p_q_inner_data);
+  buf_t dwh = buf_new();
+	dwh = buf_cat_buf(dwh, h);
+	dwh = buf_cat_buf(dwh, p_q_inner_data);
+  buf_t pad = buf_new();
+  pad.size = 255 - dwh.size;
+  dwh = buf_cat_buf(dwh, pad);
+  buf_t encrypted_data = tg_cry_rsa_e(tg->pubkey, dwh);
+ /*// data_with_hash := SHA1(data) + data + (any random bytes); such that the length equals 255 bytes;*/
+	/*buf_t data_with_hash = buf_new();*/
+	/*// SHA1(data)*/
+   /*data_with_hash = */
+		/*buf_cat_buf(data_with_hash, tg_hsh_sha1(p_q_inner_data));*/
+	/*ON_LOG_BUF(tg, data_with_hash,"%s: SHA1(data): ", __func__);*/
+	/*// data*/
+   /*data_with_hash = */
+		/*buf_cat_buf(data_with_hash,	p_q_inner_data);*/
+	/*// (any random bytes); such that the length equals 255 bytes*/
+	/*data_with_hash = buf_cat_data(data_with_hash, */
+			/*buf_new_rand(256).data, 255 - data_with_hash.size);*/
 	
-	ON_LOG_BUF(tg, data_with_hash,"%s: data_with_hash: ", __func__);
+	/*ON_LOG_BUF(tg, data_with_hash,"%s: data_with_hash: ", __func__);*/
 
- // encrypted_data := RSA (data_with_hash, server_public_key); 
-	buf_t encrypted_data = 
-		tg_cry_rsa_e(tg->pubkey, data_with_hash);
+ /*// encrypted_data := RSA (data_with_hash, server_public_key); */
+	/*buf_t encrypted_data = */
+		/*tg_cry_rsa_e(tg->pubkey, data_with_hash);*/
 	
 	ON_LOG_BUF(tg, encrypted_data,"%s: encrypted_data: ", __func__);
 

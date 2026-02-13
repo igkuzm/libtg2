@@ -19,11 +19,14 @@
 #include "socket.h"
 #include "header.h"
 
+#define TIMEOUT_SECONDS 2
+
 int tg_socket_open(tg_t *tg, const char *ip, int port)
 {
   struct sockaddr_in serv_addr;
   struct hostent * server;
 	int sockfd;
+	struct timeval tv;
 
   sockfd = 
 		socket(AF_INET, SOCK_STREAM, 0);
@@ -32,6 +35,15 @@ int tg_socket_open(tg_t *tg, const char *ip, int port)
 		ON_ERR(tg, "%s: can't open socket", __func__);
     return -1;
   }
+	
+	tv.tv_sec  = TIMEOUT_SECONDS;
+	tv.tv_usec = 0;
+
+	setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, 
+			&tv, sizeof(tv));
+	setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, 
+			&tv, sizeof(tv));
+
 
   server = gethostbyname(ip);
  

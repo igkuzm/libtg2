@@ -81,3 +81,7 @@ ping_delay_disconnect#f3427b8c ping_id:long disconnect_delay:int = Pong;
 destroy_session#e7512126 session_id:long = DestroySessionRes;
 
 destroy_auth_key#d1435160 = DestroyAuthKeyRes;
+
+
+// legacy support
+p_q_inner_data#83c95aec pq:bytes p:bytes q:bytes nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data;
