@@ -6,6 +6,20 @@
 	objectVersion = 42;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		AFCD01FF2F3F3D08000BCB26 /* config.h */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = AFCD02072F3F3D2A000BCB26 /* Build configuration list for PBXAggregateTarget "config.h" */;
+			buildPhases = (
+				AFCD01FE2F3F3D08000BCB26 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = config.h;
+			productName = config.h;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		AF212AB42F3A98E700819E2F /* alloc.h in Headers */ = {isa = PBXBuildFile; fileRef = AF212A572F3A98E700819E2F /* alloc.h */; };
 		AF212AB52F3A98E700819E2F /* base64.h in Headers */ = {isa = PBXBuildFile; fileRef = AF212A582F3A98E700819E2F /* base64.h */; };
@@ -197,6 +211,8 @@
 		AFCCDEDE2F3EA641003745C0 /* sqlite3.h in Headers */ = {isa = PBXBuildFile; fileRef = AFCCDEDD2F3EA641003745C0 /* sqlite3.h */; };
 		AFCCDEF12F3EB57E003745C0 /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = AFCCDEF02F3EB57E003745C0 /* log.h */; };
 		AFCCDEF32F3EB585003745C0 /* array.h in Headers */ = {isa = PBXBuildFile; fileRef = AFCCDEF22F3EB585003745C0 /* array.h */; };
+		AFCD01DA2F3F3210000BCB26 /* aes_ige.c in Sources */ = {isa = PBXBuildFile; fileRef = AFCD01D92F3F3210000BCB26 /* aes_ige.c */; };
+		AFCD01F72F3F367F000BCB26 /* libgcc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AFCD01F32F3F3651000BCB26 /* libgcc.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -227,6 +243,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = AF212AE22F3A99E500819E2F;
 			remoteInfo = tl_generator;
+		};
+		AFCD020B2F3F3E0F000BCB26 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF212A3D2F3A984B00819E2F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AFCD01FF2F3F3D08000BCB26 /* config.h */;
+			remoteInfo = config.h;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -450,6 +473,8 @@
 		AFCCDEF22F3EB585003745C0 /* array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = array.h; path = essential/array.h; sourceTree = "<group>"; };
 		AFCCDF092F3ECE4E003745C0 /* api_id.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = api_id.h; sourceTree = "<group>"; };
 		AFCCDF0A2F3ECE57003745C0 /* libtg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libtg.h; sourceTree = "<group>"; };
+		AFCD01D92F3F3210000BCB26 /* aes_ige.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aes_ige.c; path = support/aes_ige.c; sourceTree = SOURCE_ROOT; };
+		AFCD01F32F3F3651000BCB26 /* libgcc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgcc.a; path = darwin/libgcc.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -476,6 +501,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AFCD01F72F3F367F000BCB26 /* libgcc.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -501,6 +527,7 @@
 				AF3B3C422F3B558C00BED406 /* libstdc++.dylib */,
 				AF3B3C4D2F3B568C00BED406 /* libz.dylib */,
 				AFC628712F3CB43400A647AA /* libcrypto.a */,
+				AFCD01F32F3F3651000BCB26 /* libgcc.a */,
 			);
 			sourceTree = "<group>";
 		};
@@ -599,6 +626,7 @@
 		AF3B3B852F3B4D8200BED406 /* tg */ = {
 			isa = PBXGroup;
 			children = (
+				AFCD01D92F3F3210000BCB26 /* aes_ige.c */,
 				AF3B3B862F3B4D8200BED406 /* 2fa.c */,
 				AF3B3B872F3B4D8200BED406 /* answer.c */,
 				AF3B3B882F3B4D8200BED406 /* answer.h */,
@@ -1013,6 +1041,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				AFCD020C2F3F3E0F000BCB26 /* PBXTargetDependency */,
 			);
 			name = essential;
 			productName = essential;
@@ -1051,6 +1080,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				AFCD01FF2F3F3D08000BCB26 /* config.h */,
 				AF212AD42F3A998600819E2F /* essential */,
 				AF212AE22F3A99E500819E2F /* tl_generator */,
 				AF212A512F3A98DB00819E2F /* libtg2 */,
@@ -1071,7 +1101,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "GENERATOR_DIR=\"$BUILD_DIR/$CONFIGURATION\"\nTL_DIR=\"$PROJECT_DIR/tl\"\n\n#Generate TL\n$GENERATOR_DIR/$TARGET_NAME $GENERATOR_DIR $TL_DIR";
+			shellScript = "GENERATOR_DIR=\"$BUILD_DIR/$CONFIGURATION\"\nTL_DIR=\"$PROJECT_DIR/tl\"\n\n#Generate TL\n$GENERATOR_DIR/$TARGET_NAME $GENERATOR_DIR $TL_DIR\nexit 0";
+		};
+		AFCD01FE2F3F3D08000BCB26 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here\nsed -e \"s/#undef PACKAGE_NAME/#define PACKAGE_NAME \\\"$PROJECT_NAME\\\"/g\" config.h.in | \\\nsed -e \"s/#undef PACKAGE_VERSION/#define PACKAGE_VERSION \\\"$CURRENT_PROJECT_VERSION\\\"/g\" \\\n> config.h\nexit 0";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1119,6 +1162,7 @@
 				AF3B3C0B2F3B4D8200BED406 /* http.c in Sources */,
 				AF3B3C0E2F3B4D8200BED406 /* socket.c in Sources */,
 				AF3B3C102F3B4D8200BED406 /* updates.c in Sources */,
+				AFCD01DA2F3F3210000BCB26 /* aes_ige.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1175,6 +1219,11 @@
 			target = AF212AE22F3A99E500819E2F /* tl_generator */;
 			targetProxy = AF3B3B5C2F3B4BCE00BED406 /* PBXContainerItemProxy */;
 		};
+		AFCD020C2F3F3E0F000BCB26 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AFCD01FF2F3F3D08000BCB26 /* config.h */;
+			targetProxy = AFCD020B2F3F3E0F000BCB26 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -1182,6 +1231,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2.0;
+				OTHER_LDFLAGS = "";
 			};
 			name = Debug;
 		};
@@ -1189,6 +1240,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 2.0;
+				OTHER_LDFLAGS = "";
 			};
 			name = Release;
 		};
@@ -1202,6 +1255,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/darwin\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = libtg2;
 				ZERO_LINK = YES;
@@ -1216,6 +1274,11 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/darwin\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = libtg2;
 				ZERO_LINK = NO;
@@ -1276,6 +1339,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/darwin\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = essential;
 				ZERO_LINK = YES;
@@ -1290,6 +1358,11 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/darwin\"";
 				PREBINDING = NO;
 				PRODUCT_NAME = essential;
 				ZERO_LINK = NO;
@@ -1322,6 +1395,27 @@
 				INSTALL_PATH = "$(HOME)/bin";
 				PREBINDING = NO;
 				PRODUCT_NAME = tl_generator;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		AFCD02002F3F3D09000BCB26 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = config.h;
+			};
+			name = Debug;
+		};
+		AFCD02012F3F3D09000BCB26 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = config.h;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1370,6 +1464,15 @@
 			buildConfigurations = (
 				AF212AF72F3A9A2D00819E2F /* Debug */,
 				AF212AF82F3A9A2D00819E2F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AFCD02072F3F3D2A000BCB26 /* Build configuration list for PBXAggregateTarget "config.h" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AFCD02002F3F3D09000BCB26 /* Debug */,
+				AFCD02012F3F3D09000BCB26 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

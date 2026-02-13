@@ -22,8 +22,6 @@ add_dependencies(tl generator)
 
 if (MTX_SUPPORT)
 	add_subdirectory(mtx)	
-	string(APPEND CFLAGS " -DMTX_SUPPORT")
-	string(APPEND CXXFLAGS " -DMTX_SUPPORT")
 endif()
 
 if (MAKE_TEST)

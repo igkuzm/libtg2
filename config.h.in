@@ -64,6 +64,9 @@
 /* Version number of package */
 #undef VERSION
 
+#ifdef CMAKE
 #cmakedefine PACKAGE_NAME "@PACKAGE_NAME@"
 #cmakedefine PACKAGE_VERSION "@PACKAGE_VERSION@"
 #cmakedefine MAKE_TEST
+#cmakedefine MTX_SUPPORT
+#endif
