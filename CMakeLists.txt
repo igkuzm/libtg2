@@ -8,6 +8,10 @@ project(${TARGET} VERSION 2.0
 	LANGUAGES C CXX
 )
 
+set(PACKAGE_NAME ${PROJECT_NAME})
+set(PACKAGE_VERSION ${PROJECT_VERSION})
+configure_file(config.h.in config.h)
+
 add_subdirectory(essential)
 add_subdirectory(tl_generator)
 add_subdirectory(tl)
