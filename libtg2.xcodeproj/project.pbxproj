@@ -1109,12 +1109,14 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/config.h.in",
 			);
 			outputPaths = (
+				"$(SRCROOT)/config.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# shell script goes here\nsed -e \"s/#undef PACKAGE_NAME/#define PACKAGE_NAME \\\"$PROJECT_NAME\\\"/g\" config.h.in | \\\nsed -e \"s/#undef PACKAGE_VERSION/#define PACKAGE_VERSION \\\"$CURRENT_PROJECT_VERSION\\\"/g\" \\\n> config.h\nexit 0";
+			shellScript = "# shell script goes here\nfor (( i = 0; i < $SCRIPT_INPUT_FILE_COUNT; i++ )); do\nINPUT_FILE=SCRIPT_INPUT_FILE_$i\nOUTPUT_FILE=SCRIPT_OUTPUT_FILE_$i\nsed -e \"s/#undef PACKAGE_NAME/#define PACKAGE_NAME \\\"$PROJECT_NAME\\\"/g\" ${!INPUT_FILE} | \\\nsed -e \"s/#undef PACKAGE_VERSION/#define PACKAGE_VERSION \\\"$CURRENT_PROJECT_VERSION\\\"/g\" \\\n> ${!OUTPUT_FILE}\ndone\nexit 0";
 		};
 /* End PBXShellScriptBuildPhase section */
 
