@@ -1,7 +1,17 @@
 #include "tl_parser.h"
-#include "array.h"
+#include "../essential/log.h"
+#include "../essential/array.h"
 #include <stdio.h>
 #include <string.h>
+
+#ifdef _MSC_VER
+#include <windows.h>
+#ifndef chdir
+#define chdir SetCurrentDirectory
+#endif
+#else
+#include <unistd.h>
+#endif
 
 #define API_LAYER "185"
 #define BLEN 1024 

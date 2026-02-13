@@ -2,7 +2,7 @@
  * File              : socket.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 07.10.2025
+ * Last Modified Date: 13.02.2026
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "../../libtg.h"
@@ -77,7 +77,7 @@ static size_t tg_socket_receive(
 	
 	// get length of the package
 	int32_t len;
-	int s = recv(sockfd, len, 4, 0);
+	int s = recv(sockfd, &len, 4, 0);
 	if (s<0){
 		ON_ERR(tg, "%s: %d: socket error: %d", 
 				__func__, __LINE__, s);
