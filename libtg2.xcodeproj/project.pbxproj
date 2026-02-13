@@ -196,6 +196,8 @@
 		AFCCDED52F3E9E72003745C0 /* x509v3.h in Headers */ = {isa = PBXBuildFile; fileRef = AFCCDE8A2F3E9E72003745C0 /* x509v3.h */; };
 		AFCCDEDB2F3E9EDB003745C0 /* libessential.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF212AD52F3A998600819E2F /* libessential.a */; };
 		AFCCDEDE2F3EA641003745C0 /* sqlite3.h in Headers */ = {isa = PBXBuildFile; fileRef = AFCCDEDD2F3EA641003745C0 /* sqlite3.h */; };
+		AFCCDEF12F3EB57E003745C0 /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = AFCCDEF02F3EB57E003745C0 /* log.h */; };
+		AFCCDEF32F3EB585003745C0 /* array.h in Headers */ = {isa = PBXBuildFile; fileRef = AFCCDEF22F3EB585003745C0 /* array.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -273,10 +275,8 @@
 		AF212AC62F3A991D00819E2F /* libtg2_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = libtg2_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF212AD52F3A998600819E2F /* libessential.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libessential.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF212AE32F3A99E500819E2F /* tl_generator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = tl_generator; sourceTree = BUILT_PRODUCTS_DIR; };
-		AF212B072F3A9A4B00819E2F /* array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = array.h; sourceTree = "<group>"; };
 		AF212B092F3A9A4B00819E2F /* generator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = generator.c; sourceTree = "<group>"; };
 		AF212B0B2F3A9A4B00819E2F /* mtproto_api.tl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = mtproto_api.tl; path = tl_generator/mtproto_api.tl; sourceTree = "<group>"; };
-		AF212B0C2F3A9A4B00819E2F /* str.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = str.h; sourceTree = "<group>"; };
 		AF212B0E2F3A9A4B00819E2F /* telegram_api.tl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = telegram_api.tl; path = tl_generator/telegram_api.tl; sourceTree = "<group>"; };
 		AF212B0F2F3A9A4B00819E2F /* tl_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tl_parser.c; sourceTree = "<group>"; };
 		AF212B102F3A9A4B00819E2F /* tl_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tl_parser.h; sourceTree = "<group>"; };
@@ -449,6 +449,8 @@
 		AFCCDE892F3E9E72003745C0 /* x509_vfy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509_vfy.h; sourceTree = "<group>"; };
 		AFCCDE8A2F3E9E72003745C0 /* x509v3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x509v3.h; sourceTree = "<group>"; };
 		AFCCDEDD2F3EA641003745C0 /* sqlite3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sqlite3.h; path = essential/sqlite3.h; sourceTree = "<group>"; };
+		AFCCDEF02F3EB57E003745C0 /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = log.h; path = essential/log.h; sourceTree = "<group>"; };
+		AFCCDEF22F3EB585003745C0 /* array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = array.h; path = essential/array.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -521,6 +523,8 @@
 		AF212A4C2F3A989400819E2F /* essential */ = {
 			isa = PBXGroup;
 			children = (
+				AFCCDEF22F3EB585003745C0 /* array.h */,
+				AFCCDEF02F3EB57E003745C0 /* log.h */,
 				AF212A572F3A98E700819E2F /* alloc.h */,
 				AF212A582F3A98E700819E2F /* base64.h */,
 				AF212A592F3A98E700819E2F /* buf.h */,
@@ -557,9 +561,7 @@
 		AF212B052F3A9A4A00819E2F /* tl_generator */ = {
 			isa = PBXGroup;
 			children = (
-				AF212B072F3A9A4B00819E2F /* array.h */,
 				AF212B092F3A9A4B00819E2F /* generator.c */,
-				AF212B0C2F3A9A4B00819E2F /* str.h */,
 				AF212B0F2F3A9A4B00819E2F /* tl_parser.c */,
 				AF212B102F3A9A4B00819E2F /* tl_parser.h */,
 			);
@@ -949,6 +951,8 @@
 				AFCCDED42F3E9E72003745C0 /* x509_vfy.h in Headers */,
 				AFCCDED52F3E9E72003745C0 /* x509v3.h in Headers */,
 				AFCCDEDE2F3EA641003745C0 /* sqlite3.h in Headers */,
+				AFCCDEF12F3EB57E003745C0 /* log.h in Headers */,
+				AFCCDEF32F3EB585003745C0 /* array.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
