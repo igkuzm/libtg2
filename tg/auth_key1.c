@@ -44,12 +44,10 @@ int tg_new_auth_key1(tg_t *tg)
 	tl_t *tl = NULL;
 	buf_t nonce = buf_new_rand(16);
 	
-	//buf_t req_pq_multi = tl_req_pq_multi(nonce);
-	buf_t req_pq = tl_req_pq_multi(nonce);
-	/*buf_t req_pq = buf_new();*/
-	//req_pq = buf_cat_ui32(req_pq, 0x60469778);
-	//req_pq = buf_cat_buf(req_pq, nonce);
-	ON_LOG_BUF(tg, req_pq, "%s: req_pq_multi:", __func__);
+//	buf_t req_pq = tl_req_pq_multi(nonce);
+//	ON_LOG_BUF(tg, req_pq, "%s: req_pq_multi:", __func__);
+	buf_t req_pq = tl_req_pq(nonce);
+	ON_LOG_BUF(tg, req_pq, "%s: req_pq:", __func__);
 	
 	tl = tg_send_rfc(tg, &req_pq);
 
@@ -57,7 +55,7 @@ int tg_new_auth_key1(tg_t *tg)
  * resPQ#05162463 nonce:int128 server_nonce:int128 pq:string server_public_key_fingerprints:Vector long = ResPQ; */
 	if (tl == NULL || tl->_id != id_resPQ){
 		ON_ERR(tg, "%s: server response %s but should resPQ",
-				__func__, TL_NAME_FROM_ID(tl->_id));
+				__func__, tl?TL_NAME_FROM_ID(tl->_id):"NULL");
 		return 1;
 	}
 	tl_resPQ_t *resPQ = (tl_resPQ_t *)tl;

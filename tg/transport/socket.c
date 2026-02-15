@@ -88,7 +88,7 @@ static size_t tg_socket_receive(
 	ON_LOG(tg, "%s", __func__);
 	
 	// get length of the package
-	int32_t len;
+	uint32_t len;
 	int s = recv(sockfd, &len, 4, 0);
 	if (s<0){
 		ON_ERR(tg, "%s: %d: socket error: %d", 
@@ -99,13 +99,13 @@ static size_t tg_socket_receive(
 	len = le32toh(len);
 	printf("LEN: %d\n", len);
 
-	ON_LOG(tg, "%s: prepare to receive len: %d", __func__, len);
 	if (len < 0) {
 		// this is error - report it
 		ON_ERR(tg, "%s: received wrong length: %d", __func__, len);
 		return 0;
 	}
-
+	
+	ON_LOG(tg, "%s: prepare to receive len: %d", __func__, len);
 	// realloc buf to be enough size
 	if (buf_enlarge_to(answer, len)){
 		// handle error

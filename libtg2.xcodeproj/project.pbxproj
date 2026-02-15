@@ -212,7 +212,6 @@
 		AFCCDEF12F3EB57E003745C0 /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = AFCCDEF02F3EB57E003745C0 /* log.h */; };
 		AFCCDEF32F3EB585003745C0 /* array.h in Headers */ = {isa = PBXBuildFile; fileRef = AFCCDEF22F3EB585003745C0 /* array.h */; };
 		AFCD01DA2F3F3210000BCB26 /* aes_ige.c in Sources */ = {isa = PBXBuildFile; fileRef = AFCD01D92F3F3210000BCB26 /* aes_ige.c */; };
-		AFCD01F72F3F367F000BCB26 /* libgcc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AFCD01F32F3F3651000BCB26 /* libgcc.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -248,7 +247,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = AF212A3D2F3A984B00819E2F /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = AFCD01FF2F3F3D08000BCB26 /* config.h */;
+			remoteGlobalIDString = AFCD01FF2F3F3D08000BCB26;
 			remoteInfo = config.h;
 		};
 /* End PBXContainerItemProxy section */
@@ -474,7 +473,6 @@
 		AFCCDF092F3ECE4E003745C0 /* api_id.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = api_id.h; sourceTree = "<group>"; };
 		AFCCDF0A2F3ECE57003745C0 /* libtg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libtg.h; sourceTree = "<group>"; };
 		AFCD01D92F3F3210000BCB26 /* aes_ige.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = aes_ige.c; path = support/aes_ige.c; sourceTree = SOURCE_ROOT; };
-		AFCD01F32F3F3651000BCB26 /* libgcc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgcc.a; path = darwin/libgcc.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -501,7 +499,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AFCD01F72F3F367F000BCB26 /* libgcc.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -527,7 +524,6 @@
 				AF3B3C422F3B558C00BED406 /* libstdc++.dylib */,
 				AF3B3C4D2F3B568C00BED406 /* libz.dylib */,
 				AFC628712F3CB43400A647AA /* libcrypto.a */,
-				AFCD01F32F3F3651000BCB26 /* libgcc.a */,
 			);
 			sourceTree = "<group>";
 		};
