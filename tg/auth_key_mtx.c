@@ -3,6 +3,7 @@
 #include "tg_log.h"
 #include "../mtx/include/api.h"
 #include "crypto/hsh.h"
+#include "../config.h"
 
 int tg_new_auth_key_mtx(tg_t *tg)
 {

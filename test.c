@@ -147,21 +147,22 @@ int main(int argc, char *argv[])
 	if (!tg)
 		return 1;
 	
-	//if (tg_new_auth_key_mtx(tg))
-		//return 1;
-
-	if (tg_new_auth_key1(tg))
+	if (tg_new_auth_key_mtx(tg))
 		return 1;
+
+	/*if (tg_new_auth_key1(tg))*/
+		/*return 1;*/
 
 	/*if (tg_connect(tg))*/
 		/*return 1;*/
 
-	tg_update(tg);
+	//tg_update(tg);
 
 	/*tg_get_dialogs(tg, 10, 0, */
 			/*NULL, NULL, */
 			/*tg, dialogs_callback);*/
 
+	printf("press any key to exit\n");
 	getchar();
 
 	return 0;

@@ -73,9 +73,9 @@ void rsa(unsigned char * from, size_t from_size, unsigned char * to, size_t to_s
   }
 
 //#ifdef __APPLE__
-  rsax(from, (int)from_size, to, (int)to_size, rsa->n, rsa->e);
+//  rsax(from, (int)from_size, to, (int)to_size, rsa->n, rsa->e);
 //#else
-//  rsax(from, (int)from_size, to, (int)to_size, RSA_get0_n(rsa), RSA_get0_e(rsa));
+  rsax(from, (int)from_size, to, (int)to_size, RSA_get0_n(rsa), RSA_get0_e(rsa));
 //#endif
   RSA_free(rsa);
   fclose(pub);
