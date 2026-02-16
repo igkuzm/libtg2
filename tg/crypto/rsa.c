@@ -201,7 +201,7 @@ buf_t tg_cry_rsa_e(const char *pubkey, buf_t b)
 	r.size = 256;
 
   tg_rsa(pubkey, b.data, b.size,
-		 	r.data, 256);
+		 	r.data, r.size);
 
   return r;
 }

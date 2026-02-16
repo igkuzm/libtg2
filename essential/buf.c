@@ -70,6 +70,13 @@ buf_t buf_new(){
 	return b;
 }
 
+buf_t buf_new_zero_with_size(uint32_t size)
+{
+	buf_t b = buf_new();
+	b.size = size;
+	return b;
+}
+
 int buf_enlarge_to(buf_t *buf, uint32_t size)
 {
 	long offset = (void *)buf->data - buf->aptr;

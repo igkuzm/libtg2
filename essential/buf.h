@@ -2,7 +2,7 @@
  * File              : buf.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 07.10.2025
+ * Last Modified Date: 16.02.2026
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef BUF_H
@@ -19,6 +19,7 @@ typedef	struct buf_ {
 } buf_t;
 
 extern buf_t    buf_new();
+extern buf_t    buf_new_zero_with_size(uint32_t size);
 extern int      buf_enlarge_to(buf_t *buf, uint32_t size);
 extern buf_t    buf_new_data(uint8_t *data, uint32_t size);
 extern buf_t    buf_new_buf(buf_t);

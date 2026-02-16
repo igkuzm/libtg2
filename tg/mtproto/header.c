@@ -189,6 +189,7 @@ static buf_t tg_header_enc(tg_t *tg, buf_t *b,
 	uint32_t pad =  16 + (16 - (b->size % 16)) % 16;
 	s = buf_cat_rand(s, pad);
 
+	ON_LOG_BUF(tg, s, "%s: ", __func__);
 	return s;
 }
 
@@ -212,6 +213,7 @@ static buf_t tg_header_noenc(tg_t *tg, buf_t *b,
 	// message_data
 	s = buf_cat_buf(s, *b);
 
+	ON_LOG_BUF(tg, s, "%s: ", __func__);
 	return s;
 }
 
@@ -219,7 +221,6 @@ buf_t tg_header(tg_t *tg, buf_t *b, bool enc,
 		bool content, uint64_t *msgid)
 {
 	ON_LOG(tg, "%s", __func__);
-	ON_LOG_BUF(tg, *b, "");
   if (enc) 
 		return tg_header_enc(tg, b, content, msgid);
 		
@@ -262,13 +263,13 @@ static buf_t tg_deheader_enc(tg_t *tg, buf_t *b)
 	
 	d = buf_cat_buf(d, *b);
 
+	ON_LOG_BUF(tg, d, "%s: ", __func__);
 	return d;
 }
 
 static buf_t tg_deheader_noenc(tg_t *tg, buf_t *b)
 {
-	//ON_LOG(tg, "%s", __func__);
-	ON_LOG_BUF(tg, *b, "%s:", __func__);
+	ON_LOG(tg, "%s", __func__);
   buf_t d = buf_new();
 
 	if (buf_get_ui32(*b) == htole32(0xfffffe6c)) {
@@ -303,6 +304,7 @@ static buf_t tg_deheader_noenc(tg_t *tg, buf_t *b)
 				__func__, msg_data_len, b->size);
 	}
 	
+	ON_LOG_BUF(tg, d, "%s: ", __func__);
 	return d;
 }
 

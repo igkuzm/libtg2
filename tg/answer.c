@@ -193,6 +193,8 @@ TG_ANSWER tg_parse_answer(tg_t *tg, tl_t *tl, uint64_t msg_id,
 			break;
 
 		case id_resPQ:
+		case id_server_DH_params_ok: 
+		case id_server_DH_params_fail:
 			{
 				// callback RFC messages
 				ON_LOG(tg, "RFC message!");

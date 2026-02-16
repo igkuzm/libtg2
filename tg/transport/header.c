@@ -36,8 +36,7 @@ buf_t tg_transport_pack(tg_t *tg, buf_t *buf)
 
 buf_t tg_transport_unpack(tg_t *tg, buf_t *a)
 {
-	//ON_LOG(tg, "%s", __func__);
-	ON_LOG_BUF(tg, *a, "%s: ", __func__);
+	ON_LOG(tg, "%s", __func__);
 	buf_t b = buf_new();
 	
 	if (!a->size) {
@@ -65,5 +64,6 @@ buf_t tg_transport_unpack(tg_t *tg, buf_t *a)
 		b = buf_new_ui32(-405);
 	}
 
+	ON_LOG_BUF(tg, *a, "%s: ", __func__);
   return b;
 }

@@ -86,3 +86,4 @@ destroy_auth_key#d1435160 = DestroyAuthKeyRes;
 // legacy support
 p_q_inner_data#83c95aec pq:bytes p:bytes q:bytes nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data;
 req_pq#60469778 nonce:int128 = ResPQ;
+server_DH_params_fail#79cb045d nonce:int128 server_nonce:int128 new_nonce_hash:int128 = Server_DH_Params; server_DH_params_ok#d0e8075c nonce:int128

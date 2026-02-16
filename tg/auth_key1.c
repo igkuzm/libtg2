@@ -15,13 +15,27 @@
 
 #define SWAP(a, b) (((a) ^= (b)), ((b) ^= (a)), ((a) ^= (b)))
 
+static buf_t p_q_inner_data_with_hash(tg_t *tg, buf_t p_q_inner_data)
+{
+ /* data_with_hash := SHA1(data) + data + (any random
+	* bytes); such that the length equals 255 bytes */
+	buf_t d = buf_new();
+	buf_t hash = tg_hsh_sha1(p_q_inner_data);
+	d = buf_cat_buf(d, hash);
+	buf_free(hash);
+	d = buf_cat_buf(d, p_q_inner_data);
+	d.size = 255;
+
+	return d;
+}
+
 int tg_new_auth_key1(tg_t *tg)
 {
 	// open connection
-	/*tg->socket = */
-		/*tg_socket_open(tg, tg->dc.ipv4, tg->port);	*/
 	tg->socket = 
-		tg_socket_open(tg, "149.154.167.50", tg->port);	
+		tg_socket_open(tg, tg->dc.ipv4, tg->port);	
+	/*tg->socket = */
+		/*tg_socket_open(tg, "149.154.167.50", tg->port);	*/
 	if (tg->socket < 0)
 		return 1;
 
@@ -44,9 +58,9 @@ int tg_new_auth_key1(tg_t *tg)
 	tl_t *tl = NULL;
 	buf_t nonce = buf_new_rand(16);
 	
-//	buf_t req_pq = tl_req_pq_multi(nonce);
+	buf_t req_pq = tl_req_pq_multi(nonce);
 //	ON_LOG_BUF(tg, req_pq, "%s: req_pq_multi:", __func__);
-	buf_t req_pq = tl_req_pq(nonce);
+	/*buf_t req_pq = tl_req_pq(nonce);*/
 	ON_LOG_BUF(tg, req_pq, "%s: req_pq:", __func__);
 	
 	tl = tg_send_rfc(tg, &req_pq);
@@ -67,8 +81,8 @@ int tg_new_auth_key1(tg_t *tg)
  * The value of server_nonce is selected randomly by the server;
  * following this step, it is known to all. */
 
-	//uint64_t pq_ = be64toh(buf_get_ui64(resPQ.pq_));
-	uint64_t pq_ = buf_get_ui64(buf_swap(resPQ->pq_));
+	uint64_t pq_ = be64toh(buf_get_ui64(resPQ->pq_));
+	//ON_LOG_BUF(tg, resPQ->pq_, "%s: pq: ", __func__);
 	ON_LOG(tg, "%s: pq: %ld", __func__, pq_);
 
 /* server_public_key_fingerprints is a list of public RSA key
@@ -122,10 +136,8 @@ int tg_new_auth_key1(tg_t *tg)
 	}
 	ON_LOG(tg, "%s: p: %d, q: %d", __func__, p_, q_);
 
-	//buf_t p  = buf_add_ui32(htobe32(p_));
-	//buf_t q  = buf_add_ui32(htobe32(q_));
-	buf_t p  = buf_swap(buf_new_ui32(p_));
-	buf_t q  = buf_swap(buf_new_ui32(q_));
+	buf_t p  = buf_new_ui32(htobe32(p_));
+	buf_t q  = buf_new_ui32(htobe32(q_));
 
 /* Presenting proof of work; Server authentication
  *
@@ -153,76 +165,36 @@ int tg_new_auth_key1(tg_t *tg)
  * requisite power over the requisite modulus,
  * and the result is stored as a 256-byte number. */
 		
-	//buf_t p_q_inner_data = tl_p_q_inner_data_dc(
-			//&resPQ->pq_, 
-			//&p, 
-			//&q, 
-			//resPQ->nonce_, 
-			//resPQ->server_nonce_, 
-			//new_nonce, 
-			//tg->dc.number);
-	
-	buf_t p_q_inner_data = tl_p_q_inner_data(
+	buf_t p_q_inner_data = tl_p_q_inner_data_dc(
 			&resPQ->pq_, 
 			&p, 
 			&q, 
 			resPQ->nonce_, 
 			resPQ->server_nonce_, 
-			new_nonce);
-
-
-	/* p_q_inner_data#83c95aec pq:string p:string q:string nonce:int128 server_nonce:int128 new_nonce:int256 = P_Q_inner_data */
-	/*buf_t p_q_inner_data;*/
-	/*p_q_inner_data = buf_new_ui32(0x83c95aec);*/
-	/*// pq:string*/
-	/*p_q_inner_data = */
-		/*buf_cat_buf(p_q_inner_data, serialize_str(resPQ->pq_));*/
-	/*// p:string*/
-	/*p_q_inner_data = */
-		/*buf_cat_buf(p_q_inner_data, serialize_str(p));*/
-	/*// q:string*/
-	/*p_q_inner_data = */
-		/*buf_cat_buf(p_q_inner_data, serialize_str(q));*/
-	/*// nonce:int128*/
-	/*p_q_inner_data = */
-		/*buf_cat_buf(p_q_inner_data, resPQ->nonce_);*/
-	/*// server_nonce:int128*/
-	/*p_q_inner_data = */
-		/*buf_cat_buf(p_q_inner_data, resPQ->server_nonce_);*/
-	/*// new_nonce:int256*/
-	/*p_q_inner_data = */
-		/*buf_cat_buf(p_q_inner_data, new_nonce);*/
-		
-	ON_LOG_BUF(tg, p_q_inner_data,"%s: p_q_inner_data: ", __func__);
-
-  buf_t h = tg_hsh_sha1(p_q_inner_data);
-  buf_t dwh = buf_new();
-	dwh = buf_cat_buf(dwh, h);
-	dwh = buf_cat_buf(dwh, p_q_inner_data);
-  buf_t pad = buf_new();
-  pad.size = 255 - dwh.size;
-  dwh = buf_cat_buf(dwh, pad);
-  buf_t encrypted_data = tg_cry_rsa_e(tg->pubkey, dwh);
- /*// data_with_hash := SHA1(data) + data + (any random bytes); such that the length equals 255 bytes;*/
-	/*buf_t data_with_hash = buf_new();*/
-	/*// SHA1(data)*/
-   /*data_with_hash = */
-		/*buf_cat_buf(data_with_hash, tg_hsh_sha1(p_q_inner_data));*/
-	/*ON_LOG_BUF(tg, data_with_hash,"%s: SHA1(data): ", __func__);*/
-	/*// data*/
-   /*data_with_hash = */
-		/*buf_cat_buf(data_with_hash,	p_q_inner_data);*/
-	/*// (any random bytes); such that the length equals 255 bytes*/
-	/*data_with_hash = buf_cat_data(data_with_hash, */
-			/*buf_new_rand(256).data, 255 - data_with_hash.size);*/
+			new_nonce, 
+			tg->dc.number);
 	
-	/*ON_LOG_BUF(tg, data_with_hash,"%s: data_with_hash: ", __func__);*/
+	/*buf_t p_q_inner_data = tl_p_q_inner_data(*/
+			/*&resPQ->pq_, */
+			/*&p, */
+			/*&q, */
+			/*resPQ->nonce_, */
+			/*resPQ->server_nonce_, */
+			/*new_nonce);*/
 
- /*// encrypted_data := RSA (data_with_hash, server_public_key); */
-	/*buf_t encrypted_data = */
-		/*tg_cry_rsa_e(tg->pubkey, data_with_hash);*/
-	
-	ON_LOG_BUF(tg, encrypted_data,"%s: encrypted_data: ", __func__);
+	//ON_LOG_BUF(tg, resPQ->pq_,"%s: pq: ", __func__);
+	//ON_LOG_BUF(tg, p,"%s: p: ", __func__);
+	//ON_LOG_BUF(tg, q,"%s: q: ", __func__);
+	//ON_LOG_BUF(tg, p_q_inner_data,"%s: p_q_inner_data: ", __func__);
+
+	buf_t data_with_hash = p_q_inner_data_with_hash(tg, p_q_inner_data);
+	//ON_LOG_BUF(tg, data_with_hash,"%s: data_with_hash: ", __func__);
+	buf_free(p_q_inner_data);
+
+	buf_t encrypted_data = 
+		tg_cry_rsa_e(tg->pubkey, data_with_hash);
+	//ON_LOG_BUF(tg, encrypted_data,"%s: encrypted_data: ", __func__);
+	buf_free(data_with_hash);
 
 	// req_DH_params#d712e4be nonce:int128 server_nonce:int128 p:string q:string public_key_fingerprint:long encrypted_data:string = Server_DH_Params
 	buf_t req_DH_params = tl_req_DH_params(
@@ -230,31 +202,12 @@ int tg_new_auth_key1(tg_t *tg)
 			resPQ->server_nonce_, 
 			&p, 
 			&q, 
-			tg->fingerprint, 
+			resPQ->server_public_key_fingerprints_[nfpt], 
 			&encrypted_data);
-
-	//buf_t req_DH_params;
-	//req_DH_params = buf_new_ui32(0xd712e4be);
-	// nonce:int128
-	//req_DH_params = 
-	//	buf_cat_buf(req_DH_params, resPQ->nonce_);
-	// server_nonce:int128
-	//req_DH_params = 
-	//	buf_cat_buf(req_DH_params, resPQ->server_nonce_);
-	// p:string
-	//req_DH_params = 
-	//	buf_cat_buf(req_DH_params, serialize_str(p));
-	// q:string
-	//req_DH_params = 
-	//	buf_cat_buf(req_DH_params, serialize_str(q));
-	// public_key_fingerprint:long
-	//req_DH_params = 
-	//	buf_cat_ui64(req_DH_params, tg->fingerprint);
-	// encrypted_data:string
-	//req_DH_params = 
-	//	buf_cat_buf(req_DH_params, serialize_str(encrypted_data));
-	
 	ON_LOG_BUF(tg, req_DH_params,"%s: req_DH_params: ", __func__);
+	buf_free(encrypted_data);
+	buf_free(p);
+	buf_free(q);
 
 /* Someone might intercept the query and replace it with their own,
  * independently decomposing pq into factors instead of the client. 
@@ -285,28 +238,41 @@ int tg_new_auth_key1(tg_t *tg)
 
 	tl = tg_send_rfc(tg, &req_DH_params);
 
-	/*  5. Server responds in one of two ways:
+/* 5. Server responds in one of two ways:
+ * server_DH_params_fail#79cb045d nonce:int128 server_nonce:int128 new_nonce_hash:int128 = Server_DH_Params; 
+ * server_DH_params_ok#d0e8075c nonce:int128 server_nonce:int128 encrypted_answer:string = Server_DH_Params;*/
 
-    server_DH_params_fail#79cb045d nonce:int128 server_nonce:int128 new_nonce_hash:int128 = Server_DH_Params; server_DH_params_ok#d0e8075c nonce:int128
-    server_nonce:int128 encrypted_answer:string = Server_DH_Params;
+	if (tl == NULL || 
+			(tl->_id != id_server_DH_params_ok &&
+			 tl->_id != id_server_DH_params_fail))	
+	{
+		ON_ERR(tg, "%s: server response %s but should server_DH_params_ok "
+				"or server_DH_params_fail",
+				__func__, tl?TL_NAME_FROM_ID(tl->_id):"NULL");
+		return 1;
+	}
+	
+	if (tl->_id == id_server_DH_params_fail)
+	{
+		ON_ERR(tg, "server_DH_params_fail method is not impled yet");
+		return 1;
+	}
 
-Here, encrypted_answer is obtained as follows:
+	tl_server_DH_params_ok_t *server_DH_params = 
+		(tl_server_DH_params_ok_t *)tl;
 
-  • new_nonce_hash := 128 lower-order bits of SHA1 (new_nonce);
-
-  • answer := serialization
-
-      server_DH_inner_data#b5890dba nonce:int128 server_nonce:int128 g:int dh_prime:string g_a:string server_time:int = Server_DH_inner_data;
-
-  • answer_with_hash := SHA1(answer) + answer + (0-15 random bytes); such that the length be divisible by 16;
-
-  • tmp_aes_key := SHA1(new_nonce + server_nonce) + substr (SHA1(server_nonce + new_nonce), 0, 12);
-
-  • tmp_aes_iv := substr (SHA1(server_nonce + new_nonce), 12, 8) + SHA1(new_nonce + new_nonce) + substr (new_nonce, 0, 4);
-
-  • encrypted_answer := AES256_ige_encrypt (answer_with_hash, tmp_aes_key, tmp_aes_iv); here, tmp_aes_key is a 256-bit key, and tmp_aes_iv is a 256-bit
-    initialization vector. The same as in all the other instances that use AES encryption, the encrypted data is padded with random bytes to a length divisible
-    by 16 immediately prior to encryption.
+/* Here, encrypted_answer is obtained as follows:
+   • new_nonce_hash := 128 lower-order bits of SHA1 (new_nonce);
+	 • answer := serialization
+	   server_DH_inner_data#b5890dba nonce:int128 server_nonce:int128 g:int dh_prime:string g_a:string server_time:int = Server_DH_inner_data;
+   • answer_with_hash := SHA1(answer) + answer + (0-15 random bytes); such that the length be divisible by 16;
+   • tmp_aes_key := SHA1(new_nonce + server_nonce) + substr (SHA1(server_nonce + new_nonce), 0, 12);
+   • tmp_aes_iv := substr (SHA1(server_nonce + new_nonce), 12, 8) + SHA1(new_nonce + new_nonce) + substr (new_nonce, 0, 4);
+   • encrypted_answer := AES256_ige_encrypt (answer_with_hash, tmp_aes_key, tmp_aes_iv); 
+	 here, tmp_aes_key is a 256-bit key, and tmp_aes_iv is a 256-bit
+	 initialization vector. The same as in all the other instances that 
+	 use AES encryption, the encrypted data is padded with random bytes 
+	 to a length divisible by 16 immediately prior to encryption.
 
 Following this step, new_nonce is still known to client and server only. The client is certain that it is the server that responded and that the response was
 generated specifically in response to client query req_DH_params, since the response data are encrypted using new_nonce.

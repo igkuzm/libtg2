@@ -147,11 +147,11 @@ int main(int argc, char *argv[])
 	if (!tg)
 		return 1;
 	
-	if (tg_new_auth_key_mtx(tg))
-		return 1;
+	//if (tg_new_auth_key_mtx(tg))
+		//return 1;
 
-	/*if (tg_new_auth_key1(tg))*/
-		/*return 1;*/
+	if (tg_new_auth_key1(tg))
+		return 1;
 
 	/*if (tg_connect(tg))*/
 		/*return 1;*/

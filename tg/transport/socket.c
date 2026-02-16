@@ -2,7 +2,7 @@
  * File              : socket.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 13.02.2026
+ * Last Modified Date: 16.02.2026
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "../../libtg.h"
@@ -165,7 +165,8 @@ buf_t tg_socket_receive_query_with_progress(
 
 	answer.size = tg_socket_receive(
 			tg, socket, &answer, progressp, progress);
-
+	
+	ON_LOG_BUF(tg, answer, "%s ", __func__);
 	return answer;
 }
 

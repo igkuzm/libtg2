@@ -9,11 +9,10 @@
 buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 {
 	ON_LOG(tg, "%s", __func__);
-	ON_LOG_BUF(tg, *b, "");
   buf_t e = buf_new();
 	
 	if (!encypt){
-		// no encryption needed
+		ON_LOG(tg, "%s: no encryption needed", __func__);
 		e = buf_cat_buf(e, *b);	
 		return e;
 	}
@@ -102,14 +101,13 @@ buf_t tg_encrypt(tg_t *tg, buf_t *b, bool encypt)
 	buf_free(msg_key);
 	buf_free(enc);
 
-	//ON_LOG_BUF(tg, e, "%s: ", __func__);
+	ON_LOG_BUF(tg, e, "%s: ", __func__);
   return e;
 }
 
 buf_t tg_decrypt(tg_t *tg, buf_t *m, bool encypted)
 {
 	ON_LOG(tg, "%s", __func__);
-	ON_LOG_BUF(tg, *m, "");
   buf_t d = buf_new();
 
 	if (!m->size) {
@@ -123,7 +121,7 @@ buf_t tg_decrypt(tg_t *tg, buf_t *m, bool encypted)
   }
 
 	if (!encypted){
-		// no decryption needed
+		ON_LOG(tg, "%s: no decryption needed", __func__);
 		d = buf_cat_buf(d, *m);
 		return d;
 	}
@@ -184,6 +182,6 @@ buf_t tg_decrypt(tg_t *tg, buf_t *m, bool encypted)
 	
 	d = tg_cry_aes_d(*m, aes_key, aes_iv);
 
-	//ON_LOG_BUF(tg, d, "%s: ", __func__);
+	ON_LOG_BUF(tg, d, "%s: ", __func__);
   return d;
 }
