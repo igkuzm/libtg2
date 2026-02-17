@@ -23,6 +23,7 @@
 
 int tg_socket_open(tg_t *tg, const char *ip, int port)
 {
+	ON_LOG(tg, "%s", __func__);
   struct sockaddr_in serv_addr;
   struct hostent * server;
 	int sockfd;
@@ -70,8 +71,14 @@ int tg_socket_open(tg_t *tg, const char *ip, int port)
   }
 
 	// send intermediate protocol
+	ON_LOG(tg, "%s: start intermediate protocol", __func__);
 	char init[] = {0xee, 0xee, 0xee, 0xee};
-	send(sockfd, init, 4, 0);
+	if (send(sockfd, init, 4, 0) < 0)
+	{
+    ON_ERR(tg, "%s: can't start intermediate protocol", __func__);
+    return -1;
+	}
+	ON_LOG(tg, "%s: start intermediate protocol: OK", __func__);
 
 	return sockfd;
 }
