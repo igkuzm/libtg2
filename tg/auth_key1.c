@@ -357,7 +357,7 @@ int tg_new_auth_key1(tg_t *tg)
 
   buf_t answer = buf_new_data(
 			answer_with_hash.data + 20, answer_with_hash.size - 20);
-	ON_LOG_BUF(tg, answer, "Decrypted answer: ");
+	ON_LOG_BUF(tg, answer, "%s: Decrypted answer: ", __func__);
 
 	tl = tl_deserialize(&answer);	
 
@@ -439,22 +439,68 @@ int tg_new_auth_key1(tg_t *tg)
 		from the previous failed attempt (see Item 9). */
 
 	buf_t b = buf_new_rand(256);
-	/*buf_t g_b = tg_*/
+	/*buf_t g = buf_new_ui32(be64toh(server_DH_inner_data->g_));*/
+	buf_t g = buf_new_ui32(server_DH_inner_data->g_);
+	g = buf_swap(g);
+	buf_t g_b = tg_cmn_pow_mod(g, b, server_DH_inner_data->dh_prime_);
+	buf_t client_DH_inner_data = tl_client_DH_inner_data(
+			resPQ->nonce_, resPQ->server_nonce_, 
+			0, &g_b);
+	ON_LOG_BUF(tg, client_DH_inner_data, 
+			"%s: client_DH_inner_data: ", __func__);
+	
+	buf_t client_DH_inner_data_hash = tg_hsh_sha1(client_DH_inner_data);
+	data_with_hash = 
+		buf_new_bufs(client_DH_inner_data_hash, client_DH_inner_data);
+	uint32_t pad = (16 - (data_with_hash.size % 16)) % 16;
+	data_with_hash = buf_cat_buf(data_with_hash, buf_new_rand(pad));
+	ON_LOG_BUF(tg, data_with_hash, 
+			"%s: data_with_hash: ", __func__);
+	
+	encrypted_data = tg_cry_aes_e(
+			data_with_hash, tmp_aes_key, tmp_aes_iv);
 
-/*7. Thereafter, auth_key equals pow(g, {ab}) mod dh_prime; on the server, it is computed as pow(g_b, a) mod dh_prime, and on the client as (g_a)^b mod
-    dh_prime.
+/*7. Thereafter, auth_key equals pow(g, {ab}) mod dh_prime; 
+ * on the server, it is computed as pow(g_b, a) mod dh_prime, 
+ * and on the client as (g_a)^b mod dh_prime. */
 
- 8. auth_key_hash is computed := 64 lower-order bits of SHA1 (auth_key). The server checks whether there already is another key with the same auth_key_hash and
-    responds in one of the following ways.
+	buf_t set_client_DH_params = tl_set_client_DH_params(
+			resPQ->nonce_, resPQ->server_nonce_,
+		 	&encrypted_data);
+	tl = tg_send_rfc(tg, &set_client_DH_params);
 
- DH key exchange complete
+/* 8. auth_key_hash is computed := 64 lower-order bits of SHA1
+ * (auth_key). The server checks whether there already is 
+ * another key with the same auth_key_hash and responds in 
+ * one of the following ways.
+   
+	 DH key exchange complete
+	 
+	 9. Server responds in one of three ways:
 
- 9. Server responds in one of three ways:
+    dh_gen_ok#3bcbf734 nonce:int128 server_nonce:int128 new_nonce_hash1:int128 = Set_client_DH_params_answer; 
+		dh_gen_retry#46dc1fb9 nonce:int128 server_nonce:int128 new_nonce_hash2:int128 = Set_client_DH_params_answer; 
+		dh_gen_fail#a69dae02 nonce:int128 server_nonce:int128 new_nonce_hash3:int128 =
+    Set_client_DH_params_answer;*/
+	
+	if (tl == NULL || 
+			(tl->_id != id_dh_gen_ok &&
+			 tl->_id != id_dh_gen_retry &&
+			 tl->_id != id_dh_gen_fail))	
+	{
+		ON_ERR(tg, "%s: server response %s but should dh_gen_ok "
+				"or dh_gen_retry or dh_gen_fail",
+				__func__, tl?TL_NAME_FROM_ID(tl->_id):"NULL");
+		return 1;
+	}
 
-    dh_gen_ok#3bcbf734 nonce:int128 server_nonce:int128 new_nonce_hash1:int128 = Set_client_DH_params_answer; dh_gen_retry#46dc1fb9 nonce:int128
-    server_nonce:int128 new_nonce_hash2:int128 = Set_client_DH_params_answer; dh_gen_fail#a69dae02 nonce:int128 server_nonce:int128 new_nonce_hash3:int128 =
-    Set_client_DH_params_answer;
+	if (tl->_id == id_dh_gen_ok)
+	{
+		ON_LOG(tg, "%s: Good! We have new auth key!", __func__);
+		return 0;
+	}
 
+	/*
   • new_nonce_hash1, new_nonce_hash2, and new_nonce_hash3 are obtained as the 128 lower-order bits of SHA1 of the byte string derived from the new_nonce string
     by adding a single byte with the value of 1, 2, or 3, and followed by another 8 bytes with auth_key_aux_hash. Different values are required to prevent an
     intruder from changing server response dh_gen_ok into dh_gen_retry.
