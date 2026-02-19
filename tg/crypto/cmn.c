@@ -56,7 +56,7 @@ buf_t tg_cmn_pow_mod(buf_t g, buf_t e, buf_t m)
 	}
 
 	r.size = l;
-
+	
 	return r;
 }
 

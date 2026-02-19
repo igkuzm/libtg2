@@ -85,6 +85,43 @@ static void get_aes_key_iv(
 	buf_free(substr_new_nonce04);
 }
 
+static void get_g_b(
+		tg_t *tg, 
+		buf_t *b,
+		buf_t *g_b,
+		uint32_t g_,
+		buf_t dh_prime)
+{
+	buf_t g = buf_new_ui32(g_);
+  g = buf_swap(g);
+  *b = buf_new_rand(256);
+  *g_b = tg_cmn_pow_mod(g, *b, dh_prime);
+}
+
+
+static void get_client_DH_inner_encrypted_data(
+		tg_t *tg, 
+		buf_t *encrypted_data,
+		buf_t data,
+		buf_t tmp_aes_key,
+		buf_t tmp_aes_iv)
+{
+  buf_t hash = tg_hsh_sha1(data);
+  uint32_t pad_ = hash.size + data.size;
+  pad_ = (16 - (pad_ % 16)) % 16;
+  buf_t rand = buf_new_rand(pad_);
+
+  buf_t data_with_hash = buf_new();
+  data_with_hash = buf_cat_buf(data_with_hash, hash);
+  data_with_hash = buf_cat_buf(data_with_hash, data);
+  data_with_hash = buf_cat_buf(data_with_hash, rand);
+	ON_LOG_BUF(tg, data_with_hash, 
+			"%s: data_with_hash: ", __func__);
+
+  *encrypted_data = 
+		tg_cry_aes_e(data_with_hash, tmp_aes_key, tmp_aes_iv);
+}
+
 int tg_new_auth_key1(tg_t *tg)
 {
 	// open connection
@@ -437,29 +474,26 @@ int tg_new_auth_key1(tg_t *tg)
 		The retry_id field is equal to zero at the time of the 
 		first attempt; otherwise, it is equal to auth_key_aux_hash 
 		from the previous failed attempt (see Item 9). */
+	
+	buf_t b, g, g_b;
+	get_g_b(tg, &b, &g_b, server_DH_inner_data->g_, 
+			server_DH_inner_data->dh_prime_);
+	ON_LOG_BUF(tg, g_b, 
+			"%s: g_b: ", __func__);
 
-	buf_t b = buf_new_rand(256);
-	/*buf_t g = buf_new_ui32(be64toh(server_DH_inner_data->g_));*/
-	buf_t g = buf_new_ui32(server_DH_inner_data->g_);
-	g = buf_swap(g);
-	buf_t g_b = tg_cmn_pow_mod(g, b, server_DH_inner_data->dh_prime_);
 	buf_t client_DH_inner_data = tl_client_DH_inner_data(
 			resPQ->nonce_, resPQ->server_nonce_, 
 			0, &g_b);
 	ON_LOG_BUF(tg, client_DH_inner_data, 
 			"%s: client_DH_inner_data: ", __func__);
-	
-	buf_t client_DH_inner_data_hash = tg_hsh_sha1(client_DH_inner_data);
-	data_with_hash = 
-		buf_new_bufs(client_DH_inner_data_hash, client_DH_inner_data);
-	uint32_t pad = (16 - (data_with_hash.size % 16)) % 16;
-	data_with_hash = buf_cat_buf(data_with_hash, buf_new_rand(pad));
-	ON_LOG_BUF(tg, data_with_hash, 
-			"%s: data_with_hash: ", __func__);
-	
-	encrypted_data = tg_cry_aes_e(
-			data_with_hash, tmp_aes_key, tmp_aes_iv);
 
+	get_client_DH_inner_encrypted_data(tg, 
+			&encrypted_data, client_DH_inner_data,
+		 	tmp_aes_key, tmp_aes_iv);
+	
+	ON_LOG_BUF(tg, encrypted_data, 
+			"%s: encrypted_data: ", __func__);
+	
 /*7. Thereafter, auth_key equals pow(g, {ab}) mod dh_prime; 
  * on the server, it is computed as pow(g_b, a) mod dh_prime, 
  * and on the client as (g_a)^b mod dh_prime. */
@@ -468,6 +502,7 @@ int tg_new_auth_key1(tg_t *tg)
 			resPQ->nonce_, resPQ->server_nonce_,
 		 	&encrypted_data);
 	tl = tg_send_rfc(tg, &set_client_DH_params);
+	buf_free(set_client_DH_params);
 
 /* 8. auth_key_hash is computed := 64 lower-order bits of SHA1
  * (auth_key). The server checks whether there already is 
