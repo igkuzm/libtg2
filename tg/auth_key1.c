@@ -29,13 +29,69 @@ static buf_t p_q_inner_data_with_hash(tg_t *tg, buf_t p_q_inner_data)
 	return d;
 }
 
+static void get_aes_key_iv(
+		tg_t *tg, 
+		buf_t *tmp_aes_key, 
+		buf_t *tmp_aes_iv, 
+		buf_t server_nonce, 
+		buf_t new_nonce)
+{
+  buf_t new_nonce_plus_server_nonce = buf_new();
+  new_nonce_plus_server_nonce = buf_cat_buf(
+			new_nonce_plus_server_nonce, new_nonce);
+  new_nonce_plus_server_nonce = buf_cat_buf(
+			new_nonce_plus_server_nonce, server_nonce);
+  buf_t new_nonce_plus_server_nonce_hash = 
+		tg_hsh_sha1(new_nonce_plus_server_nonce);
+  
+	buf_t server_nonce_plus_new_nonce = buf_new();
+  server_nonce_plus_new_nonce = buf_cat_buf(
+			server_nonce_plus_new_nonce, server_nonce);
+  server_nonce_plus_new_nonce = buf_cat_buf(
+			server_nonce_plus_new_nonce, new_nonce);
+  buf_t server_nonce_plus_new_nonce_hash = tg_hsh_sha1(
+			server_nonce_plus_new_nonce);
+  buf_t substr_sha1_server_nonce_new_nonce012 =
+	 	buf_new_data(server_nonce_plus_new_nonce_hash.data, 12);
+  
+  *tmp_aes_key = buf_cat_buf(
+			*tmp_aes_key, new_nonce_plus_server_nonce_hash);
+  *tmp_aes_key = buf_cat_buf(
+			*tmp_aes_key, substr_sha1_server_nonce_new_nonce012);
+  buf_t substr_sha1_server_nonce_new_nonce128 =
+	 	buf_new_data(server_nonce_plus_new_nonce_hash.data + 12, 8);
+  buf_t new_nonce_new_nonce = buf_new();
+  new_nonce_new_nonce = 
+		buf_cat_buf(new_nonce_new_nonce, new_nonce);
+  new_nonce_new_nonce = 
+		buf_cat_buf(new_nonce_new_nonce, new_nonce);
+  buf_t new_nonce_new_nonce_hash = tg_hsh_sha1(new_nonce_new_nonce);
+  buf_t substr_new_nonce04 = buf_new_data(new_nonce.data, 4);
+  
+  *tmp_aes_iv = buf_cat_buf(*tmp_aes_iv, substr_sha1_server_nonce_new_nonce128);
+  *tmp_aes_iv = 
+		buf_cat_buf(*tmp_aes_iv, new_nonce_new_nonce_hash);
+  *tmp_aes_iv = 
+		buf_cat_buf(*tmp_aes_iv, substr_new_nonce04);
+
+	buf_free(new_nonce_plus_server_nonce);
+	buf_free(new_nonce_plus_server_nonce_hash);
+	buf_free(server_nonce_plus_new_nonce);
+	buf_free(server_nonce_plus_new_nonce_hash);
+	buf_free(substr_sha1_server_nonce_new_nonce012);
+	buf_free(substr_sha1_server_nonce_new_nonce128);
+	buf_free(new_nonce_new_nonce);
+	buf_free(new_nonce_new_nonce_hash);
+	buf_free(substr_new_nonce04);
+}
+
 int tg_new_auth_key1(tg_t *tg)
 {
 	// open connection
+	//tg->socket = 
+	//	tg_socket_open(tg, tg->dc.ipv4, tg->port);	
 	tg->socket = 
-		tg_socket_open(tg, tg->dc.ipv4, tg->port);	
-	/*tg->socket = */
-		/*tg_socket_open(tg, "149.154.167.50", tg->port);	*/
+		tg_socket_open(tg, "149.154.167.50", tg->port);	
 	if (tg->socket < 0)
 		return 1;
 
@@ -58,9 +114,9 @@ int tg_new_auth_key1(tg_t *tg)
 	tl_t *tl = NULL;
 	buf_t nonce = buf_new_rand(16);
 	
-	buf_t req_pq = tl_req_pq_multi(nonce);
+	//buf_t req_pq = tl_req_pq_multi(nonce);
 //	ON_LOG_BUF(tg, req_pq, "%s: req_pq_multi:", __func__);
-	/*buf_t req_pq = tl_req_pq(nonce);*/
+	buf_t req_pq = tl_req_pq(nonce);
 	ON_LOG_BUF(tg, req_pq, "%s: req_pq:", __func__);
 	
 	tl = tg_send_rfc(tg, &req_pq);
@@ -165,22 +221,22 @@ int tg_new_auth_key1(tg_t *tg)
  * requisite power over the requisite modulus,
  * and the result is stored as a 256-byte number. */
 		
-	buf_t p_q_inner_data = tl_p_q_inner_data_dc(
-			&resPQ->pq_, 
-			&p, 
-			&q, 
-			resPQ->nonce_, 
-			resPQ->server_nonce_, 
-			new_nonce, 
-			tg->dc.number);
-	
-	/*buf_t p_q_inner_data = tl_p_q_inner_data(*/
+	/*buf_t p_q_inner_data = tl_p_q_inner_data_dc(*/
 			/*&resPQ->pq_, */
 			/*&p, */
 			/*&q, */
 			/*resPQ->nonce_, */
 			/*resPQ->server_nonce_, */
-			/*new_nonce);*/
+			/*new_nonce, */
+			/*tg->dc.number);*/
+	
+	buf_t p_q_inner_data = tl_p_q_inner_data(
+			&resPQ->pq_, 
+			&p, 
+			&q, 
+			resPQ->nonce_, 
+			resPQ->server_nonce_, 
+			new_nonce);
 
 	//ON_LOG_BUF(tg, resPQ->pq_,"%s: pq: ", __func__);
 	//ON_LOG_BUF(tg, p,"%s: p: ", __func__);
@@ -260,6 +316,23 @@ int tg_new_auth_key1(tg_t *tg)
 
 	tl_server_DH_params_ok_t *server_DH_params = 
 		(tl_server_DH_params_ok_t *)tl;
+	
+	// check nonce
+	ON_LOG_BUF(tg, resPQ->nonce_, "%s: user_nonce 1: ", __func__);
+	ON_LOG_BUF(tg, server_DH_params->nonce_, "%s: user_nonce 2: ", __func__);
+	if (buf_cmp(resPQ->nonce_, server_DH_params->nonce_))
+	{
+		ON_ERR(tg, "%s: user_nonce mismatch", __func__);
+		return 1;
+	}
+	
+	ON_LOG_BUF(tg, resPQ->server_nonce_, "%s: server_nonce 1: ", __func__);
+	ON_LOG_BUF(tg, server_DH_params->server_nonce_, "%s: server_nonce 2: ", __func__);
+	if (buf_cmp(resPQ->server_nonce_, server_DH_params->server_nonce_))
+	{
+		ON_ERR(tg, "%s: server_nonce mismatch", __func__);
+		return 1;
+	}
 
 /* Here, encrypted_answer is obtained as follows:
    • new_nonce_hash := 128 lower-order bits of SHA1 (new_nonce);
@@ -272,47 +345,103 @@ int tg_new_auth_key1(tg_t *tg)
 	 here, tmp_aes_key is a 256-bit key, and tmp_aes_iv is a 256-bit
 	 initialization vector. The same as in all the other instances that 
 	 use AES encryption, the encrypted data is padded with random bytes 
-	 to a length divisible by 16 immediately prior to encryption.
+	 to a length divisible by 16 immediately prior to encryption. */
 
-Following this step, new_nonce is still known to client and server only. The client is certain that it is the server that responded and that the response was
-generated specifically in response to client query req_DH_params, since the response data are encrypted using new_nonce.
+	buf_t tmp_aes_iv, tmp_aes_key;
+	get_aes_key_iv(tg, &tmp_aes_key, &tmp_aes_iv, 
+			resPQ->server_nonce_, new_nonce);
 
-Client is expected to check whether p = dh_prime is a safe 2048-bit prime (meaning that both p and (p-1)/2 are prime, and that 2^2047 < p < 2^2048), and that g
-generates a cyclic subgroup of prime order (p-1)/2, i.e. is a quadratic residue mod p. Since g is always equal to 2, 3, 4, 5, 6 or 7, this is easily done using
-quadratic reciprocity law, yielding a simple condition on p mod 4g -- namely, p mod 8 = 7 for g = 2; p mod 3 = 2 for g = 3; no extra condition for g = 4; p mod
-5 = 1 or 4 for g = 5; p mod 24 = 19 or 23 for g = 6; and p mod 7 = 3, 5 or 6 for g = 7. After g and p have been checked by the client, it makes sense to cache
-the result, so as not to repeat lengthy computations in future.
+  buf_t answer_with_hash = tg_cry_aes_d(
+			server_DH_params->encrypted_answer_,
+		 	tmp_aes_key, tmp_aes_iv);
 
-If the verification takes too long time (which is the case for older mobile devices), one might initially run only 15 Miller--Rabin iterations for verifying
-primeness of p and (p - 1)/2 with error probability not exceeding one billionth, and do more iterations later in the background.
+  buf_t answer = buf_new_data(
+			answer_with_hash.data + 20, answer_with_hash.size - 20);
+	ON_LOG_BUF(tg, answer, "Decrypted answer: ");
 
-Another optimization is to embed into the client application code a small table with some known "good" couples (g,p) (or just known safe primes p, since the
-condition on g is easily verified during execution), checked during code generation phase, so as to avoid doing such verification during runtime altogether.
-Server changes these values rarely, thus one usually has to put the current value of server's dh_prime into such a table. For example, current value of
-dh_prime equals (in big-endian byte order)
+	tl = tl_deserialize(&answer);	
 
-C7 1C AE B9 C6 B1 C9 04 8E 6C 52 2F 70 F1 3F 73 98 0D 40 23 8E 3E 21 C1 49 34 D0 37 56 3D 93 0F 48 19 8A 0A A7 C1 40 58 22 94 93 D2 25 30 F4 DB FA 33 6F 6E 0A C9 25 13 95 43 AE D4 4C CE 7C 37 20 FD 51 F6 94 58 70 5A C6 8C D4 FE 6B 6B 13 AB DC 97 46 51 29 69 32 84 54 F1 8F AF 8C 59 5F 64 24 77 FE 96 BB 2A 94 1D 5B CD 1D 4A C8 CC 49 88 07 08 FA 9B 37 8E 3C 4F 3A 90 60 BE E6 7C F9 A4 A4 A6 95 81 10 51 90 7E 16 27 53 B5 6B 0F 6B 41 0D BA 74 D8 A8 4B 2A 14 B3 14 4E 0E F1 28 47 54 FD 17 ED 95 0D 59 65 B4 B9 DD 46 58 2D B1 17 8D 16 9C 6B C4 65 B0 D6 FF 9C A3 92 8F EF 5B 9A E4 E4 18 FC 15 E8 3E BE A0 F8 7F A9 FF 5E ED 70 05 0D ED 28 49 F4 7B F9 59 D9 56 85 0C E9 29 85 1F 0D 81 15 F6 35 B1 05 EE 2E 4E 15 D0 4B 24 54 BF 6F 4F AD F0 34 B1 04 03 11 9C D8 E3 B9 2F CC 5B
+	if (tl == NULL ||
+			tl->_id != id_server_DH_inner_data)
+	{
+		ON_ERR(tg, "%s: server data answer is: %s but should server_DH_inner_data. AES decription failed",
+				__func__, tl?TL_NAME_FROM_ID(tl->_id):"NULL");
+		return 1;
+	}
 
- 6. Client computes random 2048-bit number b (using a sufficient amount of entropy) and sends the server a message
+	tl_server_DH_inner_data_t *server_DH_inner_data = 
+		(tl_server_DH_inner_data_t *)tl;
 
-    set_client_DH_params#f5045f1f nonce:int128 server_nonce:int128 encrypted_data:string = Set_client_DH_params_answer;
+/* Following this step, new_nonce is still known to client and server
+ * only. The client is certain that it is the server that responded 
+ * and that the response was generated specifically in response 
+ * to client query req_DH_params, since the response data are 
+ * encrypted using new_nonce. */
 
-Here, encrypted_data is obtained thus:
+/* Client is expected to check whether p = dh_prime is a safe 
+ * 2048-bit prime (meaning that both p and (p-1)/2 are prime, 
+ * and that 2^2047 < p < 2^2048), and that g generates a cyclic 
+ * subgroup of prime order (p-1)/2, i.e. is a quadratic residue 
+ * mod p. Since g is always equal to 2, 3, 4, 5, 6 or 7, this 
+ * is easily done using quadratic reciprocity law, yielding a 
+ * simple condition on p mod 4g -- namely, p mod 8 = 7 
+ * for g = 2; p mod 3 = 2 for g = 3; no extra condition 
+ * for g = 4; p mod 5 = 1 or 4 for g = 5; p mod 24 = 19 or 23 
+ * for g = 6; and p mod 7 = 3, 5 or 6 for g = 7. 
+ * After g and p have been checked by the client, it makes 
+ * sense to cache the result, so as not to repeat lengthy 
+ * computations in future.
+ * If the verification takes too long time (which is the case 
+ * for older mobile devices), one might initially run only 
+ * 15 Miller--Rabin iterations for verifying primeness of p 
+ * and (p - 1)/2 with error probability not exceeding one 
+ * billionth, and do more iterations later in the background.
+ * Another optimization is to embed into the client application 
+ * code a small table with some known "good" couples (g,p) 
+ * (or just known safe primes p, since the condition on g is 
+ * easily verified during execution), checked during code 
+ * generation phase, so as to avoid doing such verification 
+ * during runtime altogether.Server changes these values rarely, 
+ * thus one usually has to put the current value of server's 
+ * dh_prime into such a table. For example, current value 
+ * of dh_prime equals (in big-endian byte order)
+	 C7 1C AE B9 C6 B1 C9 04 8E 6C 52 2F 70 F1 3F 73 98 0D 40 23 8E 3E 21
+	 C1 49 34 D0 37 56 3D 93 0F 48 19 8A 0A A7 C1 40 58 22 94 93 D2 25 30
+	 F4 DB FA 33 6F 6E 0A C9 25 13 95 43 AE D4 4C CE 7C 37 20 FD 51 F6 94
+	 58 70 5A C6 8C D4 FE 6B 6B 13 AB DC 97 46 51 29 69 32 84 54 F1 8F AF
+	 8C 59 5F 64 24 77 FE 96 BB 2A 94 1D 5B CD 1D 4A C8 CC 49 88 07 08 FA
+	 9B 37 8E 3C 4F 3A 90 60 BE E6 7C F9 A4 A4 A6 95 81 10 51 90 7E 16 27
+	 53 B5 6B 0F 6B 41 0D BA 74 D8 A8 4B 2A 14 B3 14 4E 0E F1 28 47 54 FD
+	 17 ED 95 0D 59 65 B4 B9 DD 46 58 2D B1 17 8D 16 9C 6B C4 65 B0 D6 FF
+	 9C A3 92 8F EF 5B 9A E4 E4 18 FC 15 E8 3E BE A0 F8 7F A9 FF 5E ED 70
+	 05 0D ED 28 49 F4 7B F9 59 D9 56 85 0C E9 29 85 1F 0D 81 15 F6 35 B1
+	 05 EE 2E 4E 15 D0 4B 24 54 BF 6F 4F AD F0 34 B1 04 03 11 9C D8 E3 B9
+	 2F CC 5B
+ */
 
+/* 6. Client computes random 2048-bit number b (using a 
+   sufficient amount of entropy) and sends the server a message
+   tl_server_DH_inner_data_t *server_DH_inner_data =
+ 	 set_client_DH_params#f5045f1f nonce:int128 server_nonce:int128
+   encrypted_data:string = Set_client_DH_params_answer;
+
+	 Here, encrypted_data is obtained thus:
   • g_b := pow(g, b) mod dh_prime;
-
   • data := serialization
+    client_DH_inner_data#6643b654 nonce:int128 server_nonce:int128 retry_id:long g_b:string = Client_DH_Inner_Data
+  • data_with_hash := SHA1(data) + data + (0-15 random bytes); 
+	  such that length be divisible by 16;
+  • encrypted_data := AES256_ige_encrypt (
+	  data_with_hash, tmp_aes_key, tmp_aes_iv);
 
-      client_DH_inner_data#6643b654 nonce:int128 server_nonce:int128 retry_id:long g_b:string = Client_DH_Inner_Data
+		The retry_id field is equal to zero at the time of the 
+		first attempt; otherwise, it is equal to auth_key_aux_hash 
+		from the previous failed attempt (see Item 9). */
 
-  • data_with_hash := SHA1(data) + data + (0-15 random bytes); such that length be divisible by 16;
+	buf_t b = buf_new_rand(256);
+	/*buf_t g_b = tg_*/
 
-  • encrypted_data := AES256_ige_encrypt (data_with_hash, tmp_aes_key, tmp_aes_iv);
-
-The retry_id field is equal to zero at the time of the first attempt; otherwise, it is equal to auth_key_aux_hash from the previous failed attempt (see Item
-9).
-
- 7. Thereafter, auth_key equals pow(g, {ab}) mod dh_prime; on the server, it is computed as pow(g_b, a) mod dh_prime, and on the client as (g_a)^b mod
+/*7. Thereafter, auth_key equals pow(g, {ab}) mod dh_prime; on the server, it is computed as pow(g_b, a) mod dh_prime, and on the client as (g_a)^b mod
     dh_prime.
 
  8. auth_key_hash is computed := 64 lower-order bits of SHA1 (auth_key). The server checks whether there already is another key with the same auth_key_hash and

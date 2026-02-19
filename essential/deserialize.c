@@ -63,8 +63,8 @@ buf_t deserialize_bytes(buf_t *b)
     buf_t s1 = buf_new_data((uint8_t *)&start, 1);
     buf_t s2 = buf_new_data(b->data, 1);
 
-    if (!buf_cmp(s1, s2)) {
-      printf("can't deserialize bytes");
+    if (buf_cmp(s1, s2)) {
+      printf("can't deserialize bytes \n");
     }
 
     buf_t len_ = buf_new_data(b->data + 1, 3);
@@ -76,7 +76,7 @@ buf_t deserialize_bytes(buf_t *b)
 		b->size -= 4;
     s = buf_new_data(b->data, len);
   } else {
-    printf("can't deserialize bytes");
+    printf("can't deserialize bytes\n");
   }
 	
 	//*b = buf_new_data(b->data + len, b->size - len);

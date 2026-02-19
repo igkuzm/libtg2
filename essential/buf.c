@@ -176,11 +176,11 @@ uint8_t buf_cmp(buf_t a, buf_t b)
 	uint32_t i;
   for (i = 0; i < a.size; ++i) {
     if (a.data[i] != b.data[i]) {
-      return 0;
+      return 1;
     }
   }
 
-  return 1;
+  return 0;
 }
 
 buf_t buf_swap(buf_t b)
