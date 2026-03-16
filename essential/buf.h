@@ -2,7 +2,7 @@
  * File              : buf.h
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 16.02.2026
+ * Last Modified Date: 25.02.2026
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #ifndef BUF_H
@@ -30,6 +30,7 @@ extern buf_t    buf_new_ui32(uint32_t);
 extern buf_t    buf_new_ui64(uint64_t);
 extern buf_t    buf_new_double(double);
 extern buf_t    buf_cat_buf(buf_t dest, buf_t src);
+extern buf_t    buf_cat_buf_free(buf_t dest, buf_t src);
 extern buf_t    buf_cat_ui32(buf_t dest, uint32_t);
 extern buf_t    buf_cat_ui64(buf_t dest, uint64_t);
 extern buf_t    buf_cat_double(buf_t dest, double);

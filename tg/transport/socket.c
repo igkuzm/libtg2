@@ -2,7 +2,7 @@
  * File              : socket.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 16.02.2026
+ * Last Modified Date: 16.03.2026
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "../../libtg.h"
@@ -19,7 +19,7 @@
 #include "socket.h"
 #include "header.h"
 
-#define TIMEOUT_SECONDS 2
+#define TIMEOUT_SECONDS 20
 
 int tg_socket_open(tg_t *tg, const char *ip, int port)
 {

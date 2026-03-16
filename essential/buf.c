@@ -155,6 +155,13 @@ buf_t buf_cat_buf(buf_t dest, buf_t src)
   return dest;
 }
 
+buf_t buf_cat_buf_free(buf_t dest, buf_t src)
+{
+	dest = buf_cat_buf(dest, src);
+	buf_free(src);
+	return dest;
+}
+
 void buf_dump(buf_t b)
 {
   char *str = tl_log_hex(b.data, b.size);
