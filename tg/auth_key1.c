@@ -93,8 +93,9 @@ static void get_g_b(
 		uint32_t g_,
 		buf_t dh_prime)
 {
-	printf("G: %d\n", g_);
 	buf_t g = buf_new_ui32(g_);
+	ON_LOG(tg, "%s: G: %d", __func__, g_);
+	ON_LOG_BUF(tg, dh_prime, "%s: DH_PRIME: ", __func__);
   g = buf_swap(g);
   *b = buf_new_rand(256);
   *g_b = tg_cmn_pow_mod(g, *b, dh_prime);
@@ -172,10 +173,10 @@ int tg_new_auth_key1(tg_t *tg)
 		set_client_DH_params.aptr = NULL;
 
 	// open connection
-	//tg->socket = 
-	//	tg_socket_open(tg, tg->dc.ipv4, tg->port);	
 	tg->socket = 
-		tg_socket_open(tg, "149.154.167.50", tg->port);	
+		tg_socket_open(tg, tg->dc.ipv4, tg->port);	
+	//tg->socket = 
+	//	tg_socket_open(tg, "149.154.167.50", tg->port);	
 	if (tg->socket < 0)
 		goto tg_new_auth_key1_end;
 
@@ -467,10 +468,13 @@ int tg_new_auth_key1(tg_t *tg)
  * subgroup of prime order (p-1)/2, i.e. is a quadratic residue 
  * mod p. Since g is always equal to 2, 3, 4, 5, 6 or 7, this 
  * is easily done using quadratic reciprocity law, yielding a 
- * simple condition on p mod 4g -- namely, p mod 8 = 7 
- * for g = 2; p mod 3 = 2 for g = 3; no extra condition 
- * for g = 4; p mod 5 = 1 or 4 for g = 5; p mod 24 = 19 or 23 
- * for g = 6; and p mod 7 = 3, 5 or 6 for g = 7. 
+ * simple condition on p mod 4g -- namely, 
+ * p mod 8 = 7 for g = 2; 
+ * p mod 3 = 2 for g = 3; 
+ * no extra condition 
+ * for g = 4; p mod 5 = 1 or 4 for g = 5; 
+ * p mod 24 = 19 or 23 for g = 6; 
+ * and p mod 7 = 3, 5 or 6 for g = 7. 
  * After g and p have been checked by the client, it makes 
  * sense to cache the result, so as not to repeat lengthy 
  * computations in future.
