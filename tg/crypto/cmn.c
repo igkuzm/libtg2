@@ -2,7 +2,7 @@
  * File              : cmn.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 24.11.2024
- * Last Modified Date: 19.02.2026
+ * Last Modified Date: 19.03.2026
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "cmn.h"
@@ -30,7 +30,7 @@ int tg_pow_mod(unsigned char * y, unsigned char * g, size_t g_s, unsigned char *
 		BN_ctx = BN_CTX_new();
 		assert(BN_mod_exp(y_, g_, e_, m_, BN_ctx)); // y = g^e % m
 		unsigned y_len = BN_num_bytes(y_);
-		memset(y, 0x00, m_s);
+		//memset(y, 0x00, m_s);
 		BN_bn2bin(y_, (unsigned char *) y);
 		BN_CTX_free(BN_ctx);
 		BN_free(y_);
@@ -39,6 +39,34 @@ int tg_pow_mod(unsigned char * y, unsigned char * g, size_t g_s, unsigned char *
 		BN_free(m_);
 
 		return y_len;
+}
+
+buf_t tg_cmn_mod(buf_t a, buf_t n)
+{
+	buf_t r;
+	BIGNUM *r_ = NULL, *a_ = NULL, *n_ = NULL;
+	BN_CTX * ctx;
+
+	r = buf_new();
+	
+	r_ = BN_new();
+	a_ = BN_new();
+	n_ = BN_new();
+	ctx = BN_CTX_new();
+	
+	BN_bin2bn((unsigned char *) a.data, (int)a.size, a_);
+	BN_bin2bn((unsigned char *) n.data, (int)n.size, n_);
+
+	assert(BN_mod(r_, a_, n_, ctx));
+	assert(BN_bn2bin(r_, (unsigned char *) r.data));
+	r.size = BN_num_bytes(r_);
+	
+	BN_CTX_free(ctx);
+	BN_free(r_);
+	BN_free(a_);
+	BN_free(n_);
+
+	return r;
 }
 
 buf_t tg_cmn_pow_mod(buf_t g, buf_t e, buf_t m)

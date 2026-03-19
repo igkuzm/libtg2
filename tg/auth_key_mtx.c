@@ -5,6 +5,8 @@
 #include "crypto/hsh.h"
 #include "../config.h"
 
+#define MTX_SUPPORT
+
 int tg_new_auth_key_mtx(tg_t *tg)
 {
 #ifdef MTX_SUPPORT

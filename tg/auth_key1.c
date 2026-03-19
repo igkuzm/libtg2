@@ -86,53 +86,132 @@ static void get_aes_key_iv(
 	buf_free(substr_new_nonce04);
 }
 
-static void get_g_b(
+static int dh_prime_fail(
 		tg_t *tg, 
-		buf_t *b,
-		buf_t *g_b,
-		uint32_t g_,
+		uint32_t g,
 		buf_t dh_prime)
 {
-	buf_t g = buf_new_ui32(g_);
-	ON_LOG(tg, "%s: G: %d", __func__, g_);
-	ON_LOG_BUF(tg, dh_prime, "%s: DH_PRIME: ", __func__);
-  g = buf_swap(g);
-  *b = buf_new_rand(256);
-  *g_b = tg_cmn_pow_mod(g, *b, dh_prime);
+	uint32_t m = 0, res = 0, ret = 1;
+	buf_t p_mod, mod;
+	p_mod.aptr = mod.aptr = NULL;
+	
+	if (g < 2 || g > 7){
+		ON_LOG(tg, "%s: g is %d, but should equal to"
+				"2, 3, 4, 5, 6 or 7", __func__, g);
+		goto dh_prime_fail_end;
+	}
+
+	switch (g) {
+		case 2: m = 8; break;
+		case 3: m = 3; break;
+		case 4: m = 4; break;
+		case 5: m = 5; break;
+		case 6: m = 24; break;
+		case 7: m = 7; break;
+		default:
+				ON_ERR(tg, "%s: error", __func__);
+				goto dh_prime_fail_end;
+	}
+
+	mod = buf_new_ui32(htobe32(m));
+	p_mod = tg_cmn_mod(dh_prime, mod);
+	if (p_mod.size == 0){
+		ON_ERR(tg, "%s: error get p_mod", __func__);
+		goto dh_prime_fail_end;
+	}
+
+	res = buf_get_ui32(p_mod);
+	ON_LOG(tg, "%s: p mod %d = %d for g = %d",
+			__func__, m, res, g);
+
+	if (g == 2 && res != 7)
+		goto dh_prime_fail_end;
+	
+	if (g == 3 && res != 2)
+		goto dh_prime_fail_end;
+	
+	if (g == 5 && (res != 1 || res != 4))
+		goto dh_prime_fail_end;
+	
+	if (g == 6 && (res != 19 || res != 23))
+		goto dh_prime_fail_end;
+	
+	if (g == 7 && (res != 3 || res != 5 || res != 6))
+		goto dh_prime_fail_end;
+
+	// dh_prime is safe
+	ret = 0;
+
+dh_prime_fail_end:
+	buf_free(mod);
+	buf_free(p_mod);
+	if (ret)
+		ON_ERR(tg, "%s: dh_prime is not safe: p mod %d = %d for g = %d",
+				__func__, m, res, g);
+	return ret;
 }
 
-
-static void get_client_DH_inner_encrypted_data(
+static buf_t get_g_b(
 		tg_t *tg, 
-		buf_t *encrypted_data,
+		uint32_t g_,
+		buf_t b,
+		buf_t dh_prime)
+{
+	buf_t g_b;
+	buf_t g = buf_new_ui32(g_);
+	ON_LOG_BUF(tg, dh_prime, "%s: DH_PRIME: ", __func__);
+  g = buf_swap(g);
+  g_b = tg_cmn_pow_mod(g, b, dh_prime);
+	buf_free(g);
+	return g_b;
+}
+
+static buf_t get_client_DH_inner_encrypted_data(
+		tg_t *tg, 
 		buf_t data,
 		buf_t tmp_aes_key,
 		buf_t tmp_aes_iv)
 {
   uint32_t pad_;
-	buf_t hash, rand, data_with_hash;
+	buf_t hash, rand, data_with_hash, encrypted_data;
 
   hash = tg_hsh_sha1(data);
   pad_ = hash.size + data.size;
   pad_ = (16 - (pad_ % 16)) % 16;
   rand = buf_new_rand(pad_);
 
-  data_with_hash = buf_new();
-  data_with_hash = buf_cat_buf(data_with_hash, hash);
+  data_with_hash = buf_new_buf(hash);
   data_with_hash = buf_cat_buf(data_with_hash, data);
   data_with_hash = buf_cat_buf(data_with_hash, rand);
 	buf_free(hash);
 	buf_free(rand);
 
-	//ON_LOG_BUF(tg, tmp_aes_key, "AES_KEY: ");
-	//ON_LOG_BUF(tg, tmp_aes_iv, "AES_IV: ");
-
 	ON_LOG_BUF(tg, data_with_hash, 
 			"%s: data_with_hash: ", __func__);
 
-  *encrypted_data = 
+  encrypted_data = 
 		tg_cry_aes_e(data_with_hash, tmp_aes_key, tmp_aes_iv);
 	buf_free(data_with_hash);
+	return encrypted_data;
+}
+
+static buf_t get_salt(
+		tg_t *tg, 
+		buf_t server_nonce,
+		buf_t new_nonce)
+{
+	buf_t salt, server_nonce_s, new_nonce_s;
+	
+	server_nonce_s = buf_new_data(
+			server_nonce.data, 8);
+	new_nonce_s = buf_new_data(
+			new_nonce.data, 8);
+ 
+	salt = buf_xor(new_nonce_s, server_nonce_s);
+	buf_free(new_nonce_s);
+	buf_free(server_nonce_s);
+
+	return salt;
 }
 
 int tg_new_auth_key1(tg_t *tg)
@@ -173,10 +252,10 @@ int tg_new_auth_key1(tg_t *tg)
 		set_client_DH_params.aptr = NULL;
 
 	// open connection
-	tg->socket = 
-		tg_socket_open(tg, tg->dc.ipv4, tg->port);	
 	//tg->socket = 
-	//	tg_socket_open(tg, "149.154.167.50", tg->port);	
+		//tg_socket_open(tg, tg->dc.ipv4, tg->port);	
+	tg->socket = 
+		tg_socket_open(tg, "149.154.167.50", tg->port);	
 	if (tg->socket < 0)
 		goto tg_new_auth_key1_end;
 
@@ -198,9 +277,9 @@ int tg_new_auth_key1(tg_t *tg)
  */
 	nonce = buf_new_rand(16);
 	
-	req_pq = tl_req_pq_multi(nonce);
+	/*req_pq = tl_req_pq_multi(nonce);*/
   // ON_LOG_BUF(tg, req_pq, "%s: req_pq_multi:", __func__);
-	//req_pq = tl_req_pq(nonce);
+	req_pq = tl_req_pq(nonce);
 	ON_LOG_BUF(tg, req_pq, "%s: req_pq:", __func__);
 	
 	tl = tg_send_rfc(tg, &req_pq);
@@ -305,22 +384,22 @@ int tg_new_auth_key1(tg_t *tg)
  * requisite power over the requisite modulus,
  * and the result is stored as a 256-byte number. */
 		
-	p_q_inner_data = tl_p_q_inner_data_dc(
-			&resPQ->pq_, 
-			&p, 
-			&q, 
-			resPQ->nonce_, 
-			resPQ->server_nonce_, 
-			new_nonce, 
-			tg->dc.number);
-	
-	/*p_q_inner_data = tl_p_q_inner_data(*/
-			/*&pq, */
+	/*p_q_inner_data = tl_p_q_inner_data_dc(*/
+			/*&resPQ->pq_, */
 			/*&p, */
 			/*&q, */
-			/*nonce, */
-			/*server_nonce, */
-			/*new_nonce);*/
+			/*resPQ->nonce_, */
+			/*resPQ->server_nonce_, */
+			/*new_nonce, */
+			/*tg->dc.number);*/
+	
+	p_q_inner_data = tl_p_q_inner_data(
+			&pq, 
+			&p, 
+			&q, 
+			nonce, 
+			server_nonce, 
+			new_nonce);
 
 	//ON_LOG_BUF(tg, resPQ->pq_,"%s: pq: ", __func__);
 	//ON_LOG_BUF(tg, p,"%s: p: ", __func__);
@@ -440,7 +519,8 @@ int tg_new_auth_key1(tg_t *tg)
 
   server_DH_inner_data_serialized = buf_new_data(
 			server_DH_params_decrypted_data.data + 20,
-		 	server_DH_params_decrypted_data.size - 20);
+		 	server_DH_params_decrypted_data.size - 20 - 8); 
+	// 8 random bytes
 	ON_LOG_BUF(tg, server_DH_inner_data_serialized, 
 			"%s: Decrypted answer: ", __func__);
 
@@ -449,7 +529,8 @@ int tg_new_auth_key1(tg_t *tg)
 	if (tl == NULL ||
 			tl->_id != id_server_DH_inner_data)
 	{
-		ON_ERR(tg, "%s: server data answer is: %s but should server_DH_inner_data. AES decription failed",
+		ON_ERR(tg, "%s: server data answer is: %s but should "
+				"server_DH_inner_data. AES decription failed",
 				__func__, tl?TL_NAME_FROM_ID(tl->_id):"NULL");
 		goto tg_new_auth_key1_end;
 	}
@@ -471,8 +552,8 @@ int tg_new_auth_key1(tg_t *tg)
  * simple condition on p mod 4g -- namely, 
  * p mod 8 = 7 for g = 2; 
  * p mod 3 = 2 for g = 3; 
- * no extra condition 
- * for g = 4; p mod 5 = 1 or 4 for g = 5; 
+ * no extra condition for g = 4; 
+ * p mod 5 = 1 or 4 for g = 5; 
  * p mod 24 = 19 or 23 for g = 6; 
  * and p mod 7 = 3, 5 or 6 for g = 7. 
  * After g and p have been checked by the client, it makes 
@@ -506,6 +587,13 @@ int tg_new_auth_key1(tg_t *tg)
 	 2F CC 5B
  */
 
+	if (dh_prime_fail(tg, 
+				server_DH_inner_data->g_, 
+				server_DH_inner_data->dh_prime_))
+	{
+		goto tg_new_auth_key1_end;
+	}
+
 /* 6. Client computes random 2048-bit number b (using a 
    sufficient amount of entropy) and sends the server a message
  	 set_client_DH_params#f5045f1f nonce:int128 server_nonce:int128
@@ -524,7 +612,10 @@ int tg_new_auth_key1(tg_t *tg)
 		first attempt; otherwise, it is equal to auth_key_aux_hash 
 		from the previous failed attempt (see Item 9). */
 	
-	get_g_b(tg, &b, &g_b, server_DH_inner_data->g_, 
+  b = buf_new_rand(256);
+	g_b = get_g_b(tg, 
+			server_DH_inner_data->g_,
+		  b,	
 			server_DH_inner_data->dh_prime_);
 	ON_LOG_BUF(tg, g_b, 
 			"%s: g_b: ", __func__);
@@ -535,13 +626,15 @@ int tg_new_auth_key1(tg_t *tg)
 	ON_LOG_BUF(tg, client_DH_inner_data, 
 			"%s: client_DH_inner_data: ", __func__);
 
-	get_client_DH_inner_encrypted_data(tg, 
-			&client_DH_inner_encrypted_data,
+	client_DH_inner_encrypted_data = 
+		get_client_DH_inner_encrypted_data(tg, 
 		 	client_DH_inner_data,
 		 	tmp_aes_key, tmp_aes_iv);
 	
 	ON_LOG_BUF(tg, client_DH_inner_encrypted_data, 
 			"%s: encrypted_data: ", __func__);
+
+	tg->salt = get_salt(tg, server_nonce, new_nonce);
 	
 /*7. Thereafter, auth_key equals pow(g, {ab}) mod dh_prime; 
  * on the server, it is computed as pow(g_b, a) mod dh_prime, 

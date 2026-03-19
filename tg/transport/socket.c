@@ -2,7 +2,7 @@
  * File              : socket.c
  * Author            : Igor V. Sementsov <ig.kuzm@gmail.com>
  * Date              : 21.11.2024
- * Last Modified Date: 16.03.2026
+ * Last Modified Date: 20.03.2026
  * Last Modified By  : Igor V. Sementsov <ig.kuzm@gmail.com>
  */
 #include "../../libtg.h"
@@ -37,6 +37,7 @@ int tg_socket_open(tg_t *tg, const char *ip, int port)
     return -1;
   }
 	
+	/*
 	tv.tv_sec  = TIMEOUT_SECONDS;
 	tv.tv_usec = 0;
 
@@ -44,7 +45,7 @@ int tg_socket_open(tg_t *tg, const char *ip, int port)
 			&tv, sizeof(tv));
 	setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, 
 			&tv, sizeof(tv));
-
+	*/
 
   server = gethostbyname(ip);
  
