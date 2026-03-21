@@ -159,8 +159,10 @@ static buf_t get_g_b(
 {
 	buf_t g_b;
 	buf_t g = buf_new_ui32(g_);
-	ON_LOG_BUF(tg, dh_prime, "%s: DH_PRIME: ", __func__);
+	/*buf_t g = buf_new_ui32(htobe32(g_));*/
+	ON_LOG_BUF(tg, g, "G: ");
   g = buf_swap(g);
+	ON_LOG_BUF(tg, g, "G: ");
   g_b = tg_cmn_pow_mod(g, b, dh_prime);
 	buf_free(g);
 	return g_b;
@@ -219,11 +221,14 @@ int tg_new_auth_key1(tg_t *tg)
 	int i, 
 			res = -1,
 			nfpt = -1; // fingerprint number
+	
+	uint64_t retry_id = 0;
 
 	tl_t *tl = NULL;
 	tl_resPQ_t *resPQ = NULL;
 	tl_server_DH_params_ok_t *server_DH_params = NULL; 
 	tl_server_DH_inner_data_t *server_DH_inner_data = NULL; 
+	tl_dh_gen_retry_t *dh_gen_retry = NULL;
 
 	buf_t nonce, server_nonce, new_nonce, 
 				req_pq, pq, p, q,
@@ -509,14 +514,10 @@ int tg_new_auth_key1(tg_t *tg)
 	get_aes_key_iv(tg, &tmp_aes_key, &tmp_aes_iv, 
 			resPQ->server_nonce_, new_nonce);
 	
-	ON_LOG(tg, "%s: %d", __func__, __LINE__);
-
   server_DH_params_decrypted_data = tg_cry_aes_d(
 			server_DH_params->encrypted_answer_,
 		 	tmp_aes_key, tmp_aes_iv);
 	
-	ON_LOG(tg, "%s: %d", __func__, __LINE__);
-
   server_DH_inner_data_serialized = buf_new_data(
 			server_DH_params_decrypted_data.data + 20,
 		 	server_DH_params_decrypted_data.size - 20 - 8); 
@@ -612,6 +613,7 @@ int tg_new_auth_key1(tg_t *tg)
 		first attempt; otherwise, it is equal to auth_key_aux_hash 
 		from the previous failed attempt (see Item 9). */
 	
+new_auth_key1_generate_b:
   b = buf_new_rand(256);
 	g_b = get_g_b(tg, 
 			server_DH_inner_data->g_,
@@ -622,7 +624,7 @@ int tg_new_auth_key1(tg_t *tg)
 
 	client_DH_inner_data = tl_client_DH_inner_data(
 			nonce, server_nonce, 
-			0, &g_b);
+			retry_id, &g_b);
 	ON_LOG_BUF(tg, client_DH_inner_data, 
 			"%s: client_DH_inner_data: ", __func__);
 
@@ -670,6 +672,12 @@ int tg_new_auth_key1(tg_t *tg)
 		goto tg_new_auth_key1_end;
 	}
 
+	if (tl->_id == id_dh_gen_fail)
+	{
+		ON_LOG(tg, "%s: fail generate authkey", __func__);
+		goto tg_new_auth_key1_end;
+	}
+
 	if (tl->_id == id_dh_gen_ok)
 	{
 		ON_LOG(tg, "%s: Good! We have new auth key!", __func__);
@@ -677,17 +685,45 @@ int tg_new_auth_key1(tg_t *tg)
 		goto tg_new_auth_key1_end;
 	}
 
+	if (tl->_id == id_dh_gen_retry)
+	{
+/* new_nonce_hash1, new_nonce_hash2, and new_nonce_hash3 are 
+ * obtained as the 128 lower-order bits of SHA1 of the byte 
+ * string derived from the new_nonce string by adding a single 
+ * byte with the value of 1, 2, or 3, and followed by another 
+ * 8 bytes with auth_key_aux_hash. Different values are required 
+ * to prevent an intruder from changing server response 
+ * dh_gen_ok into dh_gen_retry. auth_key_aux_hash is 
+ * the 64 higher-order bits of SHA1(auth_key). 
+ * It must not be confused with auth_key_hash. 
+ *
+ * In the other case, the client goes to Item 6) 
+ * generating a new b. In the first case, the client and 
+ * the server have negotiated auth_key, following which they
+ * forget all other temporary data, and the client creates 
+ * another encrypted session using auth_key. 
+ * At the same time, server_salt is initially set to substr
+ * (new_nonce, 0, 8) XOR substr(server_nonce, 0, 8). 
+ * If required, the client stores the difference between 
+ * server_time received in 5) and its local time, to be able 
+ * always to have a good approximation of server time 
+ * which is required to generate correct message identifiers.*/
+
+		buf_t auth_key_aux_hash;
+		ON_LOG(tg, "%s: retry generate authkey", __func__);
+		dh_gen_retry = (tl_dh_gen_retry_t *)tl;
+		auth_key_aux_hash = buf_new_data(
+				dh_gen_retry->new_nonce_hash2_.data + 128 + 1, 8);
+		retry_id = buf_get_ui64(auth_key_aux_hash);
+		buf_free(auth_key_aux_hash);
+		buf_free(b);
+		buf_free(g_b);
+		buf_free(client_DH_inner_data);
+		buf_free(client_DH_inner_encrypted_data);
+		buf_free(set_client_DH_params);
+		goto new_auth_key1_generate_b;
+	}
 	/*
-  • new_nonce_hash1, new_nonce_hash2, and new_nonce_hash3 are obtained as the 128 lower-order bits of SHA1 of the byte string derived from the new_nonce string
-    by adding a single byte with the value of 1, 2, or 3, and followed by another 8 bytes with auth_key_aux_hash. Different values are required to prevent an
-    intruder from changing server response dh_gen_ok into dh_gen_retry.
-  • auth_key_aux_hash is the 64 higher-order bits of SHA1(auth_key). It must not be confused with auth_key_hash.
-
-In the other case, the client goes to Item 6) generating a new b. In the first case, the client and the server have negotiated auth_key, following which they
-forget all other temporary data, and the client creates another encrypted session using auth_key. At the same time, server_salt is initially set to substr
-(new_nonce, 0, 8) XOR substr(server_nonce, 0, 8). If required, the client stores the difference between server_time received in 5) and its local time, to be
-able always to have a good approximation of server time which is required to generate correct message identifiers.
-
 IMPORTANT: Apart from the conditions on the Diffie-Hellman prime dh_prime and generator g, both sides are to check that g, g_a and g_b are greater than 1 and
 less than dh_prime - 1. We recommend checking that g_a and g_b are between 2^{2048-64} and dh_prime - 2^{2048-64} as well.
 
@@ -709,6 +745,7 @@ tg_new_auth_key1_end:
 	tl_free((tl_t *)&resPQ);
 	tl_free((tl_t *)&server_DH_params);
 	tl_free((tl_t *)&server_DH_inner_data);
+	tl_free((tl_t *)&dh_gen_retry);
 	
 	buf_free(nonce);
 	buf_free(server_nonce);
